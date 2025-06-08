@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active: dev
+
+  neo4j:
+    uri: ${GRAPH_DB_URL}
+    authentication:
+      username: ${GRAPH_DB_USERNAME}
+      password: ${GRAPH_DB_PASSWORD}
+
+---
+spring:
+  config:
+    import: classpath:application-dev.properties
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    import: classpath:application-prod.properties
+    activate:
+      on-profile: prod
