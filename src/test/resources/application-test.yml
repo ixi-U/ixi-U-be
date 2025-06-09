@@ -1,0 +1,4 @@
+spring:
+  data:
+    neo4j:
+      database: neo4j
