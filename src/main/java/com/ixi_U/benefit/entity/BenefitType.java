@@ -1,4 +1,4 @@
-package com.ixi_U.benefit;
+package com.ixi_U.benefit.entity;
 
 import lombok.Getter;
 

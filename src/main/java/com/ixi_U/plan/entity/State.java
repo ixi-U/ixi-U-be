@@ -1,4 +1,4 @@
-package com.ixi_U.plan;
+package com.ixi_U.plan.entity;
 
 import lombok.Getter;
 

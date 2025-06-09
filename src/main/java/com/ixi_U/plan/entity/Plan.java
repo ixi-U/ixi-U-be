@@ -1,5 +1,7 @@
-package com.ixi_U.benefit;
+package com.ixi_U.plan.entity;
 
+import com.ixi_U.benefit.entity.BundledBenefit;
+import com.ixi_U.benefit.entity.SingleBenefit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -10,6 +12,7 @@ import lombok.With;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
@@ -18,34 +21,39 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class BundledBenefit {
+public class Plan {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
     private final String id;
 
+    @Property(name = "name")
     private final String name;
 
-    private final String description;
-
-    private final int choice;
+    private final State state;
 
     @Builder.Default
-    @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)
+    @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
+    private List<BundledBenefit> bundledBenefits = new ArrayList<>();
+
+    @Builder.Default
+    @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-    public static BundledBenefit of(final String name, final String description, final int choice){
+    public static Plan of(final String name) {
 
-        return BundledBenefit.builder()
+        return Plan.builder()
                 .name(name)
-                .description(description)
-                .choice(choice)
                 .build();
     }
 
-    public void addSingleBenefit(final SingleBenefit singleBenefit){
+    public void addBundledBenefit(final BundledBenefit bundledBenefit) {
+
+        bundledBenefits.add(bundledBenefit);
+    }
+
+    public void addSingleBenefit(final SingleBenefit singleBenefit) {
 
         singleBenefits.add(singleBenefit);
     }
 }
-

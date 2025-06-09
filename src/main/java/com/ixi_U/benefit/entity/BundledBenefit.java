@@ -1,5 +1,7 @@
-package com.ixi_U.benefit;
+package com.ixi_U.benefit.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +10,15 @@ import lombok.With;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
-@Node(value = "SingleBenefit")
+@Node
 @Getter
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SingleBenefit {
+public class BundledBenefit {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
@@ -25,15 +28,24 @@ public class SingleBenefit {
 
     private final String description;
 
-    private final BenefitType benefitType;
+    private final int choice;
 
-    public static SingleBenefit of(final String name, final String description, final BenefitType benefitType){
+    @Builder.Default
+    @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)
+    private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-        return SingleBenefit.builder()
+    public static BundledBenefit of(final String name, final String description, final int choice){
+
+        return BundledBenefit.builder()
                 .name(name)
                 .description(description)
-                .benefitType(benefitType)
+                .choice(choice)
                 .build();
+    }
+
+    public void addSingleBenefit(final SingleBenefit singleBenefit){
+
+        singleBenefits.add(singleBenefit);
     }
 }
 

@@ -1,4 +1,4 @@
-package com.ixi_U.user;
+package com.ixi_U.user.entity;
 
 import java.util.ArrayList;
 import java.util.List;

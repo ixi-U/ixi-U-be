@@ -1,4 +1,4 @@
-package com.ixi_U.user;
+package com.ixi_U.user.entity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,22 +15,17 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Reviewed {
+public class Subscribed {
 
     @RelationshipId
     private final Long id;
 
-    private final int point;
-
-    private final String comment;
-
     @TargetNode
     private final Plan plan;
 
-    public static Reviewed of(final int point, final Plan plan) {
+    public static Subscribed of(final Plan plan){
 
-        return Reviewed.builder()
-                .point(point)
+        return Subscribed.builder()
                 .plan(plan)
                 .build();
     }
