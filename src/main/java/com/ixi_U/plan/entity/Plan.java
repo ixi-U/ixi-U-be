@@ -2,6 +2,7 @@ package com.ixi_U.plan.entity;
 
 import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
+import com.ixi_U.common.entity.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -21,7 +22,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Plan {
+public class Plan extends BaseEntity {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)

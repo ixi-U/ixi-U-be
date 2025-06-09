@@ -1,5 +1,6 @@
 package com.ixi_U.benefit.entity;
 
+import com.ixi_U.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SingleBenefit {
+public class SingleBenefit extends BaseEntity {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
@@ -27,7 +28,8 @@ public class SingleBenefit {
 
     private final BenefitType benefitType;
 
-    public static SingleBenefit of(final String name, final String description, final BenefitType benefitType){
+    public static SingleBenefit of(final String name, final String description,
+            final BenefitType benefitType) {
 
         return SingleBenefit.builder()
                 .name(name)

@@ -1,5 +1,6 @@
 package com.ixi_U.benefit.entity;
 
+import com.ixi_U.common.entity.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class BundledBenefit {
+public class BundledBenefit extends BaseEntity {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
@@ -34,7 +35,7 @@ public class BundledBenefit {
     @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-    public static BundledBenefit of(final String name, final String description, final int choice){
+    public static BundledBenefit of(final String name, final String description, final int choice) {
 
         return BundledBenefit.builder()
                 .name(name)
@@ -43,7 +44,7 @@ public class BundledBenefit {
                 .build();
     }
 
-    public void addSingleBenefit(final SingleBenefit singleBenefit){
+    public void addSingleBenefit(final SingleBenefit singleBenefit) {
 
         singleBenefits.add(singleBenefit);
     }

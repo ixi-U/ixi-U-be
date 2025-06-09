@@ -1,5 +1,6 @@
 package com.ixi_U.user.entity;
 
+import com.ixi_U.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Reviewed {
+public class Reviewed extends BaseEntity {
 
     @RelationshipId
     private final Long id;

@@ -1,5 +1,6 @@
 package com.ixi_U.user.entity;
 
+import com.ixi_U.common.entity.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -19,7 +20,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
@@ -43,7 +44,7 @@ public class User {
     @Relationship(type = "SUBSCRIBED", direction = Relationship.Direction.OUTGOING)
     private List<Subscribed> subscribedHistory = new ArrayList<>();
 
-    public static User of(final String name, final String email, final String provider){
+    public static User of(final String name, final String email, final String provider) {
 
         return User.builder()
                 .name(name)
@@ -52,12 +53,12 @@ public class User {
                 .build();
     }
 
-    public void addReviewed(final Reviewed reviewed){
+    public void addReviewed(final Reviewed reviewed) {
 
         reviewedHistory.add(reviewed);
     }
 
-    public void addSubscribed(final Subscribed subscribed){
+    public void addSubscribed(final Subscribed subscribed) {
 
         subscribedHistory.add(subscribed);
     }
