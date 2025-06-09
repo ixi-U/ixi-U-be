@@ -1,27 +1,28 @@
 package com.ixi_U.chatbot.controller;
 
+import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.ixi_U.chatbot.service.ChatBotService;
+import java.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.FluxExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
-@WebMvcTest(controllers = ChatBotController.class)
+@WebFluxTest(controllers = ChatBotController.class)
 class ChatBotControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    WebTestClient webTestClient;
 
     @MockBean
     ChatBotService chatBotService;
@@ -32,32 +33,38 @@ class ChatBotControllerTest {
         @Test
         @DisplayName("인증/인가된 사용자에게 웰컴 메세지를 응답한다")
         @WithMockUser(username = "admin", roles = {"ADMIN"})
-        void getWelcomeMessage() throws Exception {
+        void getWelcomeMessage() {
 
             //given
-            String chatBotWelcomeMessage = """        
-                    안녕하세요, 고객님! 어떤 요금제를 찾고 계실까요?
-                    관심있는 혜택 또는 원하는 조건을 말씀해주시면 최적의 요금제를 안내해드리겠습니다!
-                    예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
-                    """;
-
-            given(chatBotService.getWelcomeMessage()).willReturn(Flux.just(chatBotWelcomeMessage));
+            String[] split = CHATBOT_WELCOME_MESSAGE.split("\n");
+            given(chatBotService.getWelcomeMessage()).willReturn(
+                    Flux.fromArray(split)
+            );
 
             //when & then
-            mockMvc.perform(get("/api/chatbot/welcome")
-                            .contentType(MediaType.TEXT_PLAIN_VALUE))
-                    .andExpect(status().isOk())
-                    .andExpect(content().string(chatBotWelcomeMessage));
+            FluxExchangeResult<String> result = webTestClient.get()
+                    .uri("/api/chatbot/welcome")
+                    .accept(MediaType.TEXT_EVENT_STREAM)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .returnResult(String.class);
+
+            Flux<String> responseBody = result.getResponseBody();
+
+            StepVerifier.create(responseBody)
+                    .expectNextSequence(Arrays.asList(split))
+                    .verifyComplete();
         }
 
         @Test
         @DisplayName("인증/인가 되지않은 사용자는 4xx 에러를 반환한다")
-        public void fail() throws Exception {
+        void unauthorizedUserTest() {
 
             //when & then
-            mockMvc.perform(get("/api/chatbot/welcome"))
-                    .andExpect(status().isUnauthorized());
+            webTestClient.get()
+                    .uri("/api/chatbot/welcome")
+                    .exchange()
+                    .expectStatus().is4xxClientError();
         }
     }
-
 }
