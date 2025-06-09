@@ -1,17 +1,22 @@
 name: ixi-U_CI
 
 on: # 어떤 이벤트와 브랜치에서 트리거 될건지
-   push:
-     branches: [ "main" ]
-#  pull_request:
-#    branches: [ "deploy", "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+    paths-ignore:
+      - 'README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
     runs-on: ubuntu-latest # 실행환경 지정
-    permissions:
-      contents: read
-      pull-requests: write
 
     # 실행 스텝 지정
     steps:
@@ -24,8 +29,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: application-dev.properties 파일 주입
+        run: |
+          touch src/main/resources/application-dev.properties
+          echo "${{ secrets.APPLICATION_DEV_PROPERTIES }}" > src/main/resources/application-dev.properties
+
       - name: Gradle 권한 부여
         run: chmod +x ./gradlew
 
-      - name: Gradle 빌드 시작
-        run: ./gradlew clean build
+      - name: Gradle 빌드 실행
+        run: ./gradlew clean build --stacktrace
+
+      - name: PR에 코드 커버리지 측정 레포트 생성
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
