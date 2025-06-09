@@ -23,7 +23,7 @@ public class SubscribedController {
     public ResponseEntity<Void> updateSubscribe(
             @PathVariable("userId") String userId,
             @RequestBody CreateSubscribedRequest request) {
-        subscribedService.registerSubscribed(userId, request);
+        subscribedService.updateSubscribed(userId, request);
         return ResponseEntity.ok().build();
     }
 }
