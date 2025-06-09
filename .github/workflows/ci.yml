@@ -3,13 +3,20 @@ name: ixi-U_CI
 on: # 어떤 이벤트와 브랜치에서 트리거 될건지
   pull_request:
     branches: [ "main", "dev" ]
+    paths-ignore:
+      - 'README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
     runs-on: ubuntu-latest # 실행환경 지정
-    permissions:
-      contents: read
-      pull-requests: write
 
     # 실행 스텝 지정
     steps:
@@ -25,8 +32,8 @@ jobs:
       - name: Gradle 권한 부여
         run: chmod +x ./gradlew
 
-      - name: Gradle 빌드 시작
-        run: ./gradlew clean build
+      - name: Gradle 빌드 실행
+        run: ./gradlew clean build --stacktrace
 
       - name: PR에 코드 커버리지 측정 레포트 생성
         id: jacoco
