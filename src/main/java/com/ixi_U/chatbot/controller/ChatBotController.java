@@ -2,6 +2,7 @@ package com.ixi_U.chatbot.controller;
 
 import com.ixi_U.chatbot.service.ChatBotService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -10,11 +11,16 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ChatBotController {
 
+    private final static String CONTEST_TYPE = "Content-Type";
+    private final static String PRODUCES = "text/event-stream;charset=UTF-8";
+
     private final ChatBotService chatBotService;
 
-    @GetMapping(value = "/api/chatbot/welcome", produces = "text/plain;charset=UTF-8")
-    public Flux<String> getWelcomeMessage() {
+    @GetMapping(value = "/api/chatbot/welcome", produces = PRODUCES)
+    public ResponseEntity<Flux<String>> getWelcomeMessage() {
 
-        return chatBotService.getWelcomeMessage();
+        return ResponseEntity.ok()
+                .header(CONTEST_TYPE, PRODUCES)
+                .body(chatBotService.getWelcomeMessage());
     }
 }
