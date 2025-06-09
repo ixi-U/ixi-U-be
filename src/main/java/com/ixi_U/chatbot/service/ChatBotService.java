@@ -14,6 +14,11 @@ public class ChatBotService {
             예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
             """;
 
+    /**
+     * 챗봇의 환영 메시지를 포함하는 Flux 스트림을 반환합니다.
+     *
+     * @return 챗봇 환영 메시지를 단일 요소로 포함하는 Flux
+     */
     public Flux<String> getWelcomeMessage() {
 
         return Flux.just(CHATBOT_WELCOME_MESSAGE);

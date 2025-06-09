@@ -12,6 +12,11 @@ public class ChatBotController {
 
     private final ChatBotService chatBotService;
 
+    /**
+     * 챗봇의 환영 메시지를 비동기적으로 반환합니다.
+     *
+     * @return 환영 메시지의 Flux 스트림
+     */
     @GetMapping(value = "/api/chatbot/welcome", produces = "text/plain;charset=UTF-8")
     public Flux<String> getWelcomeMessage() {
 
