@@ -1,10 +1,8 @@
 name: ixi-U_CI
 
 on: # 어떤 이벤트와 브랜치에서 트리거 될건지
-   push:
-     branches: [ "main" ]
-#  pull_request:
-#    branches: [ "deploy", "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
@@ -29,3 +27,11 @@ jobs:
 
       - name: Gradle 빌드 시작
         run: ./gradlew clean build
+
+      - name: add code coverage review to pull request
+        id: jacoco
+        uses: madrapps/jacoco-report@1.7.2
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
