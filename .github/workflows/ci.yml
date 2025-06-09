@@ -28,7 +28,7 @@ jobs:
       - name: Gradle 빌드 시작
         run: ./gradlew clean build
 
-      - name: add code coverage review to pull request
+      - name: PR에 코드 커버리지 측정 레포트 생성
         id: jacoco
         uses: madrapps/jacoco-report@1.7.2
         with:
