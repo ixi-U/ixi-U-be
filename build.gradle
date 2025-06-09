@@ -23,11 +23,25 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springAiVersion', "1.0.0")
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// Open AI
+	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+
+	// Neo4j
 	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+
+	// Neo4j Vector DB
+	implementation 'org.springframework.ai:spring-ai-starter-vector-store-neo4j'
+
+	// Neo4j Chat Memory
+	implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-neo4j'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -35,6 +49,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+	}
 }
 
 tasks.named('test') {
