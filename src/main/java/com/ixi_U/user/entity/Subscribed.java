@@ -1,11 +1,12 @@
 package com.ixi_U.user.entity;
 
+import com.ixi_U.common.entity.BaseEntity;
+import com.ixi_U.plan.entity.Plan;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
-import org.neo4j.driver.summary.Plan;
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
@@ -15,7 +16,7 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Subscribed {
+public class Subscribed extends BaseEntity {
 
     @RelationshipId
     private final Long id;
@@ -23,7 +24,7 @@ public class Subscribed {
     @TargetNode
     private final Plan plan;
 
-    public static Subscribed of(final Plan plan){
+    public static Subscribed of(final Plan plan) {
 
         return Subscribed.builder()
                 .plan(plan)
