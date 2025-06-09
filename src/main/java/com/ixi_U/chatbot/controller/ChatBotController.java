@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ChatBotController {
 
-    private final static String CONTEST_TYPE = "Content-Type";
+    private final static String CONTENT_TYPE = "Content-Type";
     private final static String PRODUCES = "text/event-stream;charset=UTF-8";
 
     private final ChatBotService chatBotService;
@@ -20,7 +20,7 @@ public class ChatBotController {
     public ResponseEntity<Flux<String>> getWelcomeMessage() {
 
         return ResponseEntity.ok()
-                .header(CONTEST_TYPE, PRODUCES)
+                .header(CONTENT_TYPE, PRODUCES)
                 .body(chatBotService.getWelcomeMessage());
     }
 }
