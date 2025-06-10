@@ -1,6 +1,6 @@
 package com.ixi_U.auth.service;
 
-import com.ixi_U.auth.KakaoAuthException;
+import com.ixi_U.auth.exception.KakaoAuthException;
 import com.ixi_U.auth.dto.KakaoTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.view.RedirectView;
 
 @Slf4j
 @Service
