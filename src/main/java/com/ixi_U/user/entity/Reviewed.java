@@ -1,11 +1,11 @@
 package com.ixi_U.user.entity;
 
+import com.ixi_U.plan.entity.Plan;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
-import org.neo4j.driver.summary.Plan;
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
@@ -27,11 +27,12 @@ public class Reviewed {
     @TargetNode
     private final Plan plan;
 
-    public static Reviewed of(final int point, final Plan plan) {
+    public static Reviewed of(final int point, final Plan plan, final String comment) {
 
         return Reviewed.builder()
                 .point(point)
                 .plan(plan)
+                .comment(comment)
                 .build();
     }
 }
