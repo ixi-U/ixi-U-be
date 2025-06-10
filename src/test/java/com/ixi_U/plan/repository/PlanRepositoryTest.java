@@ -89,14 +89,11 @@ class PlanRepositoryTest {
         void searchByPriority() {
 
             // when, then
-            assertThat(
-                    planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
-                                    PlanSortOption.PRIORITY, null, null, null)
-                            .getContent()
-                            .stream()
-                            .map(PlanSummaryDto::name)
-                            .toList()
-            ).containsExactly("요금제1", "요금제3", "요금제2");
+            assertThat(planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
+                            PlanSortOption.PRIORITY, null, null, null)
+                    .getContent())
+                    .extracting(PlanSummaryDto::name)
+                    .containsExactly("요금제1", "요금제3", "요금제2");
         }
 
         @Test
@@ -104,14 +101,11 @@ class PlanRepositoryTest {
         void searchByPriceAsc() {
 
             // when, then
-            assertThat(
-                    planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
-                                    PlanSortOption.PRICE_ASC, null, null, null)
-                            .getContent()
-                            .stream()
-                            .map(PlanSummaryDto::name)
-                            .toList()
-            ).containsExactly("요금제1", "요금제2", "요금제3");
+            assertThat(planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
+                            PlanSortOption.PRICE_ASC, null, null, null)
+                    .getContent())
+                    .extracting(PlanSummaryDto::name)
+                    .containsExactly("요금제1", "요금제2", "요금제3");
         }
 
         @Test
@@ -119,14 +113,11 @@ class PlanRepositoryTest {
         void searchByPriceDesc() {
 
             // when, then
-            assertThat(
-                    planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
-                                    PlanSortOption.PRICE_DESC, null, null, null)
-                            .getContent()
-                            .stream()
-                            .map(PlanSummaryDto::name)
-                            .toList()
-            ).containsExactly("요금제3", "요금제2", "요금제1");
+            assertThat(planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
+                            PlanSortOption.PRICE_DESC, null, null, null)
+                    .getContent())
+                    .extracting(PlanSummaryDto::name)
+                    .containsExactly("요금제3", "요금제2", "요금제1");
         }
 
         @Test
@@ -134,14 +125,11 @@ class PlanRepositoryTest {
         void searchByDataDesc() {
 
             // when, then
-            assertThat(
-                    planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
-                                    PlanSortOption.DATA_DESC, null, null, null)
-                            .getContent()
-                            .stream()
-                            .map(PlanSummaryDto::name)
-                            .toList()
-            ).containsExactly("요금제3", "요금제1", "요금제2");
+            assertThat(planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
+                            PlanSortOption.DATA_DESC, null, null, null)
+                    .getContent())
+                    .extracting(PlanSummaryDto::name)
+                    .containsExactly("요금제3", "요금제1", "요금제2");
         }
 
         @DisplayName("검색으로 요금제를 조회할 수 있다")
@@ -150,14 +138,12 @@ class PlanRepositoryTest {
         void searchByKeyword(String keyword) {
 
             // when, then
-            assertThat(
-                    planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
-                                    PlanSortOption.DATA_DESC, keyword, null, null)
-                            .getContent()
-                            .stream()
-                            .map(PlanSummaryDto::name)
-                            .toList()
-            ).containsExactly(keyword);
+
+            assertThat(planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
+                            PlanSortOption.DATA_DESC, keyword, null, null)
+                    .getContent())
+                    .extracting(PlanSummaryDto::name)
+                    .containsExactly(keyword);
         }
     }
 
