@@ -98,11 +98,6 @@ class PlanControllerTest {
         void failIfInvalidSortOption() throws Exception {
 
             // given
-            PlanSummaryDto dto1 = new PlanSummaryDto("1", "요금제1", 10000, 2000, 300, 200, 29000, 5,
-                    List.of());
-            PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000, 200, 100, 19000, 3,
-                    List.of());
-
             given(planService.findPlans(
                     PageRequest.ofSize(2), "ONLINE", "PRIORIT", null, null, null))
                     .willThrow(new GeneralException(PlanException.INVALID_SORT_VALUE));
