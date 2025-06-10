@@ -1,4 +1,4 @@
-package com.ixi_U.plan.Controller;
+package com.ixi_U.plan.controller;
 
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.service.PlanService;

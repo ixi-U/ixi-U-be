@@ -1,4 +1,4 @@
-package com.ixi_U.plan.Controller;
+package com.ixi_U.plan.controller;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
