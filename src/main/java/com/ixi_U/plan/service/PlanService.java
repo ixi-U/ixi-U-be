@@ -30,7 +30,7 @@ public class PlanService {
         String lastPlanId = getLastPlanId(plans);
         int lastSortValue = getLastSortValue(plans, planSortOption);
 
-        return SortedPlanResponse.of(plans, lastPlanId, lastSortValue);
+        return new SortedPlanResponse(plans, lastPlanId, lastSortValue);
     }
 
     private int extractSortValue(PlanSummaryDto planSummary, PlanSortOption sortOption) {
