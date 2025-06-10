@@ -25,12 +25,20 @@ public class SubscribedService {
 
     @Transactional
     public void updateSubscribed(String userId, CreateSubscribedRequest request) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         Plan plan = planRepository.findById(request.planId())
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
-        if (user.getSubscribedHistory().stream().noneMatch(s -> s.getPlan().equals(plan))) {
-            user.addSubscribed(Subscribed.of(plan));
+
+        // 유저의 가장 최신 구독 가져오기
+        Subscribed latestSubscribed = user.getSubscribedHistory().isEmpty()
+                ? null
+                : user.getSubscribedHistory().get(user.getSubscribedHistory().size() - 1);
+
+        // 현재 요금제와 같은지 체크
+        if (latestSubscribed != null && latestSubscribed.getPlan().equals(plan)) {
+            throw new GeneralException(PlanException.ALREADY_SUBSCRIBED_PLAN);
         }
         userRepository.save(user);
     }
