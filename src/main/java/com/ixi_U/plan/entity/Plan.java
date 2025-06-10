@@ -89,6 +89,7 @@ public class Plan {
     ) {
         return Plan.builder()
                 .name(name)
+                .state(State.ABLE)
                 .mobileDataLimitMb(mobileDataLimitMb)
                 .sharedMobileDataLimitMb(sharedMobileDataLimitMb)
                 .callLimitMinutes(callLimitMinutes)
