@@ -7,3 +7,8 @@ spring:
   data:
     neo4j:
       database: neo4j
+
+---
+spring:
+  config:
+    import: classpath:application-dev.properties
