@@ -55,8 +55,6 @@ class SubscribedServiceDatabaseTest {
         Plan plan = Plan.of("5G 요금제");
         plan = planRepository.save(plan);
 
-        // CreateSubscribedRequest request = new CreateSubscribedRequest(plan.getId());
-
         // when
         user.addSubscribed(Subscribed.of(plan));
         userRepository.save(user);
