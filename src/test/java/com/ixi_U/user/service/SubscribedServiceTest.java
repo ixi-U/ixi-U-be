@@ -113,5 +113,20 @@ class SubscribedServiceTest {
             assertThatThrownBy(() -> subscribedService.updateSubscribed(userId, request))
                     .isInstanceOf(GeneralException.class);
         }
+
+        @Test
+        @DisplayName("예외 케이스: planId가 빈 문자열이면 GeneralException이 발생한다.")
+        void givenEmptyPlanId_whenRegisterSubscribed_thenThrowsException() {
+            // given
+            String userId = "user-1";
+            String planId = "";
+            User user = User.of("홍길동", "hong@example.com", "KAKAO");
+            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            CreateSubscribedRequest request = new CreateSubscribedRequest(planId);
+
+            // when & then
+            assertThatThrownBy(() -> subscribedService.updateSubscribed(userId, request))
+                    .isInstanceOf(GeneralException.class);
+        }
     }
 }
