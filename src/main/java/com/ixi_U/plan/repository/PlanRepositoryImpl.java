@@ -60,7 +60,7 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
                 .orderBy(planSortOption.getOrder() == SortOrder.ASC
                                 ? p.property(planSortOption.getField()).ascending()
                                 : p.property(planSortOption.getField()).descending(),
-                        p.property(planId).ascending())
+                        p.property("id").ascending())
                 .limit(limit + 1)
                 .build();
 
