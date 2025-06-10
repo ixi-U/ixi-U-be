@@ -20,7 +20,7 @@ public class SubscribedController {
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<Void> updateSubscribe(
+    public ResponseEntity<Void> updateSubscribed(
             @PathVariable("userId") String userId,
             @RequestBody CreateSubscribedRequest request) {
         subscribedService.updateSubscribed(userId, request);
