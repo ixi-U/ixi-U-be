@@ -27,7 +27,9 @@ jobs:
       - name: application-prod.properties 파일 주입
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_PROD_PROPERTIES }}" > src/main/resources/application-prod.properties
+          cat << 'EOF' > src/main/resources/application-prod.properties
+          ${{ secrets.APPLICATION_PROD_PROPERTIES }}
+          EOF
 
       - name: Gradle 권한 부여
         run: chmod +x ./gradlew
@@ -53,7 +55,7 @@ jobs:
 
       - name: S3에 배포 패키지 업로드
         run: |
-          aws s3 cp app.zip s3://${{ secrets.BUCKET_NAME }}/app.zip
+          aws s3 cp app.zip s3://${{ secrets.BUCKET_NAME }}/app-${{ github.sha }}.zip
 
       - name: 어플리케이션 리비전 등록
         run: |
