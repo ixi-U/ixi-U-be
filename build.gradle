@@ -56,6 +56,9 @@ dependencies {
 	// Neo4j Chat Memory
 	implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-neo4j'
 
+	// Spring AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
