@@ -24,7 +24,7 @@ public class KakaoAuthService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public String kakaoAuthTokenResponse(String code) {
+    public void kakaoAuthTokenResponse(String code) {
         // 1. 인가 코드로 토큰 요청
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
@@ -58,7 +58,5 @@ public class KakaoAuthService {
 
 //        log.info("토큰 - access_token : {}, expire_in : {} 초",
 //                response.getBody().getAccess_token(), response.getBody().getExpires_in());
-
-        return "ok";
     }
 }
