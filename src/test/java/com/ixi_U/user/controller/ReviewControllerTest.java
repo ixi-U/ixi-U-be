@@ -111,6 +111,29 @@ class ReviewControllerTest {
         class Context_with_invalid_request {
 
             @Test
+            @DisplayName("리뷰 내용이 null이면 400을 반환한다")
+            void it_returns_400_if_comment_empty() throws Exception {
+                // given
+                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
+                String comment = null;
+                CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5, comment);
+
+                // when
+                ResultActions result = mockMvc.perform(post(REVIEW_URL)
+                                .with(csrf())
+                                .param("userId", "userId")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message")
+                                .value("comment: comment를 입력해 주세요"));
+            }
+
+            @Test
             @DisplayName("리뷰 내용이 20자 미만이면 400을 반환한다")
             void it_returns_400_if_comment_too_short() throws Exception {
                 // given
@@ -156,10 +179,10 @@ class ReviewControllerTest {
                                 .value("comment: comment는 최소 20자에서 200자까지 입력 가능합니다."));
             }
 
-            @DisplayName("별점이 0 이하 또는 5 초과이면 400을 반환한다")
+            @DisplayName("별점이 0 이하이면 400을 반환한다")
             @ParameterizedTest(name = "별점 {0}점")
-            @ValueSource(ints = {-1, 0, 6})
-            void it_returns_400_if_point_invalid(int point) throws Exception {
+            @ValueSource(ints = {-1, 0})
+            void it_returns_400_if_point_under_zero(int point) throws Exception {
                 // given
                 doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", point,
@@ -174,15 +197,32 @@ class ReviewControllerTest {
                         .andDo(print());
 
                 // then
-                if (point < 1) {
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("point: point는 최소 1점 이상이어야 합니다."));
-                } else {
-                    result.andExpect(status().isBadRequest())
-                            .andExpect(jsonPath("$.message")
-                                    .value("point: point는 최대 5점 이하여야 합니다."));
-                }
+                result.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message")
+                                .value("point: point는 최소 1점 이상이어야 합니다."));
+            }
+
+            @DisplayName("별점이 6 이상이면 400을 반환한다")
+            @ParameterizedTest(name = "별점 {0}점")
+            @ValueSource(ints = {6, 100})
+            void it_returns_400_if_point_over_5(int point) throws Exception {
+                // given
+                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
+                CreateReviewRequest request = CreateReviewRequest.of("plan-001", point,
+                        "1111122222333334444455555");
+
+                // when
+                ResultActions result = mockMvc.perform(post(REVIEW_URL)
+                                .with(csrf())
+                                .param("userId", "userId")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message")
+                                .value("point: point는 최대 5점 이하여야 합니다."));
             }
 
             @Test
