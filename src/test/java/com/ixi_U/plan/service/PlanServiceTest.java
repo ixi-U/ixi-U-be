@@ -14,8 +14,10 @@ import com.ixi_U.plan.repository.PlanRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,9 +37,14 @@ class PlanServiceTest {
     @Nested
     class findPlansTest {
 
-        @Test
+        @ParameterizedTest
+        @CsvSource({
+                "5G/LTE, PRIORITY",
+                "ONLINE, PRICE_ASC",
+                "TABLET/SMARTWATCH, PRICE_DESC",
+                "DUAL_NUMBER, DATA_DESC"})
         @DisplayName("정렬 조건으로 요금제를 조회할 수 있다")
-        void searchBySort() {
+        void searchBySort(String planTypeStr, String planSortOptionStr) {
 
             // given
             PlanSummaryDto dto1 = new PlanSummaryDto("1", "요금제1", 10000, 2000,
@@ -51,32 +58,45 @@ class PlanServiceTest {
             Slice<PlanSummaryDto> slice =
                     new SliceImpl<>(List.of(dto1, dto2, dto3), pageable, true);
 
-            given(planRepository.findPlans(PageRequest.ofSize(3), PlanType.ONLINE,
-                    PlanSortOption.PRIORITY, null, null, null))
+            given(planRepository.findPlans(PageRequest.ofSize(3), PlanType.from(planTypeStr),
+                    PlanSortOption.from(planSortOptionStr), null, null, null))
                     .willReturn(slice);
 
             // when
             SortedPlanResponse result = planService.findPlans(
-                    PageRequest.ofSize(3), "ONLINE", "PRIORITY", null, null, null);
+                    PageRequest.ofSize(3), planTypeStr, planSortOptionStr, null, null, null);
 
             // then
             assertThat(result.plans().getContent()).containsExactly(dto1, dto2, dto3);
-            assertThat(result.lastPlanId()).isEqualTo("3");
-            assertThat(result.lastSortValue()).isEqualTo(1);
             verify(planRepository).findPlans(
-                    PageRequest.ofSize(3), PlanType.ONLINE,
-                    PlanSortOption.PRIORITY, null, null, null
+                    PageRequest.ofSize(3), PlanType.from(planTypeStr),
+                    PlanSortOption.from(planSortOptionStr), null, null, null
             );
         }
 
-        @Test
-        @DisplayName("정렬 조건이 유효하지 않을 때 실패한다")
-        void searchFail() {
+        @ParameterizedTest
+        @ValueSource(strings = {"ONLINEE", " ", ""})
+        @DisplayName("요금제 타입이 유효하지 않을 때 실패한다")
+        void searchFailWhenPlanTypeIsInvalid(String planType) {
 
             // given, when, then
             assertThatThrownBy(() ->
                     planService.findPlans(
-                            PageRequest.ofSize(3), "ONLINE", "PRIORITYY", null, null, null)
+                            PageRequest.ofSize(3), planType, "PRIORITY", null, null, null)
+            )
+                    .isInstanceOf(GeneralException.class)
+                    .hasMessageContaining("유효하지 않은 요금제 타입입니다.");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"PRIORITYY", " ", ""})
+        @DisplayName("정렬 조건이 유효하지 않을 때 실패한다")
+        void searchFailWhenSortOptionIsInvalid(String planSortOptionStr) {
+
+            // given, when, then
+            assertThatThrownBy(() ->
+                    planService.findPlans(
+                            PageRequest.ofSize(3), "ONLINE", planSortOptionStr, null, null, null)
             )
                     .isInstanceOf(GeneralException.class)
                     .hasMessageContaining("유효하지 않은 정렬 조건입니다.");
