@@ -32,8 +32,7 @@ class SubscribedRepositoryTest {
             DockerImageName.parse("neo4j:5"))
             .withAdminPassword("1q2w3e4r")
             .withReuse(true);
-    @Autowired
-    ReviewedRepository reviewedRepository;
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -47,7 +46,7 @@ class SubscribedRepositoryTest {
         registry.add("spring.neo4j.authentication.username", () -> "neo4j");
         registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
     }
-    
+
     @Nested
     @DisplayName("구독 관계가 존재하는지 확인할 때")
     class Describe_existsSubscribeRelation {
