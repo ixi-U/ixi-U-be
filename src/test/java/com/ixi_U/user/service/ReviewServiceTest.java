@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -59,13 +60,18 @@ class ReviewServiceTest {
                         Optional.of(User.of("testName", "testEmail", "testProvider")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(false);
+                ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
                 // when
                 reviewService.createReview("user-id",
                         CreateReviewRequest.of("plan-id", 5, "테스트-리뷰"));
 
                 // then
-                verify(userRepository, times(1)).save(any(User.class));
+                verify(userRepository, times(1)).save(userCaptor.capture());
+                assertThat(userCaptor.getValue().getReviewedHistory()).hasSize(1);
+                assertThat(
+                        userCaptor.getValue().getReviewedHistory().get(0).getComment()).isEqualTo(
+                        "테스트-리뷰");
             }
         }
 
