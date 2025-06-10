@@ -6,7 +6,6 @@ APP_NAME="app.jar"
 APP_DIR="/home/ubuntu/app"
 LOG_DIR="/home/ubuntu/app"
 LOG_FILE="$LOG_DIR/app.log"
-CLOUDWATCH_AGENT_BIN="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
 
 # 로그 디렉토리 생성
 mkdir -p "$LOG_DIR"
@@ -14,12 +13,6 @@ mkdir -p "$LOG_DIR"
 # 앱 실행
 echo "Starting $APP_NAME with prod profile..."
 nohup java -jar "$APP_DIR/$APP_NAME" --spring.profiles.active=prod > "$LOG_FILE" 2>&1 &
-
-# aws-cli 설치
-sudo apt update -y
-sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo unzip awscliv2.zip
-sudo ./aws/install
 
 CLOUDWATCH_AGENT_BIN="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
 CLOUDWATCH_CONFIG="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
