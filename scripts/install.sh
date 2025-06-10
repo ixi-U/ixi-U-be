@@ -15,4 +15,4 @@ else
 fi
 
 # 앱 디렉토리 생성
-mkdir -p $APP_DIR
+mkdir -p "$APP_DIR"
