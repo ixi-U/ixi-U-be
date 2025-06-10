@@ -58,8 +58,9 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
                         Cypher.name("singleBenefits")
                 )
                 .orderBy(planSortOption.getOrder() == SortOrder.ASC
-                        ? p.property(planSortOption.getField()).ascending()
-                        : p.property(planSortOption.getField()).descending())
+                                ? p.property(planSortOption.getField()).ascending()
+                                : p.property(planSortOption.getField()).descending(),
+                        p.property(planId).ascending())
                 .limit(limit + 1)
                 .build();
 
