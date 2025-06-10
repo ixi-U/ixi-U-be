@@ -15,23 +15,31 @@ mkdir -p "$LOG_DIR"
 echo "Starting $APP_NAME with prod profile..."
 nohup java -jar "$APP_DIR/$APP_NAME" --spring.profiles.active=prod > "$LOG_FILE" 2>&1 &
 
-# ===== CloudWatch Agent 설치 여부 확인 후 설치 =====
-echo "Checking CloudWatch Agent installation..."
-if ! command -v "$CLOUDWATCH_AGENT_BIN" &> /dev/null; then
+# aws-cli 설치
+sudo apt update -y
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo unzip awscliv2.zip
+sudo ./aws/install
+
+CLOUDWATCH_AGENT_BIN="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
+CLOUDWATCH_CONFIG="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+
+# cloudwatch Agent 설치 확인 및 설치
+if [ ! -x "$CLOUDWATCH_AGENT_BIN" ]; then
   echo "CloudWatch Agent not found. Installing..."
   sudo apt update -y
-  sudo apt install -y amazon-cloudwatch-agent
+  sudo apt install -y wget
+  sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+  sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
 else
   echo "CloudWatch Agent is already installed."
 fi
 
-# ===== CloudWatch 설정 파일 생성 =====
-CLOUDWATCH_CONFIG="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
-
+# 설정 파일 생성
 echo "Generating CloudWatch Agent configuration..."
-
 sudo mkdir -p "$(dirname "$CLOUDWATCH_CONFIG")"
-cat <<EOF | sudo tee "$CLOUDWATCH_CONFIG"
+
+cat <<EOF | sudo tee "$CLOUDWATCH_CONFIG" > /dev/null
 {
   "logs": {
     "logs_collected": {
@@ -50,12 +58,15 @@ cat <<EOF | sudo tee "$CLOUDWATCH_CONFIG"
 }
 EOF
 
-# ===== CloudWatch Agent 시작 =====
-echo "Starting CloudWatch Agent..."
-sudo "$CLOUDWATCH_AGENT_BIN" \
-  -a fetch-config \
-  -m ec2 \
-  -c file:"$CLOUDWATCH_CONFIG" \
-  -s
-
-echo "Application and CloudWatch Agent started successfully."
+# 설정 파일 존재 여부 확인 후 agent 시작
+if [ -f "$CLOUDWATCH_CONFIG" ]; then
+  echo "Starting CloudWatch Agent..."
+  sudo "$CLOUDWATCH_AGENT_BIN" \
+    -a fetch-config \
+    -m ec2 \
+    -c file:"$CLOUDWATCH_CONFIG" \
+    -s
+else
+  echo "CloudWatch configuration file not found: $CLOUDWATCH_CONFIG"
+  exit 1
+fi
