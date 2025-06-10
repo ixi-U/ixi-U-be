@@ -69,6 +69,7 @@ public class Plan {
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
     public static Plan of(
+            
             final String name,
             final int mobileDataLimitMb,
             final int sharedMobileDataLimitMb,
