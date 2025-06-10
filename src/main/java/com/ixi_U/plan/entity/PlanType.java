@@ -1,5 +1,7 @@
 package com.ixi_U.plan.entity;
 
+import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.exception.PlanException;
 import lombok.Getter;
 
 @Getter
@@ -24,7 +26,7 @@ public enum PlanType {
             case "ONLINE" -> ONLINE;
             case "TABLET/SMARTWATCH" -> TABLET_SMARTWATCH;
             case "DUAL_NUMBER" -> DUAL_NUMBER;
-            default -> throw new IllegalArgumentException("Invalid sort option");
+            default -> throw new GeneralException(PlanException.INVALID_PLAN_TYPE);
         };
     }
 }
