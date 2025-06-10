@@ -7,7 +7,7 @@ APP_NAME="app.jar"
 APP_DIR="/home/ubuntu/app"
 PID=$(pgrep -f $APP_NAME)
 
-sudo rm -f "$APP_DIR/APP_NAME"
+sudo rm -f "$APP_DIR/$APP_NAME"
 
 if [ -n "$PID" ]; then
   echo "Stopping existing application (PID: $PID)"
