@@ -19,11 +19,15 @@ public class PlanService {
 
     private final PlanRepository planRepository;
 
-    public SortedPlanResponse findPlans(Pageable pageable, String planTypeStr, String sortOptionStr,
+    public SortedPlanResponse findPlans(Pageable pageable, String planTypeStr,
+            String planSortOptionStr,
             String searchKeyword, String planId, Integer sortValue) {
 
+        validatePlanType(planTypeStr);
+        validateSortOption(planSortOptionStr);
+
         PlanType planType = PlanType.from(planTypeStr);
-        PlanSortOption planSortOption = PlanSortOption.from(sortOptionStr);
+        PlanSortOption planSortOption = PlanSortOption.from(planSortOptionStr);
         Slice<PlanSummaryDto> plans = planRepository.findPlans(pageable, planType, planSortOption,
                 searchKeyword, planId, sortValue);
 
@@ -33,14 +37,20 @@ public class PlanService {
         return new SortedPlanResponse(plans, lastPlanId, lastSortValue);
     }
 
-    private int extractSortValue(PlanSummaryDto planSummary, PlanSortOption sortOption) {
+    private void validatePlanType(String planTypeStr) {
 
-        return switch (sortOption.getField()) {
-            case "priority" -> planSummary.priority();
-            case "monthlyPrice" -> planSummary.monthlyPrice();
-            case "mobileDataLimitMb" -> planSummary.mobileDataLimitMb();
-            default -> throw new GeneralException(PlanException.INVALID_SORT_VALUE);
-        };
+        if (planTypeStr == null || planTypeStr.isBlank()) {
+
+            throw new GeneralException(PlanException.INVALID_PLAN_TYPE);
+        }
+    }
+
+    private void validateSortOption(String sortOptionStr) {
+
+        if (sortOptionStr == null || sortOptionStr.isBlank()) {
+
+            throw new GeneralException(PlanException.INVALID_SORT_VALUE);
+        }
     }
 
     private String getLastPlanId(Slice<PlanSummaryDto> plans) {
@@ -63,6 +73,6 @@ public class PlanService {
         List<PlanSummaryDto> content = plans.getContent();
         PlanSummaryDto last = content.get(content.size() - 1);
 
-        return extractSortValue(last, sortOption);
+        return PlanSortOption.extractSortValue(last, sortOption);
     }
 }
