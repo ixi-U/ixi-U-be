@@ -99,11 +99,20 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
         Condition condition = p.property("planType").eq(Cypher.parameter("planType"));
 
         if (planId != null && cursorSortValue != null) {
-            Condition sortCondition = p.property(planSortOption.getField())
-                    .lt(Cypher.parameter("cursorSortValue"))
-                    .or(p.property(planSortOption.getField())
-                            .eq(Cypher.parameter("cursorSortValue"))
-                            .and(p.property("id").gt(Cypher.parameter("planId"))));
+            Condition sortCondition;
+            if (planSortOption.getOrder() == SortOrder.ASC) {
+                sortCondition = p.property(planSortOption.getField())
+                        .gt(Cypher.parameter("cursorSortValue"))
+                        .or(p.property(planSortOption.getField())
+                                .eq(Cypher.parameter("cursorSortValue"))
+                                .and(p.property("id").gt(Cypher.parameter("planId"))));
+            } else {
+                sortCondition = p.property(planSortOption.getField())
+                        .lt(Cypher.parameter("cursorSortValue"))
+                        .or(p.property(planSortOption.getField())
+                                .eq(Cypher.parameter("cursorSortValue"))
+                                .and(p.property("id").gt(Cypher.parameter("planId"))));
+            }
             condition = condition.and(sortCondition);
         }
 
