@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface PlanCustomRepository {
 
     Slice<PlanSummaryDto> findPlans(Pageable pageable, PlanType planType, PlanSortOption sortOption,
-            String query, String planId, Integer lastSortValue);
+            String searchKeyword, String planId, Integer cursorSortValue);
 
 }

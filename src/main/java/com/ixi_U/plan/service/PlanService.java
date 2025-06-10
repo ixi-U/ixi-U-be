@@ -20,17 +20,17 @@ public class PlanService {
     private final PlanRepository planRepository;
 
     public SortedPlanResponse findPlans(Pageable pageable, String planTypeStr, String sortOptionStr,
-            String query, String planId, Integer sortValue) {
+            String searchKeyword, String planId, Integer sortValue) {
 
         PlanType planType = PlanType.from(planTypeStr);
         PlanSortOption planSortOption = PlanSortOption.from(sortOptionStr);
         Slice<PlanSummaryDto> plans = planRepository.findPlans(pageable, planType, planSortOption,
-                query, planId, sortValue);
+                searchKeyword, planId, sortValue);
 
         String lastPlanId = getLastPlanId(plans);
         int lastSortValue = getLastSortValue(plans, planSortOption);
 
-        return new SortedPlanResponse(plans, lastPlanId, lastSortValue);
+        return SortedPlanResponse.of(plans, lastPlanId, lastSortValue);
     }
 
     private int extractSortValue(PlanSummaryDto planSummary, PlanSortOption sortOption) {
