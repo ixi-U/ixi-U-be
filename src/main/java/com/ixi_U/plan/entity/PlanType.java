@@ -21,6 +21,8 @@ public enum PlanType {
 
     public static PlanType from(String type) {
 
+        validatePlanType(type);
+
         return switch (type) {
             case "5G/LTE" -> FIVE_G_LTE;
             case "ONLINE" -> ONLINE;
@@ -28,5 +30,13 @@ public enum PlanType {
             case "DUAL_NUMBER" -> DUAL_NUMBER;
             default -> throw new GeneralException(PlanException.INVALID_PLAN_TYPE);
         };
+    }
+
+    private static void validatePlanType(String planTypeStr) {
+
+        if (planTypeStr == null || planTypeStr.isBlank()) {
+
+            throw new GeneralException(PlanException.INVALID_PLAN_TYPE);
+        }
     }
 }

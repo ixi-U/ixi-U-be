@@ -1,11 +1,9 @@
 package com.ixi_U.plan.service;
 
-import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
-import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +21,6 @@ public class PlanService {
             String planSortOptionStr,
             String searchKeyword, String planId, Integer sortValue) {
 
-        validatePlanType(planTypeStr);
-        validateSortOption(planSortOptionStr);
-
         PlanType planType = PlanType.from(planTypeStr);
         PlanSortOption planSortOption = PlanSortOption.from(planSortOptionStr);
         Slice<PlanSummaryDto> plans = planRepository.findPlans(pageable, planType, planSortOption,
@@ -35,22 +30,6 @@ public class PlanService {
         int lastSortValue = getLastSortValue(plans, planSortOption);
 
         return new SortedPlanResponse(plans, lastPlanId, lastSortValue);
-    }
-
-    private void validatePlanType(String planTypeStr) {
-
-        if (planTypeStr == null || planTypeStr.isBlank()) {
-
-            throw new GeneralException(PlanException.INVALID_PLAN_TYPE);
-        }
-    }
-
-    private void validateSortOption(String sortOptionStr) {
-
-        if (sortOptionStr == null || sortOptionStr.isBlank()) {
-
-            throw new GeneralException(PlanException.INVALID_SORT_VALUE);
-        }
     }
 
     private String getLastPlanId(Slice<PlanSummaryDto> plans) {

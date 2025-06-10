@@ -26,6 +26,8 @@ public enum PlanSortOption {
 
     public static PlanSortOption from(String planSortOptionStr) {
 
+        validateSortOption(planSortOptionStr);
+
         return switch (planSortOptionStr) {
             case "PRIORITY" -> PRIORITY;
             case "PRICE_ASC" -> PRICE_ASC;
@@ -43,5 +45,13 @@ public enum PlanSortOption {
             case "mobileDataLimitMb" -> planSummary.mobileDataLimitMb();
             default -> throw new GeneralException(PlanException.INVALID_SORT_VALUE);
         };
+    }
+
+    private static void validateSortOption(String sortOptionStr) {
+
+        if (sortOptionStr == null || sortOptionStr.isBlank()) {
+
+            throw new GeneralException(PlanException.INVALID_SORT_VALUE);
+        }
     }
 }
