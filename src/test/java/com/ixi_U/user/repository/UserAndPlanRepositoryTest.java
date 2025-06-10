@@ -1,7 +1,10 @@
 package com.ixi_U.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
@@ -67,4 +70,69 @@ class UserAndPlanRepositoryTest {
                 .extracting(subscribed -> subscribed.getPlan().getId())
                 .containsExactly(plan.getId());
     }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자 조회 시 예외가 발생한다")
+    void givenNonExistentUser_whenFindById_thenThrowsException() {
+        // given
+        String nonExistentUserId = "not_exist_user_id";
+
+        // when & then
+        assertThatThrownBy(() -> userRepository.findById(nonExistentUserId)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND)))
+                .isInstanceOf(GeneralException.class)
+                .hasMessage(UserException.USER_NOT_FOUND.getMessage());
+    }
+
+
+    @Test
+    @DisplayName("이미 구독 중인 요금제를 중복 구독할 때의 동작을 확인한다")
+    void givenExistingSubscription_whenAddDuplicateSubscription_thenHandlesProperly() {
+        // given
+        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
+        Plan plan = planRepository.save(Plan.of("5G 요금제"));
+
+        // 최초 구독
+        user.addSubscribed(Subscribed.of(plan));
+        userRepository.save(user);
+
+        // when & then : 같은 요금제 중복 구독 시 예외 발생
+        assertThatThrownBy(() -> {
+            // 이미 구독한 요금제를 한 번 더 구독 시도
+            user.addSubscribed(Subscribed.of(plan));
+            userRepository.save(user);
+        })
+                .isInstanceOf(GeneralException.class)
+                .hasMessage("이미 현재 구독 중인 요금제입니다.");
+    }
+
+    @Test
+    @DisplayName("요금제를 변경하면 구독 이력이 누적된다")
+    void givenChangedSubscription_whenAddDifferentSubscription_thenHistoryAccumulates() {
+        // given
+        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
+        Plan planA = planRepository.save(Plan.of("A 요금제"));
+        Plan planB = planRepository.save(Plan.of("B 요금제"));
+
+        // 최초 구독 (A)
+        user.addSubscribed(Subscribed.of(planA));
+        userRepository.save(user);
+
+        // B로 변경
+        user.addSubscribed(Subscribed.of(planB));
+        userRepository.save(user);
+
+        // 다시 A로 변경 (이력 누적)
+        user.addSubscribed(Subscribed.of(planA));
+        userRepository.save(user);
+
+        // then
+        User savedUser = userRepository.findById(user.getId()).orElseThrow();
+        assertThat(savedUser.getSubscribedHistory())
+                .hasSize(3)
+                .extracting(subscribed -> subscribed.getPlan().getId())
+                .containsExactly(planA.getId(), planB.getId(), planA.getId());
+
+    }
+
 }
