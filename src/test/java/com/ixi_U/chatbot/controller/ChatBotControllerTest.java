@@ -49,9 +49,7 @@ class ChatBotControllerTest {
 
             //given
             String[] split = CHATBOT_WELCOME_MESSAGE.split("\n");
-            given(chatBotService.getWelcomeMessage()).willReturn(
-                    Flux.fromArray(split)
-            );
+            given(chatBotService.getWelcomeMessage()).willReturn(Flux.fromArray(split));
 
             //when & then
             webTestClient.get()
@@ -60,13 +58,14 @@ class ChatBotControllerTest {
                     .exchange()
                     .expectStatus().isOk()
                     .returnResult(String.class)
-                    .consumeWith(document("getWelcomeMessage"
-                    ));
+                    .consumeWith(document("getWelcomeMessage"));
         }
 
         @Test
         @DisplayName("인증/인가 되지않은 사용자는 4xx 에러를 반환한다")
         void unauthorizedUserTest() {
+
+            //given
 
             //when & then
             webTestClient.get()

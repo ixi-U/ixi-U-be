@@ -44,10 +44,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// Open AI
+	// Spring AI Open AI
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
-	// Neo4j
+	// Spring Data Neo4j
 	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
 
 	// Neo4j Vector DB
@@ -69,6 +69,7 @@ dependencies {
 	// Reactor Test
 	testImplementation 'io.projectreactor:reactor-test:3.6.5'
 
+	// Rest Docs
 	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.3'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient:3.0.3'
 }

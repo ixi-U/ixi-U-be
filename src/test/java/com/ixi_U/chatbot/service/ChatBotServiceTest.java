@@ -20,7 +20,9 @@ class ChatBotServiceTest {
     @DisplayName("웰컴 메세지를 응답한다")
     public void getWelcomeMessage() {
 
-        //given & when
+        //given
+
+        //when
         Flux<String> welcomeMessage = chatBotService.getWelcomeMessage();
 
         //then
