@@ -47,4 +47,16 @@ class SubscribedControllerTest {
         Mockito.verify(subscribedService)
                 .updateSubscribed(eq(userId), any(CreateSubscribedRequest.class));
     }
+
+    @Test
+    @DisplayName("유효하지 않은 요청 데이터로 호출 시 400 Bad Request를 반환한다")
+    void updateSubscribedWithInvalidRequest() throws Exception {
+        String userId = "test-user";
+        CreateSubscribedRequest invalidRequest = new CreateSubscribedRequest(""); // 빈 planId
+
+        mockMvc.perform(post("/subscribed/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+    }
 }

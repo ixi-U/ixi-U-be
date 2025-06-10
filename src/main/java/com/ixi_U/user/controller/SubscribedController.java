@@ -2,6 +2,7 @@ package com.ixi_U.user.controller;
 
 import com.ixi_U.user.dto.CreateSubscribedRequest;
 import com.ixi_U.user.service.SubscribedService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ public class SubscribedController {
     @PostMapping("/{userId}")
     public ResponseEntity<Void> updateSubscribed(
             @PathVariable("userId") String userId,
-            @RequestBody CreateSubscribedRequest request) {
+            @RequestBody @Valid CreateSubscribedRequest request) {
         subscribedService.updateSubscribed(userId, request);
         return ResponseEntity.ok().build();
     }
