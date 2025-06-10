@@ -9,7 +9,7 @@ PID=$(pgrep -f $APP_NAME)
 
 if [ -n "$PID" ]; then
   echo "Stopping existing application (PID: $PID)"
-  kill -9 "$PID"
+  sudo kill -9 "$PID"
 else
   echo "No application to stop"
 fi
