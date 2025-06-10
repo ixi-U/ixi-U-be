@@ -27,7 +27,7 @@ public class SubscribedService {
     public void updateSubscribed(String userId, CreateSubscribedRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-        Plan plan = planRepository.findById(String.valueOf(request.planId()))
+        Plan plan = planRepository.findById(request.planId())
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
         user.addSubscribed(Subscribed.of(plan));
         userRepository.save(user);
