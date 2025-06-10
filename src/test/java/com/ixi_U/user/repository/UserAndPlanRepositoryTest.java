@@ -61,9 +61,10 @@ class UserAndPlanRepositoryTest {
 
         // then: Neo4j에 저장된 유저를 조회해서 SUBSCRIBED 관계로 plan이 연결되어 있는지 확인
         User savedUser = userRepository.findById(user.getId()).orElseThrow();
-        assertThat(savedUser.getSubscribedHistory()).isNotNull();
-        assertThat(savedUser.getSubscribedHistory()).hasSize(1);
-        assertThat(savedUser.getSubscribedHistory().get(0).getPlan().getId())
-                .isEqualTo(plan.getId());
+        assertThat(savedUser.getSubscribedHistory())
+                .isNotNull()
+                .hasSize(1)
+                .extracting(subscribed -> subscribed.getPlan().getId())
+                .containsExactly(plan.getId());
     }
 }
