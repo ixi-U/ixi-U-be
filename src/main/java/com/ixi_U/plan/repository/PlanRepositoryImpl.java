@@ -66,7 +66,6 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
         List<PlanSummaryDto> content = neo4jTemplate.findAll(statement, params,
                 PlanSummaryDto.class);
 
-        System.out.println("content.get(0) = " + content.get(0));
         boolean hasNext = content.size() > limit;
         if (hasNext) {
             content = content.subList(0, limit);
