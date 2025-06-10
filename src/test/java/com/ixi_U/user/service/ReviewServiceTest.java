@@ -62,7 +62,7 @@ class ReviewServiceTest {
 
                 // when
                 reviewService.createReview("user-id",
-                        CreateReviewRequest.of("user-name", 5, "테스트-리뷰"));
+                        CreateReviewRequest.of("plan-id", 5, "테스트-리뷰"));
 
                 // then
                 verify(userRepository, times(1)).save(any(User.class));
@@ -85,7 +85,7 @@ class ReviewServiceTest {
                 // when
                 GeneralException ex = assertThrows(GeneralException.class, () -> {
                     reviewService.createReview("user-id",
-                            CreateReviewRequest.of("user-name", 5, "테스트-리뷰"));
+                            CreateReviewRequest.of("plan-id", 5, "테스트-리뷰"));
                 });
 
                 // then
@@ -108,7 +108,7 @@ class ReviewServiceTest {
                 // when
                 GeneralException ex = assertThrows(GeneralException.class, () -> {
                     reviewService.createReview("user-id",
-                            CreateReviewRequest.of("user-name", 5, "테스트-리뷰"));
+                            CreateReviewRequest.of("plan-id", 5, "테스트-리뷰"));
                 });
 
                 // then
