@@ -29,7 +29,9 @@ public class SubscribedService {
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         Plan plan = planRepository.findById(request.planId())
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
-        user.addSubscribed(Subscribed.of(plan));
+        if (user.getSubscribedHistory().stream().noneMatch(s -> s.getPlan().equals(plan))) {
+            user.addSubscribed(Subscribed.of(plan));
+        }
         userRepository.save(user);
     }
 }
