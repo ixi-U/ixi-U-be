@@ -1,5 +1,6 @@
 package com.ixi_U.chatbot.controller;
 
+import com.ixi_U.chatbot.aop.SSEEndpoint;
 import com.ixi_U.chatbot.service.ChatBotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,16 +12,14 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ChatBotController {
 
-    private final static String CONTENT_TYPE = "Content-Type";
-    private final static String PRODUCES = "text/event-stream;charset=UTF-8";
+    private final static String TEXT_EVENT_STREAM_VALUE = "text/event-stream;charset=UTF-8";
 
     private final ChatBotService chatBotService;
 
-    @GetMapping(value = "/api/chatbot/welcome", produces = PRODUCES)
+    @SSEEndpoint
+    @GetMapping(value = "/api/chatbot/welcome", produces = TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<Flux<String>> getWelcomeMessage() {
 
-        return ResponseEntity.ok()
-                .header(CONTENT_TYPE, PRODUCES)
-                .body(chatBotService.getWelcomeMessage());
+        return ResponseEntity.ok().body(chatBotService.getWelcomeMessage());
     }
 }
