@@ -62,6 +62,8 @@ class PlanRepositoryTest {
         @BeforeEach
         void setUp() {
 
+            planRepository.deleteAll();
+
             // given
             Plan plan1 = Plan.of(
                     "요금제1", 20000, 300, 200, 100, 29000,
