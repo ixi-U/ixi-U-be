@@ -1,4 +1,4 @@
-package com.ixi_U.user.service;
+package com.ixi_U.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,7 +6,6 @@ import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
-import com.ixi_U.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ import org.testcontainers.utility.DockerImageName;
 @Transactional
 @Testcontainers
 @DisplayName("Testcontainers 기반 Neo4j DB와 실제 연동되는 구독관계 저장 테스트")
-class SubscribedServiceDatabaseTest {
+class UserAndPlanRepositoryTest {
 
     @Container
     private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
