@@ -47,27 +47,7 @@ class SubscribedRepositoryTest {
         registry.add("spring.neo4j.authentication.username", () -> "neo4j");
         registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
     }
-
-    @Test
-    @DisplayName("구독_존재O")
-    void 구독_존재O() {
-
-        //given
-        User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
-        Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
-
-        savedUser.addSubscribed(Subscribed.of(savedPlan));
-        User finalUser = userRepository.save(savedUser);
-
-        //when
-        boolean existsSubscribe = subscribedRepository.existsSubscribeRelation(savedUser.getId(),
-                savedPlan.getId());
-
-        //then
-        assertThat(existsSubscribe).isTrue();
-
-    }
-
+    
     @Nested
     @DisplayName("구독 관계가 존재하는지 확인할 때")
     class Describe_existsSubscribeRelation {
