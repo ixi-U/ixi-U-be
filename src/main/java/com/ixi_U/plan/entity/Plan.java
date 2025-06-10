@@ -32,31 +32,31 @@ public class Plan {
 
     private final State state;
 
-    private final int mobile_data_limit_mb;
+    private final int mobileDataLimitMb;
 
-    private final int shared_mobile_data_limit_mb;
+    private final int sharedMobileDataLimitMb;
 
-    private final int call_limit_minutes;
+    private final int callLimitMinutes;
 
-    private final int message_limit;
+    private final int messageLimit;
 
-    private final long monthly_price;
+    private final int monthlyPrice;
 
-    private final PlanType plan_type;
+    private final PlanType planType;
 
-    private final String usage_cautions;
+    private final String usageCautions;
 
-    private final int mobile_data_throttle_speed_kbps;
+    private final int mobileDataThrottleSpeedKbps;
 
-    private final int min_age;
+    private final int minAge;
 
-    private final int max_age;
+    private final int maxAge;
 
-    private final boolean is_active_duty;
+    private final boolean isActiveDuty;
 
-    private final int price_per_kb;
+    private final int pricePerKb;
 
-    private final String etc_info;
+    private final String etcInfo;
 
     private final int priority;
 
@@ -68,29 +68,43 @@ public class Plan {
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-    public static Plan of(final String name, final int mobile_data_limit_mb,
-            final int shared_mobile_data_limit_mb, final int call_limit_minutes,
-            final int message_limit, final long monthly_price, final PlanType plan_type,
-            final String usage_cautions, final int mobile_data_throttle_speed_kbps,
-            final int min_age, final int max_age, final boolean is_active_duty,
-            final int price_per_kb, final String etc_info, final int priority) {
-
+    public static Plan of(
+            final String name,
+            final int mobileDataLimitMb,
+            final int sharedMobileDataLimitMb,
+            final int callLimitMinutes,
+            final int messageLimit,
+            final int monthlyPrice,
+            final PlanType planType,
+            final String usageCautions,
+            final int mobileDataThrottleSpeedKbps,
+            final int minAge,
+            final int maxAge,
+            final boolean isActiveDuty,
+            final int pricePerKb,
+            final String etcInfo,
+            final int priority,
+            List<BundledBenefit> bundledBenefits,
+            List<SingleBenefit> singleBenefits
+    ) {
         return Plan.builder()
                 .name(name)
-                .mobile_data_limit_mb(mobile_data_limit_mb)
-                .shared_mobile_data_limit_mb(shared_mobile_data_limit_mb)
-                .call_limit_minutes(call_limit_minutes)
-                .message_limit(message_limit)
-                .monthly_price(monthly_price)
-                .plan_type(plan_type)
-                .usage_cautions(usage_cautions)
-                .mobile_data_throttle_speed_kbps(mobile_data_throttle_speed_kbps)
-                .min_age(min_age)
-                .max_age(max_age)
-                .is_active_duty(is_active_duty)
-                .price_per_kb(price_per_kb)
-                .etc_info(etc_info)
+                .mobileDataLimitMb(mobileDataLimitMb)
+                .sharedMobileDataLimitMb(sharedMobileDataLimitMb)
+                .callLimitMinutes(callLimitMinutes)
+                .messageLimit(messageLimit)
+                .monthlyPrice(monthlyPrice)
+                .planType(planType)
+                .usageCautions(usageCautions)
+                .mobileDataThrottleSpeedKbps(mobileDataThrottleSpeedKbps)
+                .minAge(minAge)
+                .maxAge(maxAge)
+                .isActiveDuty(isActiveDuty)
+                .pricePerKb(pricePerKb)
+                .etcInfo(etcInfo)
                 .priority(priority)
+                .bundledBenefits(bundledBenefits)
+                .singleBenefits(singleBenefits)
                 .build();
     }
 
