@@ -8,7 +8,8 @@ import org.springframework.data.domain.Slice;
 
 public interface PlanCustomRepository {
 
-    Slice<PlanSummaryDto> findPlans(Pageable pageable, PlanType planType, PlanSortOption sortOption,
-            String searchKeyword, String planId, Integer cursorSortValue);
+    Slice<PlanSummaryDto> findPlans(Pageable pageable, PlanType planType,
+            PlanSortOption planSortOptionStr, String searchKeyword, String planId,
+            Integer cursorSortValue);
 
 }
