@@ -8,8 +8,9 @@ import org.springframework.data.repository.query.Param;
 public interface SubscribedRepository extends Neo4jRepository<Subscribed, Long> {
 
     @Query("""
-            MATCH (u:User {id: $userId})-[r:SUBSCRIBED]->(p:Plan {id: $planId})
-            RETURN count(r) > 0
+            RETURN EXISTS {
+               MATCH (u:User {id: $userId})-[:SUBSCRIBED]->(p:Plan {id: $planId})
+            }
             """)
     boolean existsSubscribeRelation(@Param("userId") String userId, @Param("planId") String planId);
 }

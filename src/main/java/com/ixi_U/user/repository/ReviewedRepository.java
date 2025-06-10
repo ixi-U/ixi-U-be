@@ -8,8 +8,9 @@ import org.springframework.data.repository.query.Param;
 public interface ReviewedRepository extends Neo4jRepository<Reviewed, Long> {
 
     @Query("""
-            MATCH (u:User {id: $userId})-[r:REVIEWED]->(p:Plan {id: $planId})
-            RETURN count(r) > 0
+            RETURN EXISTS {
+               MATCH (u:User {id: $userId})-[:REVIEWED]->(p:Plan {id: $planId})
+            }
             """)
     boolean existsReviewedRelation(@Param("userId") String userId, @Param("planId") String planId);
 
