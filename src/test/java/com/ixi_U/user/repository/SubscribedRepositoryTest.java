@@ -63,7 +63,7 @@ class SubscribedRepositoryTest {
                 Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
 
                 savedUser.addSubscribed(Subscribed.of(savedPlan));
-                User finalUser = userRepository.save(savedUser);
+                userRepository.save(savedUser);
 
                 //when
                 boolean existsSubscribe = subscribedRepository.existsSubscribeRelation(
