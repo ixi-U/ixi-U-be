@@ -1,4 +1,13 @@
 spring:
-  data:
-    neo4j:
-      database: neo4j
+  neo4j:
+    uri: bolt://localhost:7688
+    authentication:
+      username: neo4j
+      password: 1q2w3e4r
+
+    data:
+      neo4j:
+        database: neo4j
+
+
+
