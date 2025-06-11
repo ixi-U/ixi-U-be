@@ -3,6 +3,8 @@ package com.ixi_U.user.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -38,7 +42,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @WebMvcTest(value = {ReviewController.class})
-@ExtendWith({SpringExtension.class})
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class ReviewControllerTest {
 
     private static final String REVIEW_URL = "/api/reviews";
@@ -54,10 +58,11 @@ class ReviewControllerTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
-    public void init() {
+    public void init(RestDocumentationContextProvider restDocumentation) {
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .addFilter(new CharacterEncodingFilter("utf-8", true))
+                .apply(documentationConfiguration(restDocumentation))
                 .build();
     }
 
@@ -84,6 +89,7 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document("createReview-success"))
                         .andDo(print());
 
                 // then
@@ -131,6 +137,8 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-if review content==null then return 400 error"))
                         .andDo(print());
 
                 // then
@@ -154,6 +162,8 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-if review letter under 20 then return 400 error"))
                         .andDo(print());
 
                 // then
@@ -177,6 +187,8 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-if review letter over 200 then return 400 error"))
                         .andDo(print());
 
                 // then
@@ -201,6 +213,8 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-if review point letter under 0 then return 400 error"))
                         .andDo(print());
 
                 // then
@@ -224,6 +238,8 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-if review point letter over 6 then return 400 error"))
                         .andDo(print());
 
                 // then
@@ -246,6 +262,8 @@ class ReviewControllerTest {
                                 .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-if plan id==null then return 400 error"))
                         .andDo(print());
 
                 // then
