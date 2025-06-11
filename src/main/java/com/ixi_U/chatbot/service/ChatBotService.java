@@ -19,6 +19,7 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+
 public class ChatBotService {
 
     private static final String CHATBOT_WELCOME_MESSAGE = """
@@ -26,6 +27,7 @@ public class ChatBotService {
             관심있는 혜택 또는 원하는 조건을 말씀해주시면 최적의 요금제를 안내해드리겠습니다!
             예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
             """;
+
 
     @Qualifier("descriptionClient")
     private final ChatClient embeddingClient;

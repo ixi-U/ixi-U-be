@@ -15,6 +15,7 @@ public class ChatBotConfig {
 
     private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
 
+
     @Bean
     public ChatClient descriptionClient(ChatClient.Builder chatClientBuilder) {
 
