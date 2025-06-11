@@ -59,11 +59,11 @@ class SubscribedRepositoryTest {
             @DisplayName("true를 반환한다")
             void it_returns_true() {
                 //given
-                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
+                User user = User.of("jinu", "jinu@mail.com", "kakao");
                 Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
 
-                savedUser.addSubscribed(Subscribed.of(savedPlan));
-                userRepository.save(savedUser);
+                user.addSubscribed(Subscribed.of(savedPlan));
+                User savedUser = userRepository.save(user);
 
                 //when
                 boolean existsSubscribe = subscribedRepository.existsSubscribeRelation(
