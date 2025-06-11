@@ -2,6 +2,7 @@ package com.ixi_U.user.entity;
 
 import com.ixi_U.common.entity.BaseEntity;
 import com.ixi_U.plan.entity.Plan;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,4 +31,10 @@ public class Subscribed extends BaseEntity {
                 .plan(plan)
                 .build();
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }

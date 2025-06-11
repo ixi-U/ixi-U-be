@@ -5,6 +5,7 @@ import com.ixi_U.benefit.entity.SingleBenefit;
 import com.ixi_U.common.entity.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,4 +58,22 @@ public class Plan extends BaseEntity {
 
         singleBenefits.add(singleBenefit);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Plan plan = (Plan) o;
+        return Objects.equals(id, plan.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }
