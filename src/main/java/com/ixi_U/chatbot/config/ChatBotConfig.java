@@ -31,6 +31,7 @@ public class ChatBotConfig {
         }
     }
 
+
     @Bean
     public ChatClient descriptionClient(ChatClient.Builder chatClientBuilder) {
 
