@@ -35,7 +35,8 @@ public class ReviewController {
     public ResponseEntity<ShowReviewListResponse> showReviewList(
             @RequestParam("planId") final String planId, Pageable pageable) {
 
-        return ResponseEntity.ok(reviewService.showReview(planId, pageable));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(reviewService.showReview(planId, pageable));
     }
 
 }
