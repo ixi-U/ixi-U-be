@@ -1,11 +1,11 @@
 package com.ixi_U.chatbot.dto;
 
-import com.ixi_U.benefit.entity.BenefitType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,25 +17,27 @@ import lombok.Getter;
 public class PlanDescriptionRequest {
 
     @NotBlank
-    private String id;
+    private final String id;
 
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotBlank
-    private String subscript;
+    private final String subscript;
+
+    @NotNull
+    private final Integer data;
 
     @Positive
-    private Integer data;
-
-    @Positive
-    private Integer price;
+    private final Integer price;
 
     @Valid
-    private List<BundledBenefitRequest> bundledBenefits;
+    @NotEmpty
+    private final List<BundledBenefitRequest> bundledBenefits;
 
     @Valid
-    private List<SingleBenefitRequest> singleBenefits;
+    @NotEmpty
+    private final List<SingleBenefitRequest> singleBenefits;
 
     public static PlanDescriptionRequest of(final String id, final String name,
             final String subscript,

@@ -31,7 +31,7 @@ public class BundledBenefitRequest {
 
     @Valid
     @NotEmpty
-    private List<SingleBenefitRequest> singleBenefits;
+    private final List<SingleBenefitRequest> singleBenefits;
 
     public static BundledBenefitRequest of(final String id, final String name,
             final String subscript,
