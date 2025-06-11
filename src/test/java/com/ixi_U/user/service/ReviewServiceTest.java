@@ -11,12 +11,15 @@ import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.response.ShowReviewListResponse;
+import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.repository.ReviewedRepository;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +28,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -123,6 +130,38 @@ class ReviewServiceTest {
                 assertThat(ex.getMessage()).isEqualTo(
                         ReviewedException.REVIEW_ALREADY_EXIST.getMessage());
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("showReview 메서드는")
+    class Describe_showReview {
+
+        @Test
+        @DisplayName("요금제에 대한 리뷰 리스트를 반환한다")
+        void it_returns_review_list() {
+            // given
+            String planId = "plan-id";
+            Pageable pageable = PageRequest.of(0, 5);
+
+            List<ShowReviewResponse> content = List.of(
+                    new ShowReviewResponse("유저1", 4, "리뷰1"),
+                    new ShowReviewResponse("유저2", 5, "리뷰2")
+            );
+
+            Slice<ShowReviewResponse> mockSlice = Mockito.mock(Slice.class);
+            given(mockSlice.getContent()).willReturn(content);
+            given(mockSlice.hasNext()).willReturn(false);
+            given(reviewedRepository.findReviewedByPlanWithPaging(any(), any())).willReturn(
+                    mockSlice);
+
+            // when
+            ShowReviewListResponse result = reviewService.showReview(planId, pageable);
+
+            // then
+            assertThat(result.hasNextPage()).isFalse();
+            assertThat(result.reviewResponseList()).hasSize(2);
+            assertThat(result.reviewResponseList().get(0).comment()).isEqualTo("리뷰1");
         }
     }
 }
