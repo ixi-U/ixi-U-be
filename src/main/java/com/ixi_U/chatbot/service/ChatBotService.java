@@ -1,12 +1,24 @@
 package com.ixi_U.chatbot.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ixi_U.chatbot.dto.PlanDescriptionRequest;
+import com.ixi_U.chatbot.exception.ChatBotException;
+import com.ixi_U.common.exception.GeneralException;
+import jakarta.validation.Valid;
+import java.io.IOException;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
+@Validated
 public class ChatBotService {
 
     private static final String CHATBOT_WELCOME_MESSAGE = """
@@ -15,9 +27,29 @@ public class ChatBotService {
             예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
             """;
 
+    @Qualifier("descriptionClient")
+    private final ChatClient embeddingClient;
+    private final ObjectMapper objectMapper;
+
     public Flux<String> getWelcomeMessage() {
 
         return Flux.fromArray(CHATBOT_WELCOME_MESSAGE.split(""))
                 .delayElements(Duration.ofMillis(50));
+    }
+
+    public String getPlanDescription(@Valid PlanDescriptionRequest request) throws IOException {
+
+        String planInfo = objectMapper.writeValueAsString(request);
+
+        String chatBotResponse = embeddingClient.prompt()
+                .user(planInfo)
+                .call()
+                .content();
+
+        if (chatBotResponse == null || chatBotResponse.isBlank()) {
+            throw new GeneralException(ChatBotException.CHAT_BOT_BAD_RESPONSE);
+        }
+
+        return chatBotResponse;
     }
 }
