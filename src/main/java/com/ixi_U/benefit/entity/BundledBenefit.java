@@ -1,6 +1,6 @@
 package com.ixi_U.benefit.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -36,11 +36,11 @@ public class BundledBenefit {
 
     @CreatedDate
     @Property("created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Property("updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Builder.Default
     @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)

@@ -2,7 +2,7 @@ package com.ixi_U.plan.entity;
 
 import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -37,11 +37,11 @@ public class Plan {
 
     @CreatedDate
     @Property("created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Property("updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Builder.Default
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)

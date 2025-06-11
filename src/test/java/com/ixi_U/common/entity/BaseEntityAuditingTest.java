@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ class BaseEntityAuditingTest {
         assertThat(savedUser.getUpdatedAt()).isNotNull();
 
         // 엔티티 수정 후 updatedAt이 변경되는지 확인
-        LocalDateTime oldUpdatedAt = savedUser.getUpdatedAt();
+        Instant oldUpdatedAt = savedUser.getUpdatedAt();
 
         // user 정보 수정 (예: 닉네임 변경 등)
         User updatedUser = userRepository.save(

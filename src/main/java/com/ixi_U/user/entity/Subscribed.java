@@ -1,7 +1,7 @@
 package com.ixi_U.user.entity;
 
 import com.ixi_U.plan.entity.Plan;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,11 +29,11 @@ public class Subscribed {
 
     @CreatedDate
     @Property("created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Property("updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     public static Subscribed of(final Plan plan) {
 

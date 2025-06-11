@@ -1,6 +1,6 @@
 package com.ixi_U.user.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -40,11 +40,11 @@ public class User {
 
     @CreatedDate
     @Property("created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Property("updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
