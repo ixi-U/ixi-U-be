@@ -22,6 +22,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -159,6 +161,21 @@ class PlanControllerTest {
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
                     .andDo(document("plans-get-invalid-plan-type"));
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {0, -1})
+        @DisplayName("파라미터 size가 1보다 작을 경우 실패한다")
+        void failIfSizeLessThanOne(int size) throws Exception {
+
+            // given, when, then
+            mockMvc.perform(get("/plans")
+                            .param("size", String.valueOf(size))
+                            .param("planTypeStr", "ONLINE")
+                            .param("planSortOptionStr", "PRIORITY")
+                            .with(user("tester").roles("USER")))
+                    .andExpect(status().isBadRequest())
+                    .andDo(document("plans-get-invalid-size-parameter"));
         }
     }
 }
