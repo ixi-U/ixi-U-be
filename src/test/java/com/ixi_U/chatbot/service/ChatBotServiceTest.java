@@ -1,12 +1,31 @@
 package com.ixi_U.chatbot.service;
 
 import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ixi_U.chatbot.dto.PlanDescriptionRequest;
+import com.ixi_U.chatbot.testutil.TestDataFactory;
+import com.ixi_U.common.exception.GeneralException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import java.util.Set;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -15,8 +34,22 @@ import reactor.test.StepVerifier;
 @ExtendWith(MockitoExtension.class)
 class ChatBotServiceTest {
 
+    @Mock
+    @Qualifier("descriptionClient")
+    ChatClient descriptionClient;
+
+    Validator validator;
+
+    @Mock
+    ObjectMapper objectMapper;
+
     @InjectMocks
     ChatBotService chatBotService;
+
+    @BeforeEach
+    void setUp() {
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
+    }
 
     @Test
     @DisplayName("웰컴 메세지를 응답한다")
@@ -31,5 +64,60 @@ class ChatBotServiceTest {
         StepVerifier.create(welcomeMessage.collectList())
                 .expectNextMatches(chars -> String.join("", chars).equals(CHATBOT_WELCOME_MESSAGE))
                 .verifyComplete();
+    }
+
+    @Nested
+    class WhenPlanDescriptionRequested {
+
+        @Test
+        @DisplayName("LLM 응답이 null일 경우 예외를 발생한다")
+        public void getPlanDescription() throws Exception {
+
+            //given
+            PlanDescriptionRequest plan = TestDataFactory.createValidPlan();
+
+            //Mocking
+            ChatClient.ChatClientRequestSpec requestSpec = mock(
+                    ChatClient.ChatClientRequestSpec.class);
+            ChatClient.CallResponseSpec callResponseSpec = mock(ChatClient.CallResponseSpec.class);
+
+            given(objectMapper.writeValueAsString(any())).willReturn("{\"id\":\"test\"}");
+            given(descriptionClient.prompt()).willReturn(requestSpec);
+            given(requestSpec.user(anyString())).willReturn(requestSpec);
+            given(requestSpec.call()).willReturn(callResponseSpec);
+            given(callResponseSpec.content()).willReturn(null);
+
+            //when & then
+            assertThrows(GeneralException.class,
+                    () -> chatBotService.getPlanDescription(plan));
+        }
+
+        @Test
+        @DisplayName("유효한 요청이면 통과된다")
+        public void validPlanRequest() {
+
+            //given
+            PlanDescriptionRequest plan = TestDataFactory.createValidPlan();
+
+            //when
+            Set<ConstraintViolation<PlanDescriptionRequest>> validate = validator.validate(plan);
+
+            //then
+            Assertions.assertTrue(validate.isEmpty());
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 요청이면 예외를 발생한다")
+        public void exceptNullPlan() {
+
+            //given
+            PlanDescriptionRequest plan = TestDataFactory.createNullFieldPlan();
+
+            //when
+            Set<ConstraintViolation<PlanDescriptionRequest>> validate = validator.validate(plan);
+
+            //then
+            Assertions.assertFalse(validate.isEmpty());
+        }
     }
 }
