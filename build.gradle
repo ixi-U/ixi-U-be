@@ -1,9 +1,9 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.3.12'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.12'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'jacoco'
 }
 
 group = 'com'
@@ -16,10 +16,10 @@ java {
 }
 
 configurations {
-	asciidoctorExt
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
@@ -27,70 +27,72 @@ repositories {
 }
 
 ext {
-	set('springAiVersion', "1.0.0")
-	// Rest Docs
-	snippetsDir = file('build/generated-snippets')
+    set('springAiVersion', "1.0.0")
+    // Rest Docs
+    snippetsDir = file('build/generated-snippets')
 }
 
 bootJar {
-	dependsOn asciidoctor // jar 빌드 전에 asciidoctor(문서 생성) 실행
-	copy{
-		from ("${asciidoctor.outputDir}")
-		into 'src/main/resources/static/docs'
-	}
+    dependsOn asciidoctor // jar 빌드 전에 asciidoctor(문서 생성) 실행
+    copy {
+        from("${asciidoctor.outputDir}")
+        into 'src/main/resources/static/docs'
+    }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	// Spring AI Open AI
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
-	// Spring Data Neo4j
-	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    // Spring AI Open AI
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
-	// Neo4j Vector DB
-	implementation 'org.springframework.ai:spring-ai-starter-vector-store-neo4j'
+    // Spring Data Neo4j
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
 
-	// Neo4j Chat Memory
-	implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-neo4j'
+    // Neo4j Vector DB
+    implementation 'org.springframework.ai:spring-ai-starter-vector-store-neo4j'
 
-	// Spring AOP
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
+    // Neo4j Chat Memory
+    implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-neo4j'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    // Spring AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	testImplementation "org.testcontainers:junit-jupiter:1.21.1"
-	testImplementation "org.testcontainers:neo4j:1.21.1"
+    testImplementation "org.testcontainers:junit-jupiter:1.21.1"
+    testImplementation "org.testcontainers:neo4j:1.21.1"
 
-	// Reactor Test
-	testImplementation 'io.projectreactor:reactor-test:3.6.5'
+    // Reactor Test
+    testImplementation 'io.projectreactor:reactor-test:3.6.5'
 
-	// Rest Docs
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.3'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient:3.0.3'
+    // Rest Docs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.3'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient:3.0.3'
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+    }
 }
 
 test {
-	outputs.dir snippetsDir
+    outputs.dir snippetsDir
 }
 
 asciidoctor {
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
-	dependsOn test
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
 }
 
 tasks.named('test') {
