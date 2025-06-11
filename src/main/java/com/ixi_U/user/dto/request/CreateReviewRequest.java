@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record CreateReviewRequest(
+
         @NotBlank(message = "planId를 입력해 주세요")
         String planId,
 

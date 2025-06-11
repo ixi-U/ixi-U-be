@@ -3,6 +3,7 @@ package com.ixi_U.user.dto.response;
 import java.time.LocalDateTime;
 
 public record ShowReviewResponse(
+        
         String userName,
         int point,
         String comment,

@@ -3,6 +3,7 @@ package com.ixi_U.user.dto.response;
 import java.util.List;
 
 public record ShowReviewListResponse(
+
         List<ShowReviewResponse> reviewResponseList,
         boolean hasNextPage
 ) {
