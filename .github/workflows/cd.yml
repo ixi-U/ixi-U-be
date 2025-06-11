@@ -1,7 +1,7 @@
 name: ixi-U_CD
 
 on:
-  pull_request:
+  push:
     branches: ["main", "dev"]
     paths-ignore:
       - 'README.md'
@@ -9,6 +9,10 @@ on:
 permissions:
   id-token: write
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
