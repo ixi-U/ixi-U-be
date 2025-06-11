@@ -15,6 +15,36 @@ operation::getWelcomeMessage[]
 
 operation::unauthorizedUserTest[]
 
-== topic2
+== 리뷰
+
+=== 리뷰 저장 성공
+
+operation::createReview-success[]
+
+=== 실패
+
+==== 리뷰 저장 실패 - planID가 NULL 인 경우
+
+operation::createReview-error-if plan id==null then return 400 error[]
+
+==== 리뷰 저장 실패 - 리뷰 글자가 200보다 큰 경우
+
+operation::createReview-error-if review letter over 200 then return 400 error[]
+
+==== 리뷰 저장 실패 - 리뷰 글자가 20보다 작은 경우
+
+operation::createReview-error-if review letter under 20 then return 400 error[]
+
+==== 리뷰 저장 실패 - 리뷰 점수가 6점 보다 큰 경우
+
+operation::createReview-error-if review point letter over 6 then return 400 error[]
+
+==== 리뷰 저장 실패 - 리뷰 점수가 0점보다 같거나 작은 경우
+
+operation::createReview-error-if review point letter under 0 then return 400 error[]
+
+==== 리뷰 저장 실패 - 리뷰 내용이 빈 경우
+
+operation::createReview-error-if review content==null then return 400 error[]
 
 == topic3
