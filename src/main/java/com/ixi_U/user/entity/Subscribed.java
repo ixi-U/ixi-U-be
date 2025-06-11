@@ -45,20 +45,25 @@ public class Subscribed {
     @Override
     public boolean equals(Object o) {
         if (this == o) {
+
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
+
             return false;
         }
         Subscribed that = (Subscribed) o;
         if (id == null || that.id == null) {
+
             return false;
         }
+
         return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
+
         return id == null ? 0 : id.hashCode();
     }
 

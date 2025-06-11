@@ -17,16 +17,19 @@ public enum PlanException implements BaseException {
 
     @Override
     public String getExceptionName() {
+
         return this.name();
     }
 
     @Override
     public HttpStatus getHttpStatus() {
+
         return this.httpStatus;
     }
 
     @Override
     public String getMessage() {
+
         return this.message;
     }
 

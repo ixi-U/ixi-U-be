@@ -23,6 +23,7 @@ public class UserService {
 
         // setter 없이 withName으로 새 객체 생성
         User updated = user.withName(newName);
+
         return userRepository.save(updated);
     }
 

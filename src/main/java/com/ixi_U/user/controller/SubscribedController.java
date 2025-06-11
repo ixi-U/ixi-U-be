@@ -25,6 +25,7 @@ public class SubscribedController {
             @PathVariable("userId") String userId,
             @RequestBody @Valid CreateSubscribedRequest request) {
         subscribedService.updateSubscribed(userId, request);
+
         return ResponseEntity.ok().build();
     }
 }

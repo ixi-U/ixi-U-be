@@ -71,20 +71,25 @@ public class Plan {
     @Override
     public boolean equals(Object o) {
         if (this == o) {
+
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
+
             return false;
         }
         Plan plan = (Plan) o;
         if (id == null || plan.id == null) {
+
             return false;
         }
+
         return id.equals(plan.id);
     }
 
     @Override
     public int hashCode() {
+
         return id == null ? 0 : id.hashCode();
     }
 
