@@ -5,6 +5,8 @@ import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.response.ShowReviewListResponse;
+import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
@@ -14,6 +16,8 @@ import com.ixi_U.user.repository.ReviewedRepository;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +62,14 @@ public class ReviewService {
         if (reviewedRepository.existsReviewedRelation(findUser.getId(), findPlan.getId())) {
             throw new GeneralException(ReviewedException.REVIEW_ALREADY_EXIST);
         }
+    }
+
+    public ShowReviewListResponse showReview(String planId, Pageable pageable) {
+
+        Slice<ShowReviewResponse> reviewedList = reviewedRepository.findReviewedByPlanWithPaging(
+                planId, pageable);
+
+        return ShowReviewListResponse.of(reviewedList.getContent(), reviewedList.hasNext());
     }
 
 }
