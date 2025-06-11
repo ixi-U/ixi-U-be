@@ -32,3 +32,7 @@ operation::plans-get-invalid-sort[]
 === 유효하지 않은 요금제 타입 실패
 
 operation::plans-get-invalid-plan-type[]
+
+=== 유효하지 않은 파라미터(size) 실패
+
+operation::plans-get-invalid-size-parameter[]
