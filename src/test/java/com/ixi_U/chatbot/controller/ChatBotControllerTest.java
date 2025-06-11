@@ -59,12 +59,14 @@ class ChatBotControllerTest {
                     .accept(MediaType.TEXT_EVENT_STREAM)
                     .exchange()
                     .expectStatus().isOk()
-                    .returnResult(String.class)
+                    .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
+                    .expectBodyList(String.class)
+                    .contains(split[0])
                     .consumeWith(document("getWelcomeMessage"));
         }
 
         @Test
-        @DisplayName("인증/인가 되지않은 사용자는 4xx 에러를 반환한다")
+        @DisplayName("인증/인가 되지않은 사용자는 401 에러를 반환한다")
         void unauthorizedUserTest() {
 
             //given
