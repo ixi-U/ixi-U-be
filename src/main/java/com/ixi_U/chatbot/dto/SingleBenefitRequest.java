@@ -2,7 +2,7 @@ package com.ixi_U.chatbot.dto;
 
 import com.ixi_U.benefit.entity.BenefitType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,10 +22,11 @@ public class SingleBenefitRequest {
     @NotBlank
     private String subscript;
 
-    @NotEmpty
+    @NotNull
     private BenefitType benefitType;
 
-    public static SingleBenefitRequest of(final String id, final String name, final String subscript,
+    public static SingleBenefitRequest of(final String id, final String name,
+            final String subscript,
             final BenefitType benefitType) {
         return SingleBenefitRequest.builder()
                 .id(id)

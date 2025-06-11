@@ -1,8 +1,9 @@
 package com.ixi_U.chatbot.dto;
 
 import com.ixi_U.benefit.entity.BenefitType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -24,17 +25,20 @@ public class PlanDescriptionRequest {
     @NotBlank
     private String subscript;
 
-    @NotEmpty
-    private int data;
+    @Positive
+    private Integer data;
 
-    @NotEmpty
-    private int price;
+    @Positive
+    private Integer price;
 
+    @Valid
     private List<BundledBenefitRequest> bundledBenefits;
 
+    @Valid
     private List<SingleBenefitRequest> singleBenefits;
 
-    public static PlanDescriptionRequest of(final String id, final String name, final String subscript,
+    public static PlanDescriptionRequest of(final String id, final String name,
+            final String subscript,
             final int data, final int price,
             final List<BundledBenefitRequest> bundledBenefits,
             final List<SingleBenefitRequest> singleBenefits) {
