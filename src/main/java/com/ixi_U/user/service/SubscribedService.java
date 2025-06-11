@@ -32,9 +32,9 @@ public class SubscribedService {
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
         // 유저의 가장 최신 구독 가져오기
-        Subscribed latestSubscribed = user.getSubscribedHistory().isEmpty()
-                ? null
-                : user.getSubscribedHistory().get(user.getSubscribedHistory().size() - 1);
+        Subscribed latestSubscribed = user.getSubscribedHistory().stream()
+                .reduce((first, second) -> second)
+                .orElse(null);
 
         // 현재 요금제와 같은지 체크
         if (latestSubscribed != null && latestSubscribed.getPlan().equals(plan)) {
