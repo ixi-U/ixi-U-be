@@ -1,8 +1,10 @@
 package com.ixi_U.user.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -11,7 +13,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.response.ShowReviewListResponse;
+import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.service.ReviewService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -246,6 +251,44 @@ class ReviewControllerTest {
                         .andExpect(jsonPath("$.message")
                                 .value("planId: planId를 입력해 주세요"));
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("리뷰 목록 조회 요청은")
+    class Describe_showReviewList {
+
+        @Test
+        @DisplayName("리뷰 목록과 hasNext를 반환한다")
+        void it_returns_review_list_and_hasNext() throws Exception {
+            // given
+            List<ShowReviewResponse> content = List.of(
+                    new ShowReviewResponse("유저1", 5, "좋았어요"),
+                    new ShowReviewResponse("유저2", 3, "괜찮아요")
+            );
+
+            ShowReviewListResponse response = ShowReviewListResponse.of(content, false);
+
+            given(reviewService.showReview(any(), any())).willReturn(response);
+
+            // when
+            ResultActions result = mockMvc.perform(
+                            get(REVIEW_URL)
+                                    .with(csrf())
+                                    .param("planId", "plan-001")
+                                    .param("page", "0")
+                                    .param("size", "5")
+                                    .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print());
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.hasNextPage").value(false))
+                    .andExpect(jsonPath("$.reviewResponseList").isArray())
+                    .andExpect(jsonPath("$.reviewResponseList.length()").value(2))
+                    .andExpect(jsonPath("$.reviewResponseList[0].comment").value("좋았어요"))
+                    .andExpect(jsonPath("$.reviewResponseList[0].userName").value("유저1"))
+                    .andExpect(jsonPath("$.reviewResponseList[0].point").value(5));
         }
     }
 
