@@ -43,22 +43,29 @@ class BaseEntityAuditingTest {
     }
 
     @Test
-    @DisplayName("createdAt과 updatedAt에 값이 정상적으로 들어가는지 확인")
-    void testCreatedAndModifiedDateAreSet() {
-        // 엔티티 생성 및 저장
+    @DisplayName("엔티티 저장 시 createdAt, updatedAt이 세팅된다")
+    void testCreatedAndUpdatedAtSetOnSave() {
+        // given & when
         User savedUser = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
 
-        // 저장 후 createdAt, updatedAt 값이 null이 아닌지 확인
+        // then
         assertThat(savedUser.getCreatedAt()).isNotNull();
         assertThat(savedUser.getUpdatedAt()).isNotNull();
+    }
 
-        // 엔티티 수정 후 updatedAt이 변경되는지 확인
+    @Test
+    @DisplayName("엔티티 수정 시 updatedAt이 변경된다")
+    void testUpdatedAtChangesOnUpdate() {
+        // given
+        User savedUser = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
         Instant oldUpdatedAt = savedUser.getUpdatedAt();
 
-        // user 정보 수정 (예: 닉네임 변경 등)
+        // when
         User updatedUser = userRepository.save(
                 userService.changeName(savedUser.getId(), "new 홍길동"));
 
+        // then
         assertThat(updatedUser.getUpdatedAt()).isAfter(oldUpdatedAt);
     }
+
 }
