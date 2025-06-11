@@ -14,8 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 import org.springframework.data.domain.PageRequest;
@@ -178,14 +176,13 @@ class ReviewedRepositoryTest {
             assertThat(page.hasNext()).isFalse();
         }
 
-        @DisplayName("내림 차순 정렬이 잘 된다.")
-        @ParameterizedTest(name = "정렬 칼럼 {0}")
-        @ValueSource(strings = {"point"})
-        void it_returns_with_correct_order_desc(String orderColumn) {
+        @Test
+        @DisplayName("점수 기반 내림 차순 정렬이 잘 된다.")
+        void it_returns_with_correct_point_order_desc() {
             // when
             Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
                     savedPlan.getId(),
-                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.DESC, orderColumn)));
+                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.DESC, "point")));
 
             List<ShowReviewResponse> content = page.getContent();
 
@@ -196,14 +193,30 @@ class ReviewedRepositoryTest {
             }
         }
 
-        @DisplayName("오름 차순 정렬이 잘 된다.")
-        @ParameterizedTest(name = "정렬 칼럼 {0}")
-        @ValueSource(strings = {"point"})
-        void it_returns_with_correct_order_asc(String orderColumn) {
+        @Test
+        @DisplayName("생성 시간 기반 내림 차순 정렬이 잘 된다.")
+        void it_returns_with_correct_createdAt_order_desc() {
             // when
             Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
                     savedPlan.getId(),
-                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.ASC, orderColumn)));
+                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.DESC, "createdAt")));
+
+            List<ShowReviewResponse> content = page.getContent();
+
+            // then
+            for (int i = 1; i < content.size(); i++) {
+                assertThat(content.get(i - 1).createdAt())
+                        .isAfterOrEqualTo(content.get(i).createdAt());
+            }
+        }
+
+        @Test
+        @DisplayName("점수 기반 오름 차순 정렬이 잘 된다.")
+        void it_returns_with_correct_score_order_asc() {
+            // when
+            Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
+                    savedPlan.getId(),
+                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.ASC, "point")));
 
             List<ShowReviewResponse> content = page.getContent();
 

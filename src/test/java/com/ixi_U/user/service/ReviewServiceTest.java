@@ -19,6 +19,8 @@ import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.repository.ReviewedRepository;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -145,8 +147,10 @@ class ReviewServiceTest {
             Pageable pageable = PageRequest.of(0, 5);
 
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse("유저1", 4, "리뷰1"),
-                    new ShowReviewResponse("유저2", 5, "리뷰2")
+                    new ShowReviewResponse("유저1", 4, "리뷰1",
+                            LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
+                    new ShowReviewResponse("유저2", 5, "리뷰2",
+                            LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 
             Slice<ShowReviewResponse> mockSlice = Mockito.mock(Slice.class);

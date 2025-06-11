@@ -16,6 +16,8 @@ import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.service.ReviewService;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -263,8 +265,10 @@ class ReviewControllerTest {
         void it_returns_review_list_and_hasNext() throws Exception {
             // given
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse("유저1", 5, "좋았어요"),
-                    new ShowReviewResponse("유저2", 3, "괜찮아요")
+                    new ShowReviewResponse("유저1", 5, "좋았어요",
+                            LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
+                    new ShowReviewResponse("유저2", 3, "괜찮아요",
+                            LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 
             ShowReviewListResponse response = ShowReviewListResponse.of(content, false);
@@ -288,7 +292,11 @@ class ReviewControllerTest {
                     .andExpect(jsonPath("$.reviewResponseList.length()").value(2))
                     .andExpect(jsonPath("$.reviewResponseList[0].comment").value("좋았어요"))
                     .andExpect(jsonPath("$.reviewResponseList[0].userName").value("유저1"))
-                    .andExpect(jsonPath("$.reviewResponseList[0].point").value(5));
+                    .andExpect(jsonPath("$.reviewResponseList[0].point").value(5))
+                    .andExpect(jsonPath("$.reviewResponseList[0].createdAt").value(
+                            "2025-06-11T12:00:00"))
+                    .andExpect(jsonPath("$.reviewResponseList[1].createdAt").value(
+                            "2025-06-13T12:00:00"));
         }
     }
 
