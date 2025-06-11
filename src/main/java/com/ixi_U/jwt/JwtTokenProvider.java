@@ -14,7 +14,7 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
-    // TODO: yml에서 설정하세요 네? 쉬발 뒤지기싫으면
+    // TODO: yml에서 설정하세요 네? 쉬발 뒤지기싫으면 -> 만료시간을 하드코딩하네;;;
     private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 1일
 
     private Key key;

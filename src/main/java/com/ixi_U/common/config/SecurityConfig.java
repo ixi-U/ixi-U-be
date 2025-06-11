@@ -30,6 +30,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 X
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/**", "/public/**").permitAll() // 로그인 관련 요청은 허용
+                        .requestMatchers("/test/**").permitAll()
+                        .requestMatchers("/api/user/**").authenticated()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CORS preflight 허용
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )

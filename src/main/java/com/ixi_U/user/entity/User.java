@@ -46,7 +46,6 @@ public class User {
     private List<Subscribed> subscribedHistory = new ArrayList<>();
 
     public static User of(final String name, final String email, final String provider, final Long kakaoId) {
-
         return User.builder()
                 .name(name)
                 .email(email)
