@@ -1,13 +1,13 @@
 package com.ixi_U.auth.controller;
 
-import com.ixi_U.auth.dto.KakaoUserResponse;
 import com.ixi_U.auth.service.KakaoAuthService;
 import com.ixi_U.common.exception.GeneralException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,34 +15,28 @@ public class KakaoAuthController {
 
     private final KakaoAuthService kakaoAuthService;
 
-    private static final String FRONT_REDIRECT_BASE = "http://localhost:3000/login/status";
-
     @GetMapping("/login/auth/code/kakao")
-    public RedirectView kakaoLogin(@RequestParam("code") String code){
-
+    public ResponseEntity<Void> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
         try {
-            String kakaoAccessToken = kakaoAuthService.getAccessToken(code); // 카카오 access_token 요청
-            KakaoUserResponse kakaoUser = kakaoAuthService.getUserInfoFromKakao(kakaoAccessToken); // 사용자 정보
+            String jwt = kakaoAuthService.loginAndIssueJwt(code); // 사용자 정보를 바탕으로 jwt 발급
 
-            boolean isNewUser = kakaoAuthService.handleUserLoginFlow(kakaoUser);
+            // 쿠키에 Jwt를 담아서 프론트에 전달
+            Cookie cookie = new Cookie("access_token", jwt);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60 * 24); // 1일
 
-            return redirectToStatusWithNewUserFlag(isNewUser);
+            response.addCookie(cookie);
+
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .header("Location", "http://localhost:3000/login/status")
+                    .build();
 
         } catch (GeneralException e) {
-            return redirectToStatusWithError(e.getExceptionName());
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .header("Location", "http://localhost:3000/login/status?error=" + e.getExceptionName())
+                    .build();
         }
-    }
-
-    private RedirectView redirectToStatusWithNewUserFlag(boolean isNewUser) {
-        if (isNewUser) {
-            return new RedirectView(FRONT_REDIRECT_BASE + "?isNewUser=" + "true"); // 신규 회원
-        } else {
-            return new RedirectView(FRONT_REDIRECT_BASE + "?isNewUser=" + "false"); // 기존 유저
-        }
-
-    }
-
-    private RedirectView redirectToStatusWithError(String error) {
-        return new RedirectView(FRONT_REDIRECT_BASE + "?error=" + error);
     }
 }
