@@ -60,6 +60,6 @@ class BaseEntityAuditingTest {
 
         User updatedUser = userRepository.save(savedUser);
 
-        assertThat(updatedUser.getUpdatedAt()).isAfterOrEqualTo(oldUpdatedAt);
+        assertThat(updatedUser.getUpdatedAt()).isAfter(oldUpdatedAt);
     }
 }
