@@ -83,7 +83,7 @@ class ReviewControllerTest {
             @Test
             @DisplayName("리뷰를 저장하고 201을 반환한다")
             void it_returns_201_created() throws Exception {
-
+                //given
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5,
                         "안녕하십니까....저는 이 리뷰를 좋아합니다");
 
@@ -182,7 +182,6 @@ class ReviewControllerTest {
             @DisplayName("리뷰 내용이 200자 초과면 400을 반환한다")
             void it_returns_400_if_comment_too_long() throws Exception {
                 // given
-
                 String comment = "아".repeat(201);
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5, comment);
 
@@ -208,7 +207,6 @@ class ReviewControllerTest {
             @ValueSource(ints = {-1, 0})
             void it_returns_400_if_point_under_zero(int point) throws Exception {
                 // given
-
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", point,
                         "1111122222333334444455555");
 
@@ -233,7 +231,6 @@ class ReviewControllerTest {
             @ValueSource(ints = {6, 100})
             void it_returns_400_if_point_over_5(int point) throws Exception {
                 // given
-
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", point,
                         "1111122222333334444455555");
 
@@ -257,10 +254,8 @@ class ReviewControllerTest {
             @DisplayName("planId가 비어있으면 400을 반환한다")
             void it_returns_400_if_planId_missing() throws Exception {
                 // given
-
                 CreateReviewRequest request = CreateReviewRequest.of("", 5,
                         "1111122222333334444455555");
-
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
@@ -270,7 +265,6 @@ class ReviewControllerTest {
                         .andDo(document(
                                 "createReview-error-plan-id-null"))
                         .andDo(print());
-
                 // then
                 result.andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message")

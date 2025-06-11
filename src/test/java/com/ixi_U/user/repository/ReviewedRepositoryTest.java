@@ -48,11 +48,11 @@ class ReviewedRepositoryTest {
 
     @DynamicPropertySource
     static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
+
         registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
         registry.add("spring.neo4j.authentication.username", () -> "neo4j");
         registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
     }
-
 
     @Nested
     @DisplayName("리뷰를 저장할 때")
@@ -139,6 +139,7 @@ class ReviewedRepositoryTest {
 
         @BeforeEach
         void setUp() {
+
             savedPlan = planRepository.save(Plan.of("요금제 A"));
 
             for (int i = 0; i < totalReviewCount; i++) {
@@ -165,6 +166,7 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("마지막 페이지 조회 시, 남은 리뷰 수만큼 조회되며 다음 페이지가 존재하지 않는다")
         void it_returns_last_page_with_has_next_false() {
+
             int expectedLastPageSize = totalReviewCount % pageSize;
 
             // when

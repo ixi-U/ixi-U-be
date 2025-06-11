@@ -41,6 +41,7 @@ class SubscribedRepositoryTest {
 
     @DynamicPropertySource
     static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
+
         registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
         registry.add("spring.neo4j.authentication.username", () -> "neo4j");
         registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
