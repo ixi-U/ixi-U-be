@@ -301,6 +301,8 @@ class ReviewControllerTest {
                                     .param("page", "0")
                                     .param("size", "5")
                                     .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(document(
+                            "showReview-success"))
                     .andDo(print());
 
             // then
