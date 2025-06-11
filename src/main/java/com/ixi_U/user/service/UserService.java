@@ -1,5 +1,7 @@
 package com.ixi_U.user.service;
 
+import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ public class UserService {
     @Transactional
     public User changeName(String userId, String newName) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
         // setter 없이 withName으로 새 객체 생성
         User updated = user.withName(newName);
