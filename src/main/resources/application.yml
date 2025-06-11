@@ -35,4 +35,4 @@ spring:
 
 kakao:
   rest-api-key: ${KAKAO_REST_API_KEY}
-  redirect-uri: http://localhost:8080/login/auth/code/kakao
+  redirect-uri: ${KAKAO_REDIRECT_URI}
