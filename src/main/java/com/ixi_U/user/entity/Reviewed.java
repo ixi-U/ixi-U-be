@@ -1,12 +1,15 @@
 package com.ixi_U.user.entity;
 
-import com.ixi_U.common.entity.BaseEntity;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
 import org.neo4j.driver.summary.Plan;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
@@ -16,7 +19,7 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Reviewed extends BaseEntity {
+public class Reviewed {
 
     @RelationshipId
     private final Long id;
@@ -27,6 +30,14 @@ public class Reviewed extends BaseEntity {
 
     @TargetNode
     private final Plan plan;
+
+    @CreatedDate
+    @Property("created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Property("updated_at")
+    private LocalDateTime updatedAt;
 
     public static Reviewed of(final int point, final Plan plan) {
 

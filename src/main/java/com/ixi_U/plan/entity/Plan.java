@@ -2,7 +2,7 @@ package com.ixi_U.plan.entity;
 
 import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
-import com.ixi_U.common.entity.BaseEntity;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -22,7 +24,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Plan extends BaseEntity {
+public class Plan {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
@@ -32,6 +34,14 @@ public class Plan extends BaseEntity {
     private final String name;
 
     private final State state;
+
+    @CreatedDate
+    @Property("created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Property("updated_at")
+    private LocalDateTime updatedAt;
 
     @Builder.Default
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)

@@ -1,6 +1,6 @@
 package com.ixi_U.user.entity;
 
-import com.ixi_U.common.entity.BaseEntity;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -20,7 +22,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 @With
 @Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
+public class User {
 
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
@@ -35,6 +37,14 @@ public class User extends BaseEntity {
 
     @Property(name = "provider")
     private final String provider;
+
+    @CreatedDate
+    @Property("created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Property("updated_at")
+    private LocalDateTime updatedAt;
 
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
