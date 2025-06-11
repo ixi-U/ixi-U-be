@@ -15,6 +15,20 @@ operation::getWelcomeMessage[]
 
 operation::unauthorizedUserTest[]
 
-== topic2
+== 요금제 API
 
-== topic3
+=== 정렬 조건으로 요금제 조회 성공
+
+operation::plans-get-sort[]
+
+=== 검색 조건으로 요금제 조회 성공
+
+operation::plans-get-search[]
+
+=== 유효하지 않은 정렬 조건 실패
+
+operation::plans-get-invalid-sort[]
+
+=== 유효하지 않은 요금제 타입 실패
+
+operation::plans-get-invalid-plan-type[]
