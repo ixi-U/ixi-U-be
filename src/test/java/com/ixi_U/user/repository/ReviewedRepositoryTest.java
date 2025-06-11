@@ -5,14 +5,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
+import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
+import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -123,5 +131,90 @@ class ReviewedRepositoryTest {
                 assertThat(existReview).isFalse();
             }
         }
+    }
+
+    @Nested
+    @DisplayName("리뷰 리스트를 조회할 때")
+    class Describe_showReview {
+
+        private final int totalReviewCount = 6;
+        private final int pageSize = 5;
+        private Plan savedPlan;
+
+        @BeforeEach
+        void setUp() {
+            savedPlan = planRepository.save(Plan.of("요금제 A"));
+
+            for (int i = 0; i < totalReviewCount; i++) {
+                User user = userRepository.save(
+                        User.of("user" + i, "user" + i + "@mail.com", "kakao"));
+                Reviewed reviewed = Reviewed.of(5 - i % 5, savedPlan, "user" + i + "의 리뷰입니다");
+                user.addReviewed(reviewed);
+                userRepository.save(user);
+            }
+        }
+
+        @Test
+        @DisplayName("첫 페이지 조회 시, 페이지 크기만큼 조회되며 다음 페이지가 존재한다")
+        void it_returns_first_page_with_has_next_true() {
+            // when
+            Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
+                    savedPlan.getId(), PageRequest.of(0, pageSize));
+
+            // then
+            assertThat(page.getContent()).hasSize(pageSize);
+            assertThat(page.hasNext()).isTrue();
+        }
+
+        @Test
+        @DisplayName("마지막 페이지 조회 시, 남은 리뷰 수만큼 조회되며 다음 페이지가 존재하지 않는다")
+        void it_returns_last_page_with_has_next_false() {
+            int expectedLastPageSize = totalReviewCount % pageSize;
+
+            // when
+            Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
+                    savedPlan.getId(), PageRequest.of(1, pageSize));
+
+            // then
+            assertThat(page.getContent()).hasSize(expectedLastPageSize);
+            assertThat(page.hasNext()).isFalse();
+        }
+
+        @DisplayName("내림 차순 정렬이 잘 된다.")
+        @ParameterizedTest(name = "정렬 칼럼 {0}")
+        @ValueSource(strings = {"point"})
+        void it_returns_with_correct_order_desc(String orderColumn) {
+            // when
+            Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
+                    savedPlan.getId(),
+                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.DESC, orderColumn)));
+
+            List<ShowReviewResponse> content = page.getContent();
+
+            // then
+            for (int i = 1; i < content.size(); i++) {
+                assertThat(content.get(i - 1).point())
+                        .isGreaterThanOrEqualTo(content.get(i).point());
+            }
+        }
+
+        @DisplayName("오름 차순 정렬이 잘 된다.")
+        @ParameterizedTest(name = "정렬 칼럼 {0}")
+        @ValueSource(strings = {"point"})
+        void it_returns_with_correct_order_asc(String orderColumn) {
+            // when
+            Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
+                    savedPlan.getId(),
+                    PageRequest.of(0, pageSize, Sort.by(Sort.DEFAULT_DIRECTION.ASC, orderColumn)));
+
+            List<ShowReviewResponse> content = page.getContent();
+
+            // then
+            for (int i = 1; i < content.size(); i++) {
+                assertThat(content.get(i - 1).point())
+                        .isLessThanOrEqualTo(content.get(i).point());
+            }
+        }
+
     }
 }
