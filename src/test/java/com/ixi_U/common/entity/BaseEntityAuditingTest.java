@@ -43,7 +43,7 @@ class BaseEntityAuditingTest {
     }
 
     @Test
-    @DisplayName("createdAt과 updatedAT에 값이 정상적으로 들어가는지 확인")
+    @DisplayName("createdAt과 updatedAt에 값이 정상적으로 들어가는지 확인")
     void testCreatedAndModifiedDateAreSet() {
         // 엔티티 생성 및 저장
         User savedUser = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
