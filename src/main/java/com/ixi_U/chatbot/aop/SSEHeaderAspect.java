@@ -16,7 +16,7 @@ public class SSEHeaderAspect {
         Object result = joinPoint.proceed();
 
         if (result instanceof ResponseEntity<?> responseEntity) {
-            return ResponseEntity.ok()
+            return ResponseEntity.status(responseEntity.getStatusCode())
                     .headers(responseEntity.getHeaders())
                     .header(sseEndpoint.headerType(), sseEndpoint.contentType())
                     .body(responseEntity.getBody());
