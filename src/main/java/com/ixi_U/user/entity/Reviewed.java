@@ -27,7 +27,7 @@ public class Reviewed {
     @TargetNode
     private final Plan plan;
 
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public static Reviewed of(final int point, final Plan plan, final String comment) {
 
