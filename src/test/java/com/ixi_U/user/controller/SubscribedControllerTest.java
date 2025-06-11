@@ -64,6 +64,7 @@ class SubscribedControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
+        Mockito.verifyNoInteractions(subscribedService);
     }
 
     @TestConfiguration
