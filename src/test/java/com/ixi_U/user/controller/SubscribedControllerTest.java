@@ -1,6 +1,5 @@
 package com.ixi_U.user.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +50,7 @@ class SubscribedControllerTest {
                 .andExpect(status().isOk());
 
         Mockito.verify(subscribedService)
-                .updateSubscribed(eq(userId), any(CreateSubscribedRequest.class));
+                .updateSubscribed(eq(userId), eq(request));
     }
 
     @Test
