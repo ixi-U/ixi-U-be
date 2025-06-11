@@ -54,10 +54,10 @@ class BaseEntityAuditingTest {
 
         // 엔티티 수정 후 updatedAt이 변경되는지 확인
         LocalDateTime oldUpdatedAt = savedUser.getUpdatedAt();
-        // user 정보 수정 (예: 닉네임 변경 등)
-        savedUser = userService.changeName(savedUser.getId(), "new 홍길동");
 
-        User updatedUser = userRepository.save(savedUser);
+        // user 정보 수정 (예: 닉네임 변경 등)
+        User updatedUser = userRepository.save(
+                userService.changeName(savedUser.getId(), "new 홍길동"));
 
         assertThat(updatedUser.getUpdatedAt()).isAfter(oldUpdatedAt);
     }
