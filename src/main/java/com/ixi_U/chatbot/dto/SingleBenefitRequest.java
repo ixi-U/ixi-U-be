@@ -14,18 +14,18 @@ import lombok.Getter;
 public class SingleBenefitRequest {
 
     @NotBlank
-    private String id;
+    private final String id;
 
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotBlank
-    private String subscript;
+    private final String subscript;
 
     @NotNull
-    private BenefitType benefitType;
+    private final BenefitType benefitType;
 
-    public static SingleBenefitRequest of(final String id, final String name,
+    public static SingleBenefitRequest create(final String id, final String name,
             final String subscript,
             final BenefitType benefitType) {
         return SingleBenefitRequest.builder()

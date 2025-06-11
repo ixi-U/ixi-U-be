@@ -28,28 +28,35 @@ public class ChatBotService {
             """;
 
     @Qualifier("descriptionClient")
-    private final ChatClient embeddingClient;
+    private final ChatClient descriptionClient;
     private final ObjectMapper objectMapper;
 
     public Flux<String> getWelcomeMessage() {
 
-        return Flux.fromArray(CHATBOT_WELCOME_MESSAGE.split(""))
+        return Flux.fromStream(CHATBOT_WELCOME_MESSAGE.chars()
+                .mapToObj(c -> String.valueOf((char) c)))
                 .delayElements(Duration.ofMillis(50));
     }
 
-    public String getPlanDescription(@Valid PlanDescriptionRequest request) throws IOException {
+    public String getPlanDescription(@Valid PlanDescriptionRequest request) {
 
-        String planInfo = objectMapper.writeValueAsString(request);
+        try {
+            String planInfo = objectMapper.writeValueAsString(request);
 
-        String chatBotResponse = embeddingClient.prompt()
-                .user(planInfo)
-                .call()
-                .content();
+            String chatBotResponse = descriptionClient.prompt()
+                    .user(planInfo)
+                    .call()
+                    .content();
 
-        if (chatBotResponse == null || chatBotResponse.isBlank()) {
+            if (chatBotResponse == null || chatBotResponse.isBlank()) {
+                throw new GeneralException(ChatBotException.CHAT_BOT_BAD_RESPONSE);
+            }
+
+            return chatBotResponse;
+
+        } catch (IOException e) {
+
             throw new GeneralException(ChatBotException.CHAT_BOT_BAD_RESPONSE);
         }
-
-        return chatBotResponse;
     }
 }

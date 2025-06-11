@@ -52,16 +52,4 @@ public class PlanDescriptionRequest {
                 .singleBenefits(singleBenefits)
                 .build();
     }
-
-    public static PlanDescriptionRequest createValidPlan() {
-
-        SingleBenefitRequest sbr = SingleBenefitRequest.of(
-                UUID.randomUUID().toString(), "테스트 단일 혜택", "기본 단일 혜택", BenefitType.DEVICE);
-
-        BundledBenefitRequest bbr = BundledBenefitRequest.of(
-                UUID.randomUUID().toString(), "테스트 번들 혜택", "기본 번들 혜택", 1, List.of(sbr));
-
-        return PlanDescriptionRequest.of(UUID.randomUUID().toString(), "테스트 요금제", "기본 요금제", 100,
-                59000, List.of(bbr), List.of(sbr));
-    }
 }

@@ -16,7 +16,7 @@ public enum ChatBotException implements BaseException {
 
     @Override
     public String getExceptionName() {
-        return "";
+        return name();
     }
 
     @Override

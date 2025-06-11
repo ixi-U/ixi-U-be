@@ -2,6 +2,8 @@ package com.ixi_U.chatbot.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.AccessLevel;
@@ -15,18 +17,20 @@ import lombok.Getter;
 public class BundledBenefitRequest {
 
     @NotBlank
-    private String id;
+    private final String id;
 
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotBlank
-    private String subscript;
+    private final String subscript;
 
     @Positive
-    private Integer choice;
+    @NotNull
+    private final Integer choice;
 
     @Valid
+    @NotEmpty
     private List<SingleBenefitRequest> singleBenefits;
 
     public static BundledBenefitRequest of(final String id, final String name,
