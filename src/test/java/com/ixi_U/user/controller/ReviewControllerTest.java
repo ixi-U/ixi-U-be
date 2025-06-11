@@ -3,6 +3,7 @@ package com.ixi_U.user.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -16,9 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.exception.ReviewedException;
+import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.service.ReviewService;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -79,7 +83,7 @@ class ReviewControllerTest {
             @Test
             @DisplayName("리뷰를 저장하고 201을 반환한다")
             void it_returns_201_created() throws Exception {
-                
+
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5,
                         "안녕하십니까....저는 이 리뷰를 좋아합니다");
 
@@ -139,7 +143,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-if review content==null then return 400 error"))
+                                "createReview-error-review-content-null"))
                         .andDo(print());
 
                 // then
@@ -164,7 +168,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-if review letter under 20 then return 400 error"))
+                                "createReview-error-review-letter-too-short"))
                         .andDo(print());
 
                 // then
@@ -189,7 +193,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-if review letter over 200 then return 400 error"))
+                                "createReview-error-review-letter-too-long"))
                         .andDo(print());
 
                 // then
@@ -215,7 +219,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-if review point letter under 0 then return 400 error"))
+                                "createReview-error-review-point-under-zero"))
                         .andDo(print());
 
                 // then
@@ -240,7 +244,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-if review point letter over 6 then return 400 error"))
+                                "createReview-error-review-point-over-6"))
                         .andDo(print());
 
                 // then
@@ -264,13 +268,65 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-if plan id==null then return 400 error"))
+                                "createReview-error-plan-id-null"))
                         .andDo(print());
 
                 // then
                 result.andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message")
                                 .value("planId: planId를 입력해 주세요"));
+            }
+
+            @Test
+            @DisplayName("구독하지 않은 요금제에 대해 리뷰하면 400을 반환한다")
+            void it_returns_400_when_not_subscribed() throws Exception {
+                // given
+                doThrow(new GeneralException(SubscribedException.PLAN_NOT_SUBSCRIBED))
+                        .when(reviewService).createReview(any(), any());
+
+                CreateReviewRequest request = CreateReviewRequest.of("plan-id", 5,
+                        "1111122222333334444455555");
+
+                // when
+                ResultActions result = mockMvc.perform(post(REVIEW_URL)
+                                .with(csrf())
+                                .param("userId", "userId")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-when-not-subscribe"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message")
+                                .value(SubscribedException.PLAN_NOT_SUBSCRIBED.getMessage()));
+            }
+
+            @Test
+            @DisplayName("이미 리뷰한 요금제에 대해 리뷰하면 400을 반환한다")
+            void it_returns_400_when_already_reviewed() throws Exception {
+                // given
+                doThrow(new GeneralException(ReviewedException.REVIEW_ALREADY_EXIST))
+                        .when(reviewService).createReview(any(), any());
+
+                CreateReviewRequest request = CreateReviewRequest.of("plan-id", 5,
+                        "1111122222333334444455555");
+
+                // when
+                ResultActions result = mockMvc.perform(post(REVIEW_URL)
+                                .with(csrf())
+                                .param("userId", "userId")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "createReview-error-when-already-reviewed"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message")
+                                .value(ReviewedException.REVIEW_ALREADY_EXIST.getMessage()));
             }
         }
     }
