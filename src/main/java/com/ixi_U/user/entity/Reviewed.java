@@ -1,12 +1,12 @@
 package com.ixi_U.user.entity;
 
+import com.ixi_U.plan.entity.Plan;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
-import org.neo4j.driver.summary.Plan;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.core.schema.Property;
