@@ -9,6 +9,7 @@ import com.ixi_U.user.dto.CreateSubscribedRequest;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,7 @@ public class SubscribedService {
                 .orElse(null);
 
         // 현재 요금제와 같은지 체크
-        if (latestSubscribed != null && latestSubscribed.getPlan().equals(plan)) {
+        if (Objects.nonNull(latestSubscribed) && latestSubscribed.getPlan().equals(plan)) {
             throw new GeneralException(PlanException.ALREADY_SUBSCRIBED_PLAN);
         }
 
