@@ -68,7 +68,10 @@ public class Plan extends BaseEntity {
             return false;
         }
         Plan plan = (Plan) o;
-        return Objects.equals(id, plan.id);
+        if (id == null || plan.id == null) {
+            return false;
+        }
+        return id.equals(plan.id);
     }
 
     @Override
