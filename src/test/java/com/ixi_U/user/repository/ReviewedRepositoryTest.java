@@ -40,9 +40,7 @@ class ReviewedRepositoryTest {
     @Container
     private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
             DockerImageName.parse("neo4j:5"))
-            .withAdminPassword("1q2w3e4r")
-            .withReuse(true);
-
+            .withAdminPassword("1q2w3e4r");
     @Autowired
     ReviewedRepository reviewedRepository;
     @Autowired
