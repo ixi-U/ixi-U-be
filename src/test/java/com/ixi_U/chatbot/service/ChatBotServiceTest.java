@@ -1,7 +1,9 @@
 package com.ixi_U.chatbot.service;
 
 import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -15,7 +17,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -35,7 +35,6 @@ import reactor.test.StepVerifier;
 class ChatBotServiceTest {
 
     @Mock
-    @Qualifier("descriptionClient")
     ChatClient descriptionClient;
 
     Validator validator;
@@ -103,7 +102,7 @@ class ChatBotServiceTest {
             Set<ConstraintViolation<PlanDescriptionRequest>> validate = validator.validate(plan);
 
             //then
-            Assertions.assertTrue(validate.isEmpty());
+            assertTrue(validate.isEmpty());
         }
 
         @Test
@@ -117,7 +116,7 @@ class ChatBotServiceTest {
             Set<ConstraintViolation<PlanDescriptionRequest>> validate = validator.validate(plan);
 
             //then
-            Assertions.assertFalse(validate.isEmpty());
+            assertFalse(validate.isEmpty());
         }
     }
 }
