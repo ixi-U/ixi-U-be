@@ -3,6 +3,8 @@ package com.ixi_U.user.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -77,9 +79,7 @@ class ReviewControllerTest {
             @Test
             @DisplayName("리뷰를 저장하고 201을 반환한다")
             void it_returns_201_created() throws Exception {
-                // given
-                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
-
+                
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5,
                         "안녕하십니까....저는 이 리뷰를 좋아합니다");
 
@@ -94,6 +94,7 @@ class ReviewControllerTest {
 
                 // then
                 result.andExpect(status().isCreated());
+                verify(reviewService, times(1)).createReview("userId", request);
             }
 
             @DisplayName("별점이 1~5일 경우 저장된다")
@@ -177,7 +178,7 @@ class ReviewControllerTest {
             @DisplayName("리뷰 내용이 200자 초과면 400을 반환한다")
             void it_returns_400_if_comment_too_long() throws Exception {
                 // given
-                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
+
                 String comment = "아".repeat(201);
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5, comment);
 
@@ -203,7 +204,7 @@ class ReviewControllerTest {
             @ValueSource(ints = {-1, 0})
             void it_returns_400_if_point_under_zero(int point) throws Exception {
                 // given
-                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
+
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", point,
                         "1111122222333334444455555");
 
@@ -228,7 +229,7 @@ class ReviewControllerTest {
             @ValueSource(ints = {6, 100})
             void it_returns_400_if_point_over_5(int point) throws Exception {
                 // given
-                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
+
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", point,
                         "1111122222333334444455555");
 
@@ -252,7 +253,7 @@ class ReviewControllerTest {
             @DisplayName("planId가 비어있으면 400을 반환한다")
             void it_returns_400_if_planId_missing() throws Exception {
                 // given
-                doNothing().when(reviewService).createReview(any(), any(CreateReviewRequest.class));
+
                 CreateReviewRequest request = CreateReviewRequest.of("", 5,
                         "1111122222333334444455555");
 
