@@ -12,3 +12,5 @@ spring:
 spring:
   config:
     import: classpath:application-dev.properties
+  main:
+    allow-bean-definition-overriding: true

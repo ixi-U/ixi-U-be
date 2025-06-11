@@ -14,22 +14,28 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
+@WebMvcTest(
+        controllers = SubscribedController.class,
+        excludeAutoConfiguration = {
+                org.springframework.boot.autoconfigure.data.neo4j.Neo4jDataAutoConfiguration.class,
+                org.springframework.boot.autoconfigure.data.neo4j.Neo4jRepositoriesAutoConfiguration.class
+        }
+)
 @AutoConfigureMockMvc(addFilters = false)
-@WebMvcTest(SubscribedController.class)
 class SubscribedControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-
     @Autowired
     ObjectMapper objectMapper;
-
     @MockBean
     SubscribedService subscribedService;
 
@@ -58,5 +64,14 @@ class SubscribedControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @TestConfiguration
+    static class DisableNeo4jAuditingConfig {
+
+        @Bean("neo4jAuditingHandler")
+        public Object fakeAuditingHandler() {
+            return new Object();
+        }
     }
 }
