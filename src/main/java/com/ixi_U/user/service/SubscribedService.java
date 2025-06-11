@@ -40,6 +40,9 @@ public class SubscribedService {
         if (latestSubscribed != null && latestSubscribed.getPlan().equals(plan)) {
             throw new GeneralException(PlanException.ALREADY_SUBSCRIBED_PLAN);
         }
+
+        user.addSubscribed(Subscribed.of(plan));
+
         userRepository.save(user);
     }
 }
