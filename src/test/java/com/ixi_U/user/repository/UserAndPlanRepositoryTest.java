@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.common.exception.enums.PlanException;
 import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -158,7 +159,8 @@ class UserAndPlanRepositoryTest {
                         new CreateSubscribedRequest(plan.getId()))
         )
                 .isInstanceOf(GeneralException.class)
-                .hasMessage("이미 현재 구독 중인 요금제입니다.");
+                .hasMessage(PlanException.ALREADY_SUBSCRIBED_PLAN.getMessage());
+
     }
 
 
