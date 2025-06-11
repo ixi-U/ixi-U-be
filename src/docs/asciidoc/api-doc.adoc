@@ -1,0 +1,20 @@
+= Connect API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: right
+:toclevels: 2
+
+== 챗봇 API
+
+=== 웰컴 메세지 성공
+
+operation::getWelcomeMessage[]
+
+=== 인증/인가 되지 않은 요청 거부
+
+operation::unauthorizedUserTest[]
+
+== topic2
+
+== topic3
