@@ -73,7 +73,7 @@ class ReviewedRepositoryTest {
             Optional<User> loadedUser = userRepository.findById(finalUser.getId());
 
             // then
-            assertThat(loadedUser).isNotNull();
+            assertThat(loadedUser).isPresent();
             assertThat(loadedUser.get().getReviewedHistory()).hasSize(1);
             assertThat(loadedUser.get().getReviewedHistory().get(0).getComment()).isEqualTo(
                     "안녕하세영");
