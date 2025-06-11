@@ -34,20 +34,6 @@ public class KakaoAuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public String loginAndIssueJwt(String code) {
-        String kakaoAccessToken = getAccessToken(code); // 2. 카카오 서버로 카카오 access_token 발급
-        KakaoUserResponse kakaoUser = getUserInfoFromKakao(kakaoAccessToken); // 3. 카카오 access_token으로 유저 정보 확인
-
-        handleUserLoginFlow(kakaoUser); // 4. 카카오 유저 정보를 기반으로 신규/기존 사용자 확인 후 신규면 DB 저장
-
-        // 5. 카카오 유저를 구분하는 고유 Pk 값으로 user를 찾을 수 없다면 error
-        User user = userRepository.findByKakaoId(kakaoUser.id())
-                .orElseThrow(() -> new GeneralException(KakaoAuthException.USER_NOT_FOUND));
-
-        // 6. 사용자 확인되면 jwt 토큰 발급
-        return jwtTokenProvider.generateToken(user.getId(), "ROLE_USER");
-    }
-
     // 1. 카카오 인가코드 요청
     public String getAccessToken(String code) {
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
@@ -72,22 +58,19 @@ public class KakaoAuthService {
         }
     }
 
-    public KakaoUserResponse getUserInfoFromKakao(String accessToken) {
-        String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+    public String loginAndIssueJwt(String code) {
+        String kakaoAccessToken = getAccessToken(code); // 2. 카카오 서버로 카카오 access_token 발급
+        KakaoUserResponse kakaoUser = getUserInfoFromKakao(kakaoAccessToken); // 3. 카카오 access_token으로 유저 정보 확인
 
-        ResponseEntity<KakaoUserResponse> response =
-                restTemplate.exchange(userInfoUrl, HttpMethod.GET, entity, KakaoUserResponse.class);
+        handleUserLoginFlow(kakaoUser); // 4. 카카오 유저 정보를 기반으로 신규/기존 사용자 확인 후 신규면 DB 저장
 
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new GeneralException(KakaoAuthException.USER_INFO_REQUEST_FAILED);
-        }
+        // 5. 카카오 유저를 구분하는 고유 Pk 값으로 user를 찾을 수 없다면 error
+        User user = userRepository.findByKakaoId(kakaoUser.id())
+                .orElseThrow(() -> new GeneralException(KakaoAuthException.USER_NOT_FOUND));
 
-        return response.getBody();
+        // 6. 사용자 확인되면 jwt 토큰 발급
+        return jwtTokenProvider.generateToken(user.getId(), "ROLE_USER");
     }
-
 
     // 4. 카카오 유저 정보를 기반으로 신규/기존 사용자 확인 후 신규면 DB 저장
     public boolean handleUserLoginFlow(KakaoUserResponse kakaoUser) {
@@ -102,5 +85,21 @@ public class KakaoAuthService {
         User newUser = User.of(nickname, email, "kakao", kakaoId);
         userRepository.save(newUser);
         return true;
+    }
+
+    public KakaoUserResponse getUserInfoFromKakao(String accessToken) {
+        String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<KakaoUserResponse> response =
+                restTemplate.exchange(userInfoUrl, HttpMethod.GET, entity, KakaoUserResponse.class);
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new GeneralException(KakaoAuthException.USER_INFO_REQUEST_FAILED);
+        }
+
+        return response.getBody();
     }
 }
