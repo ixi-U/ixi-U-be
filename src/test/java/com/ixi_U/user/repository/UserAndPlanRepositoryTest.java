@@ -134,7 +134,6 @@ class UserAndPlanRepositoryTest {
 
         // 3. DB에서 fresh 조회
         User freshUser = userRepository.findById(user.getId()).orElseThrow();
-        System.out.println("freshUser 구독 이력: " + freshUser.getSubscribedHistory().size());
 
         // 4. then 이력이 1 이상이어야 정상!
         assertThat(freshUser.getSubscribedHistory()).isNotEmpty();
