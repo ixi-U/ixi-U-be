@@ -19,7 +19,7 @@ public interface ReviewedRepository extends Neo4jRepository<Reviewed, Long> {
 
     @Query("""
             MATCH (u:User)-[r:REVIEWED]->(p:Plan {id: $planId})
-            RETURN r.comment as comment, u.name as userName, r.point as point
+            RETURN r.comment as comment, u.name as userName, r.point as point, r.createdAt as createdAt
             :#{orderBy(#pageable)} SKIP $skip LIMIT $limit           
             """)
     Slice<ShowReviewResponse> findReviewedByPlanWithPaging(@Param("planId") String planId,

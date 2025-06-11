@@ -1,6 +1,7 @@
 package com.ixi_U.user.entity;
 
 import com.ixi_U.plan.entity.Plan;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,9 +24,10 @@ public class Reviewed {
     private final int point;
 
     private final String comment;
-
     @TargetNode
     private final Plan plan;
+
+    private LocalDateTime createdAt;
 
     public static Reviewed of(final int point, final Plan plan, final String comment) {
 
@@ -33,6 +35,7 @@ public class Reviewed {
                 .point(point)
                 .plan(plan)
                 .comment(comment)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
