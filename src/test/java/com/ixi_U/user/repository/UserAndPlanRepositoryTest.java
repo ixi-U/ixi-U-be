@@ -7,12 +7,15 @@ import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
+import com.ixi_U.user.dto.CreateSubscribedRequest;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
+import com.ixi_U.user.service.SubscribedService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -23,6 +26,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 
+@Import(SubscribedService.class)
 @DataNeo4jTest
 @ActiveProfiles("test")
 @Transactional
@@ -35,10 +39,13 @@ class UserAndPlanRepositoryTest {
             DockerImageName.parse("neo4j:5.15"))
             .withAdminPassword(System.getenv().getOrDefault("GRAPH_DB_PASSWORD", "testPassword"))
             .withReuse(true);
+
     @Autowired
     UserRepository userRepository;
     @Autowired
     PlanRepository planRepository;
+    @Autowired
+    SubscribedService subscribedService;
 
     @DynamicPropertySource
     static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
@@ -84,28 +91,6 @@ class UserAndPlanRepositoryTest {
                 .hasMessage(UserException.USER_NOT_FOUND.getMessage());
     }
 
-
-    @Test
-    @DisplayName("이미 구독 중인 요금제를 중복 구독할 때의 동작을 확인한다")
-    void givenExistingSubscription_whenAddDuplicateSubscription_thenHandlesProperly() {
-        // given
-        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
-        Plan plan = planRepository.save(Plan.of("5G 요금제"));
-
-        // 최초 구독
-        user.addSubscribed(Subscribed.of(plan));
-        userRepository.save(user);
-
-        // when & then : 같은 요금제 중복 구독 시 예외 발생
-        assertThatThrownBy(() -> {
-            // 이미 구독한 요금제를 한 번 더 구독 시도
-            user.addSubscribed(Subscribed.of(plan));
-            userRepository.save(user);
-        })
-                .isInstanceOf(GeneralException.class)
-                .hasMessage("이미 현재 구독 중인 요금제입니다.");
-    }
-
     @Test
     @DisplayName("요금제를 변경하면 구독 이력이 누적된다")
     void givenChangedSubscription_whenAddDifferentSubscription_thenHistoryAccumulates() {
@@ -134,5 +119,47 @@ class UserAndPlanRepositoryTest {
                 .containsExactly(planA.getId(), planB.getId(), planA.getId());
 
     }
+
+
+    @Test
+    @DisplayName("관계 매핑/저장 로직 확인")
+    void givenSubscribed_whenReloadedFromDb_thenSubscribedHistoryIsNotEmpty() {
+        // 1. given
+        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
+        Plan plan = planRepository.save(Plan.of("5G 요금제"));
+
+        // 2. when 서비스로 구독 추가
+        subscribedService.updateSubscribed(user.getId(), new CreateSubscribedRequest(plan.getId()));
+
+        // 3. DB에서 fresh 조회
+        User freshUser = userRepository.findById(user.getId()).orElseThrow();
+        System.out.println("freshUser 구독 이력: " + freshUser.getSubscribedHistory().size());
+
+        // 4. then 이력이 1 이상이어야 정상!
+        assertThat(freshUser.getSubscribedHistory()).isNotEmpty();
+    }
+
+
+    @Test
+    @DisplayName("이미 구독 중인 요금제를 중복 구독할 때의 동작을 확인한다")
+    void givenExistingSubscription_whenAddDuplicateSubscription_thenHandlesProperly() {
+        // given
+        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
+        Plan plan = planRepository.save(Plan.of("5G 요금제"));
+
+        CreateSubscribedRequest request = new CreateSubscribedRequest(plan.getId());
+
+        // 최초 구독
+        subscribedService.updateSubscribed(user.getId(), request);
+
+        // when & then: 같은 요금제 중복 구독 시 예외 발생
+        assertThatThrownBy(() ->
+                subscribedService.updateSubscribed(user.getId(),
+                        new CreateSubscribedRequest(plan.getId()))
+        )
+                .isInstanceOf(GeneralException.class)
+                .hasMessage("이미 현재 구독 중인 요금제입니다.");
+    }
+
 
 }
