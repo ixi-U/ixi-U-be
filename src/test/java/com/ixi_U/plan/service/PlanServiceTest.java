@@ -11,6 +11,7 @@ import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
+import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class PlanServiceTest {
 
@@ -59,19 +62,17 @@ class PlanServiceTest {
             Slice<PlanSummaryDto> slice =
                     new SliceImpl<>(List.of(dto1, dto2, dto3), pageable, true);
 
-            given(planRepository.findPlans(PageRequest.ofSize(3), PlanType.from(planTypeStr),
+            given(planRepository.findPlans(pageable, PlanType.from(planTypeStr),
                     PlanSortOption.from(planSortOptionStr), null, null, null))
                     .willReturn(slice);
 
             // when
             SortedPlanResponse result = planService.findPlans(
-                    PageRequest.ofSize(3),
-                    GetPlansRequest.of(planTypeStr, planSortOptionStr, null, null, null));
+                    pageable, GetPlansRequest.of(planTypeStr, planSortOptionStr, null, null, null));
 
             // then
             assertThat(result.plans().getContent()).containsExactly(dto1, dto2, dto3);
-            verify(planRepository).findPlans(
-                    PageRequest.ofSize(3), PlanType.from(planTypeStr),
+            verify(planRepository).findPlans(pageable, PlanType.from(planTypeStr),
                     PlanSortOption.from(planSortOptionStr), null, null, null
             );
         }
@@ -88,7 +89,7 @@ class PlanServiceTest {
                             GetPlansRequest.of(planType, "PRIORITY", null, null, null))
             )
                     .isInstanceOf(GeneralException.class)
-                    .hasMessageContaining("유효하지 않은 요금제 타입입니다.");
+                    .hasMessageContaining(PlanException.INVALID_PLAN_TYPE.getMessage());
         }
 
         @ParameterizedTest
@@ -103,7 +104,7 @@ class PlanServiceTest {
                             GetPlansRequest.of("ONLINE", planSortOptionStr, null, null, null))
             )
                     .isInstanceOf(GeneralException.class)
-                    .hasMessageContaining("유효하지 않은 정렬 조건입니다.");
+                    .hasMessageContaining(PlanException.INVALID_SORT_VALUE.getMessage());
         }
     }
 }
