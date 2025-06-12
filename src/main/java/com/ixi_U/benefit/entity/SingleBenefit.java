@@ -1,6 +1,6 @@
 package com.ixi_U.benefit.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,11 +33,11 @@ public class SingleBenefit {
 
     @CreatedDate
     @Property("created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Property("updated_at")
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     public static SingleBenefit of(final String name, final String description,
             final BenefitType benefitType) {
@@ -46,7 +46,6 @@ public class SingleBenefit {
                 .name(name)
                 .description(description)
                 .benefitType(benefitType)
-                .createdAt(Instant.now())
                 .build();
     }
 }
