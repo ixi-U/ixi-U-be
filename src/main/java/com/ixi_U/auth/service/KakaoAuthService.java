@@ -80,7 +80,11 @@ public class KakaoAuthService {
         if (optionalUser.isPresent()) return false;
 
         String nickname = kakaoUser.getNickname();
-        String email = "temp_kakao_" + kakaoId + "@example.com";
+        String email = "temp_kakao_" + kakaoId + "@example.com"; // todo 프론트에서 이메일 입력 요청 (필수?)
+
+//        if (email == null) {
+//            throw new GeneralException(KakaoAuthException.EMAIL_NOT_FOUND);
+//        }
 
         User newUser = User.of(nickname, email, "kakao", kakaoId);
         userRepository.save(newUser);
