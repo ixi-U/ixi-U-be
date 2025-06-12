@@ -32,6 +32,34 @@ public class Plan {
 
     private final State state;
 
+    private final int mobileDataLimitMb;
+
+    private final int sharedMobileDataLimitMb;
+
+    private final int callLimitMinutes;
+
+    private final int messageLimit;
+
+    private final int monthlyPrice;
+
+    private final PlanType planType;
+
+    private final String usageCautions;
+
+    private final int mobileDataThrottleSpeedKbps;
+
+    private final int minAge;
+
+    private final int maxAge;
+
+    private final boolean isActiveDuty;
+
+    private final int pricePerKb;
+
+    private final String etcInfo;
+
+    private final int priority;
+
     @Builder.Default
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
     private List<BundledBenefit> bundledBenefits = new ArrayList<>();
@@ -40,10 +68,45 @@ public class Plan {
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-    public static Plan of(final String name) {
-
+    public static Plan of(
+            
+            final String name,
+            final int mobileDataLimitMb,
+            final int sharedMobileDataLimitMb,
+            final int callLimitMinutes,
+            final int messageLimit,
+            final int monthlyPrice,
+            final PlanType planType,
+            final String usageCautions,
+            final int mobileDataThrottleSpeedKbps,
+            final int minAge,
+            final int maxAge,
+            final boolean isActiveDuty,
+            final int pricePerKb,
+            final String etcInfo,
+            final int priority,
+            List<BundledBenefit> bundledBenefits,
+            List<SingleBenefit> singleBenefits
+    ) {
         return Plan.builder()
                 .name(name)
+                .state(State.ABLE)
+                .mobileDataLimitMb(mobileDataLimitMb)
+                .sharedMobileDataLimitMb(sharedMobileDataLimitMb)
+                .callLimitMinutes(callLimitMinutes)
+                .messageLimit(messageLimit)
+                .monthlyPrice(monthlyPrice)
+                .planType(planType)
+                .usageCautions(usageCautions)
+                .mobileDataThrottleSpeedKbps(mobileDataThrottleSpeedKbps)
+                .minAge(minAge)
+                .maxAge(maxAge)
+                .isActiveDuty(isActiveDuty)
+                .pricePerKb(pricePerKb)
+                .etcInfo(etcInfo)
+                .priority(priority)
+                .bundledBenefits(bundledBenefits)
+                .singleBenefits(singleBenefits)
                 .build();
     }
 
