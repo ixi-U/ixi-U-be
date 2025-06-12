@@ -1,30 +1,4 @@
 spring:
-  neo4j:
-    uri: ${GRAPH_DB_URL}
-    authentication:
-      username: ${GRAPH_DB_USERNAME}
-      password: ${GRAPH_DB_PASSWORD}
   data:
     neo4j:
       database: neo4j
-
-  ai:
-    openai:
-      api-key: ${OPEN_AI_API_KEY}
-      embedding:
-        options:
-          model: ${OPEN_AI_EMBEDDING_MODEL}
-      chat:
-        options:
-          model: ${OPEN_AI_CHAT_MODEL}
-
----
-spring:
-  config:
-    import: classpath:application-test.properties
-  main:
-    allow-bean-definition-overriding: true
-
-kakao:
-  rest-api-key: ${KAKAO_REST_API_KEY}
-  redirect-uri: ${KAKAO_REDIRECT_URI}
