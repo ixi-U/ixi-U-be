@@ -1,14 +1,16 @@
 package com.ixi_U.common.config;
 
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.auditing.AuditingHandler;
 
 @TestConfiguration
 public class FakeNeo4jAuditingConfig {
 
     @Bean("neo4jAuditingHandler")
-    public Object fakeAuditingHandler() {
+    public AuditingHandler fakeAuditingHandler() {
 
-        return new Object();
+        return Mockito.mock(AuditingHandler.class);
     }
 }
