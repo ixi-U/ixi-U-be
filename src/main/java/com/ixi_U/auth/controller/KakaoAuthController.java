@@ -20,8 +20,8 @@ public class KakaoAuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Value("${front.login-redirect-url}")
-    private String loginRedirectUrl;
+//    @Value("${front.login-redirect-url}")
+    private final static String loginRedirectUrl = "http://localhost:3000/login/status";
 
     @GetMapping("/login/auth/code/kakao")
     public ResponseEntity<Void> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
