@@ -6,7 +6,7 @@ import com.ixi_U.common.AbstractNeo4jContainer;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ class BaseEntityAuditingTest extends AbstractNeo4jContainer {
     void testUpdatedAtChangesOnUpdate() {
         // given
         User savedUser = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
-        Instant oldUpdatedAt = savedUser.getUpdatedAt();
+        LocalDateTime oldUpdatedAt = savedUser.getUpdatedAt();
 
         // when
         User updatedUser = userRepository.save(
