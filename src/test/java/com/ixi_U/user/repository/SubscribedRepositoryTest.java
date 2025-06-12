@@ -2,35 +2,65 @@ package com.ixi_U.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ixi_U.common.AbstractNeo4jContainer;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 @DataNeo4jTest
 @Testcontainers
 @ActiveProfiles("test")
 @Transactional
-class SubscribedRepositoryTest extends AbstractNeo4jContainer {
+class SubscribedRepositoryTest {
 
 
+    private static Neo4jContainer<?> neo4jContainer;
     @Autowired
     UserRepository userRepository;
     @Autowired
     PlanRepository planRepository;
     @Autowired
     SubscribedRepository subscribedRepository;
+
+    @BeforeAll
+    static void initializeNeo4j() {
+
+        neo4jContainer = new Neo4jContainer<>(DockerImageName.parse("neo4j:5.24"))
+                .withAdminPassword("haruharu");
+
+        neo4jContainer.start();
+    }
+
+    @AfterAll
+    static void stopNeo4j() {
+
+        neo4jContainer.close();
+    }
+
+    @DynamicPropertySource
+    static void neo4jProperties(DynamicPropertyRegistry registry) {
+
+        registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
+        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
+        registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
+    }
+
 
     @Nested
     @DisplayName("구독 관계가 존재하는지 확인할 때")

@@ -3,7 +3,6 @@ package com.ixi_U.user.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import com.ixi_U.common.AbstractNeo4jContainer;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.PlanException;
 import com.ixi_U.common.exception.enums.UserException;
@@ -15,13 +14,19 @@ import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.service.SubscribedService;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 
 @Import(SubscribedService.class)
@@ -29,14 +34,39 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("test")
 @Testcontainers
 @DisplayName("Testcontainers 기반 Neo4j DB와 실제 연동되는 구독관계 저장 테스트")
-class UserAndPlanRepositoryTest extends AbstractNeo4jContainer {
+class UserAndPlanRepositoryTest {
 
+    private static Neo4jContainer<?> neo4jContainer;
     @Autowired
     UserRepository userRepository;
     @Autowired
     PlanRepository planRepository;
     @Autowired
     SubscribedService subscribedService;
+
+    @BeforeAll
+    static void initializeNeo4j() {
+
+        neo4jContainer = new Neo4jContainer<>(DockerImageName.parse("neo4j:5.24"))
+                .withAdminPassword("haruharu");
+
+        neo4jContainer.start();
+    }
+
+    @AfterAll
+    static void stopNeo4j() {
+
+        neo4jContainer.close();
+    }
+
+    @DynamicPropertySource
+    static void neo4jProperties(DynamicPropertyRegistry registry) {
+
+        registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
+        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
+        registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
+    }
+
 
     @Test
     @DisplayName("회원과 요금제 생성 후 실제 SUBSCRIBED 관계가 DB에 저장된다")

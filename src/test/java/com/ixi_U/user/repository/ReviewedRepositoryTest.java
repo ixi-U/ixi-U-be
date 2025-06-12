@@ -3,7 +3,6 @@ package com.ixi_U.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ixi_U.common.AbstractNeo4jContainer;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -12,6 +11,8 @@ import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,15 +23,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 @DataNeo4jTest
 @ActiveProfiles("test")
 @Transactional
 @Testcontainers
-class ReviewedRepositoryTest extends AbstractNeo4jContainer {
+class ReviewedRepositoryTest {
 
+    private static Neo4jContainer<?> neo4jContainer;
 
     @Autowired
     ReviewedRepository reviewedRepository;
@@ -38,6 +44,30 @@ class ReviewedRepositoryTest extends AbstractNeo4jContainer {
     UserRepository userRepository;
     @Autowired
     PlanRepository planRepository;
+
+    @BeforeAll
+    static void initializeNeo4j() {
+
+        neo4jContainer = new Neo4jContainer<>(DockerImageName.parse("neo4j:5.24"))
+                .withAdminPassword("haruharu");
+
+        neo4jContainer.start();
+    }
+
+    @AfterAll
+    static void stopNeo4j() {
+
+        neo4jContainer.close();
+    }
+
+    @DynamicPropertySource
+    static void neo4jProperties(DynamicPropertyRegistry registry) {
+
+        registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
+        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
+        registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
+    }
+
 
     @Nested
     @DisplayName("리뷰를 저장할 때")
