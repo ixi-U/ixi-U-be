@@ -5,6 +5,6 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PlanRepository extends Neo4jRepository<Plan, String> {
+public interface PlanRepository extends Neo4jRepository<Plan, String>, PlanCustomRepository {
 
 }
