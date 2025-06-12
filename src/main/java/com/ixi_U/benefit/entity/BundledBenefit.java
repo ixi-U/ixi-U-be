@@ -52,6 +52,7 @@ public class BundledBenefit {
                 .name(name)
                 .description(description)
                 .choice(choice)
+                .createdAt(Instant.now())
                 .build();
     }
 

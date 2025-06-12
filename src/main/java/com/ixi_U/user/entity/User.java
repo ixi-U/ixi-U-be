@@ -60,6 +60,7 @@ public class User {
                 .name(name)
                 .email(email)
                 .provider(provider)
+                .createdAt(Instant.now())
                 .build();
     }
 

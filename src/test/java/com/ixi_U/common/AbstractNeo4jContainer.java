@@ -10,7 +10,7 @@ public abstract class AbstractNeo4jContainer {
 
     @Container
     protected static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
-            DockerImageName.parse("neo4j:5.15"))
+            DockerImageName.parse("neo4j:5.24"))
             .withAdminPassword(System.getenv().getOrDefault("GRAPH_DB_PASSWORD", "testPassword"));
 
     @DynamicPropertySource

@@ -39,11 +39,13 @@ public class Reviewed {
     @Property("updated_at")
     private Instant updatedAt;
 
-    public static Reviewed of(final int point, final Plan plan) {
+    public static Reviewed of(final int point, final Plan plan, final String comment) {
 
         return Reviewed.builder()
                 .point(point)
                 .plan(plan)
+                .comment(comment)
+                .createdAt(Instant.now())
                 .build();
     }
 }

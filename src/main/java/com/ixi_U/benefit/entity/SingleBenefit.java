@@ -46,6 +46,7 @@ public class SingleBenefit {
                 .name(name)
                 .description(description)
                 .benefitType(benefitType)
+                .createdAt(Instant.now())
                 .build();
     }
 }

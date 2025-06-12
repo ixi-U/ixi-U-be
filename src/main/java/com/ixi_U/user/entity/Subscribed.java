@@ -39,6 +39,7 @@ public class Subscribed {
 
         return Subscribed.builder()
                 .plan(plan)
+                .createdAt(Instant.now())
                 .build();
     }
 

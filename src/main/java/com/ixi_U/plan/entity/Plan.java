@@ -55,6 +55,7 @@ public class Plan {
 
         return Plan.builder()
                 .name(name)
+                .createdAt(Instant.now())
                 .build();
     }
 
