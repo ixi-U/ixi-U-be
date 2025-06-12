@@ -14,20 +14,20 @@ mkdir -p "$LOG_DIR"
 echo "Starting $APP_NAME with prod profile..."
 nohup java -jar "$APP_DIR/$APP_NAME" --spring.profiles.active=prod > "$LOG_FILE" 2>&1 &
 
-#CLOUDWATCH_AGENT_BIN="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
-#CLOUDWATCH_CONFIG="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
-#
-## cloudwatch Agent 설치 확인 및 설치
-#if [ ! -x "$CLOUDWATCH_AGENT_BIN" ]; then
-#  echo "CloudWatch Agent not found. Installing..."
-#  sudo apt update -y
-#  sudo apt install -y wget
-#  sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
-#  sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
-#else
-#  echo "CloudWatch Agent is already installed."
-#fi
-#
+CLOUDWATCH_AGENT_BIN="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
+CLOUDWATCH_CONFIG="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+
+# cloudwatch Agent 설치 확인 및 설치
+if [ ! -x "$CLOUDWATCH_AGENT_BIN" ]; then
+  echo "CloudWatch Agent not found. Installing..."
+  sudo apt update -y
+  sudo apt install -y wget
+  sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+  sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+else
+  echo "CloudWatch Agent is already installed."
+fi
+
 ## 설정 파일 생성
 #echo "Generating CloudWatch Agent configuration..."
 #sudo mkdir -p "$(dirname "$CLOUDWATCH_CONFIG")"
