@@ -8,11 +8,13 @@ import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.PlanException;
 import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
+import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.CreateSubscribedRequest;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.service.SubscribedService;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +45,10 @@ class UserAndPlanRepositoryTest extends AbstractNeo4jContainer {
         User user = User.of("홍승민", "hong@example.com", "KAKAO");
         user = userRepository.save(user);
 
-        Plan plan = Plan.of("5G 요금제");
-        plan = planRepository.save(plan);
+        Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                PlanType.ONLINE, "주의사항", 400,
+                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+        ));
 
         // when
         user.addSubscribed(Subscribed.of(plan));
@@ -77,8 +81,14 @@ class UserAndPlanRepositoryTest extends AbstractNeo4jContainer {
     void givenChangedSubscription_whenAddDifferentSubscription_thenHistoryAccumulates() {
         // given
         User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
-        Plan planA = planRepository.save(Plan.of("A 요금제"));
-        Plan planB = planRepository.save(Plan.of("B 요금제"));
+        Plan planA = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                PlanType.ONLINE, "주의사항", 400,
+                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+        ));
+        Plan planB = planRepository.save(Plan.of("요금제 B", 20000, 300, 200, 100, 29000,
+                PlanType.ONLINE, "주의사항", 400,
+                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+        ));
 
         // 최초 구독 (A)
         user.addSubscribed(Subscribed.of(planA));
@@ -107,7 +117,10 @@ class UserAndPlanRepositoryTest extends AbstractNeo4jContainer {
     void givenSubscribed_whenReloadedFromDb_thenSubscribedHistoryIsNotEmpty() {
         // 1. given
         User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
-        Plan plan = planRepository.save(Plan.of("5G 요금제"));
+        Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                PlanType.ONLINE, "주의사항", 400,
+                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+        ));
 
         // 2. when 서비스로 구독 추가
         subscribedService.updateSubscribed(user.getId(), new CreateSubscribedRequest(plan.getId()));
@@ -125,7 +138,10 @@ class UserAndPlanRepositoryTest extends AbstractNeo4jContainer {
     void givenExistingSubscription_whenAddDuplicateSubscription_thenHandlesProperly() {
         // given
         User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
-        Plan plan = planRepository.save(Plan.of("5G 요금제"));
+        Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                PlanType.ONLINE, "주의사항", 400,
+                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+        ));
 
         CreateSubscribedRequest request = new CreateSubscribedRequest(plan.getId());
 
