@@ -7,6 +7,7 @@ import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
@@ -70,6 +71,11 @@ public class ReviewService {
                 planId, pageable);
 
         return ShowReviewListResponse.of(reviewedList.getContent(), reviewedList.hasNext());
+    }
+
+    public ShowReviewStatsResponse showReviewStats(String planId) {
+
+        return userRepository.findAveragePointAndReviewCount(planId);
     }
 
 }
