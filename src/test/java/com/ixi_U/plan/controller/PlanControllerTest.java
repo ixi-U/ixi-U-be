@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
+import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
@@ -78,8 +79,9 @@ class PlanControllerTest {
             SortedPlanResponse response =
                     new SortedPlanResponse(new SliceImpl<>(List.of(dto1, dto2)), "2", 3);
 
-            given(planService.findPlans(PageRequest.ofSize(2),
-                    "ONLINE", "PRIORITY", null, null, null)).willReturn(response);
+            given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
+                    "ONLINE", "PRIORITY", null, null, null)))
+                    .willReturn(response);
 
             // when, then
             mockMvc.perform(get("/plans")
@@ -107,8 +109,9 @@ class PlanControllerTest {
             SortedPlanResponse response =
                     new SortedPlanResponse(new SliceImpl<>(List.of(dto2)), "2", 3);
 
-            given(planService.findPlans(PageRequest.ofSize(2),
-                    "ONLINE", "PRIORITY", "제2", null, null)).willReturn(response);
+            given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
+                    "ONLINE", "PRIORITY", "제2", null, null)))
+                    .willReturn(response);
 
             // when, then
             mockMvc.perform(get("/plans")
@@ -130,8 +133,8 @@ class PlanControllerTest {
         void failIfInvalidSortOption() throws Exception {
 
             // given
-            given(planService.findPlans(PageRequest.ofSize(2),
-                    "ONLINE", "PRIORIT", null, null, null))
+            given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
+                    "ONLINE", "PRIORIT", null, null, null)))
                     .willThrow(new GeneralException(PlanException.INVALID_SORT_VALUE));
 
             // when, then
@@ -149,8 +152,8 @@ class PlanControllerTest {
         void failIfInvalidPlanType() throws Exception {
 
             // given
-            given(planService.findPlans(PageRequest.ofSize(2),
-                    "ONLINEE", "PRIORITY", null, null, null))
+            given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
+                    "ONLINEE", "PRIORITY", null, null, null)))
                     .willThrow(new GeneralException(PlanException.INVALID_PLAN_TYPE));
 
             // when, then
