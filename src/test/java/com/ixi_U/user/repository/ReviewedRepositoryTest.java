@@ -4,6 +4,7 @@ package com.ixi_U.user.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ixi_U.plan.entity.Plan;
+import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.entity.Reviewed;
@@ -61,9 +62,13 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("정상적으로 리뷰가 저장된다")
         void it_saves_review() {
+            
             // given
             User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
-            Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
+            Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                    PlanType.ONLINE, "주의사항", 400,
+                    0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+            ));
             Reviewed reviewed = Reviewed.of(5, savedPlan, "안녕하세영");
 
             savedUser.addReviewed(reviewed);
@@ -91,9 +96,13 @@ class ReviewedRepositoryTest {
             @Test
             @DisplayName("true를 반환한다")
             void it_returns_true() {
+
                 // given
                 User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
-                Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
+                Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                        PlanType.ONLINE, "주의사항", 400,
+                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                ));
                 Reviewed reviewed = Reviewed.of(5, savedPlan, "안녕하세영");
 
                 savedUser.addReviewed(reviewed);
@@ -115,9 +124,13 @@ class ReviewedRepositoryTest {
             @Test
             @DisplayName("false를 반환한다")
             void it_returns_false() {
+
                 // given
                 User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
-                Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
+                Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                        PlanType.ONLINE, "주의사항", 400,
+                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                ));
 
                 // when
                 boolean existReview = reviewedRepository.existsReviewedRelation(savedUser.getId(),
@@ -140,7 +153,10 @@ class ReviewedRepositoryTest {
         @BeforeEach
         void setUp() {
 
-            savedPlan = planRepository.save(Plan.of("요금제 A"));
+            savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
+                    PlanType.ONLINE, "주의사항", 400,
+                    0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+            ));
 
             for (int i = 0; i < totalReviewCount; i++) {
                 User user = userRepository.save(
@@ -154,6 +170,7 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("첫 페이지 조회 시, 페이지 크기만큼 조회되며 다음 페이지가 존재한다")
         void it_returns_first_page_with_has_next_true() {
+
             // when
             Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
                     savedPlan.getId(), PageRequest.of(0, pageSize));
@@ -181,6 +198,7 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("점수 기반 내림 차순 정렬이 잘 된다.")
         void it_returns_with_correct_point_order_desc() {
+
             // when
             Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
                     savedPlan.getId(),
@@ -198,6 +216,7 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("생성 시간 기반 내림 차순 정렬이 잘 된다.")
         void it_returns_with_correct_createdAt_order_desc() {
+
             // when
             Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
                     savedPlan.getId(),
@@ -215,6 +234,7 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("점수 기반 오름 차순 정렬이 잘 된다.")
         void it_returns_with_correct_score_order_asc() {
+
             // when
             Slice<ShowReviewResponse> page = reviewedRepository.findReviewedByPlanWithPaging(
                     savedPlan.getId(),

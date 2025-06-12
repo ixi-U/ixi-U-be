@@ -3,9 +3,11 @@ package com.ixi_U.user.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ixi_U.plan.entity.Plan;
+import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,6 @@ import org.testcontainers.utility.DockerImageName;
 @ActiveProfiles("test")
 @Transactional
 class SubscribedRepositoryTest {
-
 
     @Container
     private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
@@ -60,7 +61,11 @@ class SubscribedRepositoryTest {
             void it_returns_true() {
                 //given
                 User user = User.of("jinu", "jinu@mail.com", "kakao");
-                Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
+                Plan savedPlan = planRepository.save(Plan.of(
+                        "요금제 A", 20000, 300, 200, 100, 29000,
+                        PlanType.ONLINE, "주의사항", 400,
+                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                ));
 
                 user.addSubscribed(Subscribed.of(savedPlan));
                 User savedUser = userRepository.save(user);
@@ -84,7 +89,11 @@ class SubscribedRepositoryTest {
             void it_returns_false() {
                 //given
                 User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
-                Plan savedPlan = planRepository.save(Plan.of("요금제 A"));
+                Plan savedPlan = planRepository.save(Plan.of(
+                        "요금제 A", 20000, 300, 200, 100, 29000,
+                        PlanType.ONLINE, "주의사항", 400,
+                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                ));
 
                 //when
                 boolean existsSubscribe = subscribedRepository.existsSubscribeRelation(
