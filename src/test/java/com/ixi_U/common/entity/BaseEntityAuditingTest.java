@@ -44,7 +44,7 @@ class BaseEntityAuditingTest extends AbstractNeo4jContainer {
 
     @Test
     @DisplayName("유저가 요금제 구독 시 구독에 createdAt이 세팅된다")
-    void testCreatedAndUpdatedAtSetOnSave2() {
+    void testSubscribedCreatedAtSetOnSave() {
         // given & when
         User savedUser = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO"));
 
