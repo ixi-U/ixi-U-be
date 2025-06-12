@@ -1,5 +1,7 @@
 package com.ixi_U.common.config;
 
+import com.ixi_U.auth.service.CustomOAuth2UserService;
+import com.ixi_U.auth.handler.OAuth2SuccessHandler;
 import com.ixi_U.jwt.JwtAuthenticationFilter;
 import com.ixi_U.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,35 +22,38 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    // SecurityFilterChain 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // CORS 설정 허용
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 X
+                .cors(cors -> {})
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**", "/public/**").permitAll() // 로그인 관련 요청은 허용
-                        .requestMatchers("/test/**").permitAll()
-                        .requestMatchers("/api/user/**").authenticated()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // CORS preflight 허용
-                        .anyRequest().authenticated() // 나머지는 인증 필요
+                        .requestMatchers("/login/**", "/oauth2/**", "/public/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    // CORS 설정
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // 프론트 주소
+                        .allowedOrigins("http://localhost:3000")
                         .allowedMethods("*")
-                        .allowCredentials(true); // 쿠키 허용
+                        .allowCredentials(true);
             }
         };
     }
