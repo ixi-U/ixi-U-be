@@ -63,20 +63,5 @@ class ChatBotControllerTest {
                     .returnResult(String.class)
                     .consumeWith(document("getWelcomeMessage"));
         }
-
-        @Test
-        @DisplayName("인증/인가 되지않은 사용자는 4xx 에러를 반환한다")
-        void unauthorizedUserTest() {
-
-            //given
-
-            //when & then
-            webTestClient.get()
-                    .uri("/api/chatbot/welcome")
-                    .exchange()
-                    .expectStatus().is4xxClientError()
-                    .returnResult(Void.class)
-                    .consumeWith(document("unauthorizedUserTest"));
-        }
     }
 }

@@ -64,7 +64,7 @@ class ReviewedRepositoryTest {
         void it_saves_review() {
             
             // given
-            User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
+            User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L));
             Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                     PlanType.ONLINE, "주의사항", 400,
                     0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
@@ -98,7 +98,7 @@ class ReviewedRepositoryTest {
             void it_returns_true() {
 
                 // given
-                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
+                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L));
                 Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
@@ -126,7 +126,7 @@ class ReviewedRepositoryTest {
             void it_returns_false() {
 
                 // given
-                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
+                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L));
                 Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
@@ -160,7 +160,7 @@ class ReviewedRepositoryTest {
 
             for (int i = 0; i < totalReviewCount; i++) {
                 User user = userRepository.save(
-                        User.of("user" + i, "user" + i + "@mail.com", "kakao"));
+                        User.of("user" + i, "user" + i + "@mail.com", "kakao", 123L));
                 Reviewed reviewed = Reviewed.of(5 - i % 5, savedPlan, "user" + i + "의 리뷰입니다");
                 user.addReviewed(reviewed);
                 userRepository.save(user);
