@@ -1,7 +1,7 @@
 name: ixi-U_CD
 
 on:
-  push:
+  pull_request:
     branches: ["main", "dev"]
     paths-ignore:
       - 'README.md'
