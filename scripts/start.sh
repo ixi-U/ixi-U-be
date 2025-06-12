@@ -28,28 +28,28 @@ else
   echo "CloudWatch Agent is already installed."
 fi
 
-## 설정 파일 생성
-#echo "Generating CloudWatch Agent configuration..."
-#sudo mkdir -p "$(dirname "$CLOUDWATCH_CONFIG")"
-#
-#cat <<EOF | sudo tee "$CLOUDWATCH_CONFIG" > /dev/null
-#{
-#  "logs": {
-#    "logs_collected": {
-#      "files": {
-#        "collect_list": [
-#          {
-#            "file_path": "$LOG_FILE",
-#            "log_group_name": "MyAppLogs",
-#            "log_stream_name": "{instance_id}",
-#            "timestamp_format": "%Y-%m-%d %H:%M:%S"
-#          }
-#        ]
-#      }
-#    }
-#  }
-#}
-#EOF
+# 설정 파일 생성
+echo "Generating CloudWatch Agent configuration..."
+sudo mkdir -p "$(dirname "$CLOUDWATCH_CONFIG")"
+
+cat <<EOF | sudo tee "$CLOUDWATCH_CONFIG" > /dev/null
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "$LOG_FILE",
+            "log_group_name": "MyAppLogs",
+            "log_stream_name": "{instance_id}",
+            "timestamp_format": "%Y-%m-%d %H:%M:%S"
+          }
+        ]
+      }
+    }
+  }
+}
+EOF
 #
 ## 설정 파일 존재 여부 확인 후 agent 시작
 #if [ -f "$CLOUDWATCH_CONFIG" ]; then
