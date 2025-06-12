@@ -1,6 +1,7 @@
 package com.ixi_U.plan.service;
 
 import com.ixi_U.plan.dto.PlanSummaryDto;
+import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
@@ -17,14 +18,12 @@ public class PlanService {
 
     private final PlanRepository planRepository;
 
-    public SortedPlanResponse findPlans(Pageable pageable, String planTypeStr,
-            String planSortOptionStr,
-            String searchKeyword, String planId, Integer sortValue) {
+    public SortedPlanResponse findPlans(Pageable pageable, GetPlansRequest request) {
 
-        PlanType planType = PlanType.from(planTypeStr);
-        PlanSortOption planSortOption = PlanSortOption.from(planSortOptionStr);
+        PlanType planType = PlanType.from(request.planTypeStr());
+        PlanSortOption planSortOption = PlanSortOption.from(request.planSortOptionStr());
         Slice<PlanSummaryDto> plans = planRepository.findPlans(pageable, planType, planSortOption,
-                searchKeyword, planId, sortValue);
+                request.searchKeyword(), request.planId(), request.cursorSortValue());
 
         String lastPlanId = getLastPlanId(plans);
         int lastSortValue = getLastSortValue(plans, planSortOption);
