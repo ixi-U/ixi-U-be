@@ -106,5 +106,4 @@ class PlanServiceTest {
                     .hasMessageContaining("유효하지 않은 정렬 조건입니다.");
         }
     }
-
 }
