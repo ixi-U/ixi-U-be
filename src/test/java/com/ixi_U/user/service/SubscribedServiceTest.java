@@ -41,7 +41,7 @@ class SubscribedServiceTest {
     class RegisterSubscribed {
 
         @Test
-        @DisplayName("정상 케이스: 유효한 userId/planId로 구독 등록 시 User에 관계가 추가되고 저장된다.")
+        @DisplayName("유효한 userId/planId로 구독 등록 시 User에 관계가 추가되고 정상적으로 저장된다.")
         void givenValidUserIdAndPlanId_whenRegisterSubscribed_thenUserIsUpdated() {
             // given
             String userId = "user-1";
@@ -68,7 +68,7 @@ class SubscribedServiceTest {
         }
 
         @Test
-        @DisplayName("예외 케이스: 존재하지 않는 userId로 구독 등록 시 UserException이 발생한다.")
+        @DisplayName("존재하지 않는 userId로 구독 등록 시 UserException이 발생한다.")
         void givenNonExistentUserId_whenRegisterSubscribed_thenThrowsUserException() {
             // given
             String userId = "not-exist";
@@ -83,7 +83,7 @@ class SubscribedServiceTest {
         }
 
         @Test
-        @DisplayName("예외 케이스: 존재하지 않는 planId로 구독 등록 시 PlanException이 발생한다.")
+        @DisplayName("존재하지 않는 planId로 구독 등록 시 PlanException이 발생한다.")
         void givenNonExistentPlanId_whenRegisterSubscribed_thenThrowsPlanException() {
             // given
             String userId = "user-1";
@@ -100,7 +100,7 @@ class SubscribedServiceTest {
         }
 
         @Test
-        @DisplayName("예외 케이스: planId가 null이면 GeneralException이 발생한다.")
+        @DisplayName("planId가 null이면 GeneralException이 발생한다.")
         void givenNullPlanId_whenRegisterSubscribed_thenThrowsException() {
             // given
             String userId = "user-1";
@@ -115,7 +115,7 @@ class SubscribedServiceTest {
         }
 
         @Test
-        @DisplayName("예외 케이스: planId가 빈 문자열이면 GeneralException이 발생한다.")
+        @DisplayName("planId가 빈 문자열이면 GeneralException이 발생한다.")
         void givenEmptyPlanId_whenRegisterSubscribed_thenThrowsException() {
             // given
             String userId = "user-1";
