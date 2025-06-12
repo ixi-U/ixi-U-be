@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.entity.Plan;
+import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
@@ -63,8 +64,12 @@ class ReviewServiceTest {
             @Test
             @DisplayName("리뷰를 저장한다")
             void it_saves_review() {
+                
                 // given
-                given(planRepository.findById(any())).willReturn(Optional.of(Plan.of("플랜1")));
+                given(planRepository.findById(any())).willReturn(Optional.of(Plan.of(
+                        "플랜1", 20000, 300, 200, 100, 29000,
+                        PlanType.ONLINE, "주의사항", 400,
+                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
                         Optional.of(User.of("testName", "testEmail", "testProvider")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
@@ -91,8 +96,13 @@ class ReviewServiceTest {
             @Test
             @DisplayName("구독하지 않은 요금제에 대해 리뷰하면 예외를 던진다")
             void it_throws_exception_when_not_subscribed() {
+
                 // given
-                given(planRepository.findById(any())).willReturn(Optional.of(Plan.of("플랜1")));
+                given(planRepository.findById(any())).willReturn(
+                        Optional.of(Plan.of("플랜1", 20000, 300, 200, 100, 29000,
+                                PlanType.ONLINE, "주의사항", 400,
+                                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                        )));
                 given(userRepository.findById(any())).willReturn(
                         Optional.of(User.of("testName", "testEmail", "testProvider")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(false);
@@ -113,8 +123,12 @@ class ReviewServiceTest {
             @Test
             @DisplayName("이미 리뷰한 요금제에 대해 다시 리뷰하면 예외를 던진다")
             void it_throws_exception_when_already_reviewed() {
+
                 // given
-                given(planRepository.findById(any())).willReturn(Optional.of(Plan.of("플랜1")));
+                given(planRepository.findById(any())).willReturn(Optional.of(Plan.of(
+                        "플랜1", 20000, 300, 200, 100, 29000,
+                        PlanType.ONLINE, "주의사항", 400,
+                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
                         Optional.of(User.of("testName", "testEmail", "testProvider")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
@@ -142,6 +156,7 @@ class ReviewServiceTest {
         @Test
         @DisplayName("요금제에 대한 리뷰 리스트를 반환한다")
         void it_returns_review_list() {
+
             // given
             String planId = "plan-id";
             Pageable pageable = PageRequest.of(0, 5);
