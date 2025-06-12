@@ -14,8 +14,12 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
-    // TODO: yml에서 설정하세요 네? 쉬발 뒤지기싫으면 -> 만료시간을 하드코딩하네;;;
-    private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 1일
+
+    @Value("${jwt.access-token-expiration-time}")
+    private long ACCESS_TOKEN_EXP;
+
+    @Value("${jwt.refresh-token-expiration-days}")
+    private int REFRESH_TOKEN_EXP;
 
     private Key key;
 
@@ -24,13 +28,22 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    // JWT 토큰 생성
-    public String generateToken(String userId, String role) {
+    // JWT token 생성
+    public String generateAccessToken(String userId, String role) {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXP))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public String generateRefreshToken(String userId) {
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXP))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -57,6 +70,14 @@ public class JwtTokenProvider {
         } catch (JwtException e) {
             return false;
         }
+    }
+
+    public long getAccessTokenExp() {
+        return ACCESS_TOKEN_EXP;
+    }
+
+    public long getRefreshTokenExp() {
+        return REFRESH_TOKEN_EXP;
     }
 
     // JWT의 모든 정보 확인

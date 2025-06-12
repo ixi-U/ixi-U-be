@@ -47,7 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 4. SecurityContext에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         // 5. 다음 필터로 넘김
         filterChain.doFilter(request, response);
     }
@@ -60,7 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return cookie.getValue();
             }
         }
-
         return null;
     }
 }

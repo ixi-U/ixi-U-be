@@ -37,6 +37,9 @@ public class User {
     @Property(name = "kakao_id")
     private final Long kakaoId;
 
+    @Property(name = "refresh_token")
+    private final String refreshToken;
+
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
     private List<Reviewed> reviewedHistory = new ArrayList<>();
@@ -52,6 +55,10 @@ public class User {
                 .provider(provider)
                 .kakaoId(kakaoId)
                 .build();
+    }
+
+    public User updateRefreshToken(String refreshToken) {
+        return this.withRefreshToken(refreshToken);
     }
 
     public void addReviewed(final Reviewed reviewed){

@@ -2,6 +2,7 @@ package com.ixi_U.auth.service;
 
 import com.ixi_U.auth.dto.KakaoUserResponse;
 import com.ixi_U.auth.dto.KakaoTokenResponse;
+import com.ixi_U.auth.dto.TokenPair;
 import com.ixi_U.auth.exception.KakaoAuthException;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.jwt.JwtTokenProvider;
@@ -58,7 +59,7 @@ public class KakaoAuthService {
         }
     }
 
-    public String loginAndIssueJwt(String code) {
+    public TokenPair loginAndIssueTokens(String code) {
         String kakaoAccessToken = getAccessToken(code); // 2. 카카오 서버로 카카오 access_token 발급
         KakaoUserResponse kakaoUser = getUserInfoFromKakao(kakaoAccessToken); // 3. 카카오 access_token으로 유저 정보 확인
 
@@ -69,7 +70,14 @@ public class KakaoAuthService {
                 .orElseThrow(() -> new GeneralException(KakaoAuthException.USER_NOT_FOUND));
 
         // 6. 사용자 확인되면 jwt 토큰 발급
-        return jwtTokenProvider.generateToken(user.getId(), "ROLE_USER");
+//        return jwtTokenProvider.generateToken(user.getId(), "ROLE_USER");
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), "ROLE_USER");
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
+
+        User updatedUser = user.withRefreshToken(refreshToken);
+        userRepository.save(updatedUser);
+
+        return new TokenPair(accessToken, refreshToken);
     }
 
     // 4. 카카오 유저 정보를 기반으로 신규/기존 사용자 확인 후 신규면 DB 저장
