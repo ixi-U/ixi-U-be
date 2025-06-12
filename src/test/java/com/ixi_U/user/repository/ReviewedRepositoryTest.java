@@ -3,6 +3,7 @@ package com.ixi_U.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ixi_U.common.AbstractNeo4jContainer;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
@@ -20,39 +21,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 @DataNeo4jTest
 @ActiveProfiles("test")
 @Transactional
 @Testcontainers
-class ReviewedRepositoryTest {
+class ReviewedRepositoryTest extends AbstractNeo4jContainer {
 
 
-    @Container
-    private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
-            DockerImageName.parse("neo4j:5"))
-            .withAdminPassword("1q2w3e4r");
     @Autowired
     ReviewedRepository reviewedRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
     PlanRepository planRepository;
-
-    @DynamicPropertySource
-    static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
-
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
-        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
-        registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
-    }
 
     @Nested
     @DisplayName("리뷰를 저장할 때")

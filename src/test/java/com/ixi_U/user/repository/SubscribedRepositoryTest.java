@@ -2,6 +2,7 @@ package com.ixi_U.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.ixi_U.common.AbstractNeo4jContainer;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
@@ -12,25 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 @DataNeo4jTest
 @Testcontainers
 @ActiveProfiles("test")
 @Transactional
-class SubscribedRepositoryTest {
+class SubscribedRepositoryTest extends AbstractNeo4jContainer {
 
-
-    @Container
-    private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
-            DockerImageName.parse("neo4j:5"))
-            .withAdminPassword("1q2w3e4r");
 
     @Autowired
     UserRepository userRepository;
@@ -38,14 +29,6 @@ class SubscribedRepositoryTest {
     PlanRepository planRepository;
     @Autowired
     SubscribedRepository subscribedRepository;
-
-    @DynamicPropertySource
-    static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
-
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
-        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
-        registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
-    }
 
     @Nested
     @DisplayName("구독 관계가 존재하는지 확인할 때")
