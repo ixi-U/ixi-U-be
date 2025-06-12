@@ -1,6 +1,6 @@
 package com.ixi_U.user.controller;
 
-import org.neo4j.driver.summary.Plan;
+import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.service.UserService;
 import lombok.RequiredArgsConstructor;
