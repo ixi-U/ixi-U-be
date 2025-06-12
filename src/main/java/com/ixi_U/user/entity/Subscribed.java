@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.RelationshipId;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
@@ -28,17 +26,13 @@ public class Subscribed {
     private final Plan plan;
 
     @CreatedDate
-    @Property("created_at")
     private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Property("updated_at")
-    private LocalDateTime updatedAt;
 
     public static Subscribed of(final Plan plan) {
 
         return Subscribed.builder()
                 .plan(plan)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
