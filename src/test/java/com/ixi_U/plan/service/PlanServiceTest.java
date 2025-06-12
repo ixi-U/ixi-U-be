@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
+import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
@@ -64,7 +65,8 @@ class PlanServiceTest {
 
             // when
             SortedPlanResponse result = planService.findPlans(
-                    PageRequest.ofSize(3), planTypeStr, planSortOptionStr, null, null, null);
+                    PageRequest.ofSize(3),
+                    GetPlansRequest.of(planTypeStr, planSortOptionStr, null, null, null));
 
             // then
             assertThat(result.plans().getContent()).containsExactly(dto1, dto2, dto3);
@@ -82,7 +84,8 @@ class PlanServiceTest {
             // given, when, then
             assertThatThrownBy(() ->
                     planService.findPlans(
-                            PageRequest.ofSize(3), planType, "PRIORITY", null, null, null)
+                            PageRequest.ofSize(3),
+                            GetPlansRequest.of(planType, "PRIORITY", null, null, null))
             )
                     .isInstanceOf(GeneralException.class)
                     .hasMessageContaining("유효하지 않은 요금제 타입입니다.");
@@ -96,7 +99,8 @@ class PlanServiceTest {
             // given, when, then
             assertThatThrownBy(() ->
                     planService.findPlans(
-                            PageRequest.ofSize(3), "ONLINE", planSortOptionStr, null, null, null)
+                            PageRequest.ofSize(3),
+                            GetPlansRequest.of("ONLINE", planSortOptionStr, null, null, null))
             )
                     .isInstanceOf(GeneralException.class)
                     .hasMessageContaining("유효하지 않은 정렬 조건입니다.");
