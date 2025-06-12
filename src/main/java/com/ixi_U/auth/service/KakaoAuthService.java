@@ -70,11 +70,10 @@ public class KakaoAuthService {
                 .orElseThrow(() -> new GeneralException(KakaoAuthException.USER_NOT_FOUND));
 
         // 6. 사용자 확인되면 jwt 토큰 발급
-//        return jwtTokenProvider.generateToken(user.getId(), "ROLE_USER");
         String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), "ROLE_USER");
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
 
-        User updatedUser = user.withRefreshToken(refreshToken);
+        User updatedUser = user.updateRefreshToken(refreshToken);
         userRepository.save(updatedUser);
 
         return new TokenPair(accessToken, refreshToken);
