@@ -55,9 +55,8 @@ class BaseEntityAuditingTest extends AbstractNeo4jContainer {
 
         savedUser = userRepository.save(savedUser);
 
-        Subscribed latestSubscribed = savedUser.getSubscribedHistory().stream()
-                .reduce((first, second) -> second)
-                .orElse(null);
+        Subscribed latestSubscribed = savedUser.getSubscribedHistory()
+                .get(savedUser.getSubscribedHistory().size() - 1);
 
         // then
         assertThat(latestSubscribed).isNotNull();
