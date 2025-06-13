@@ -1,16 +1,4 @@
 spring:
-  neo4j:
-    uri: ${GRAPH_DB_URL}
-    authentication:
-      username: ${GRAPH_DB_USERNAME}
-      password: ${GRAPH_DB_PASSWORD}
   data:
     neo4j:
       database: neo4j
-
----
-spring:
-  config:
-    import: classpath:application-dev.properties
-  main:
-    allow-bean-definition-overriding: true
