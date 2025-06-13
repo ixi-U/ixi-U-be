@@ -80,3 +80,7 @@ operation::createReview-error-when-not-subscribe[]
 === 요금제 리뷰 조회 성공
 
 operation::showReview-success[]
+
+=== 요금제 리뷰 개수 및 평균 별점 조회
+
+operation::showReviewStats-success[]
