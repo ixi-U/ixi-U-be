@@ -7,6 +7,7 @@ import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReviewService {
 
     private final ReviewedRepository reviewedRepository;
@@ -70,6 +72,11 @@ public class ReviewService {
                 planId, pageable);
 
         return ShowReviewListResponse.of(reviewedList.getContent(), reviewedList.hasNext());
+    }
+
+    public ShowReviewStatsResponse showReviewStats(String planId) {
+
+        return userRepository.findAveragePointAndReviewCount(planId);
     }
 
 }

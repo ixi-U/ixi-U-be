@@ -1,6 +1,7 @@
 package com.ixi_U.user.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -21,6 +22,7 @@ import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.service.ReviewService;
@@ -371,6 +373,37 @@ class ReviewControllerTest {
                     .andExpect(jsonPath("$.reviewResponseList[1].createdAt").value(
                             "2025-06-13T12:00:00"));
         }
+    }
+
+    @Nested
+    @DisplayName("리뷰 stats 요청은 ")
+    class Describe_showReviewStats {
+
+        @Test
+        @DisplayName("리뷰 개수와 리뷰 평균 별점을 반환한다")
+        void it_returns_review_count_and_average() throws Exception {
+
+            //given
+            double averageRating = 3.5;
+            int reviewCount = 3;
+            given(reviewService.showReviewStats(anyString())).willReturn(
+                    ShowReviewStatsResponse.of(averageRating, reviewCount));
+
+            //when
+            ResultActions result = mockMvc.perform(
+                            get(REVIEW_URL + "/stats")
+                                    .param("planId", "plan-001")
+                                    .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(document(
+                            "showReviewStats-success"))
+                    .andDo(print());
+
+            //then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.averagePoint").value(averageRating))
+                    .andExpect(jsonPath("$.totalCount").value(reviewCount));
+        }
+
     }
 
 
