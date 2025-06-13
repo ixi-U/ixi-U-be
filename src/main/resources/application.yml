@@ -17,7 +17,8 @@ spring:
       chat:
         options:
           model: ${OPEN_AI_CHAT_MODEL}
-
+server:
+  forward-headers-strategy: native
 ---
 spring:
   config:
