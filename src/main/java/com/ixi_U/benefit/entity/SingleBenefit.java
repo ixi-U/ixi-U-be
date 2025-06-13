@@ -1,13 +1,17 @@
 package com.ixi_U.benefit.entity;
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 @Node(value = "SingleBenefit")
@@ -27,7 +31,16 @@ public class SingleBenefit {
 
     private final BenefitType benefitType;
 
-    public static SingleBenefit of(final String name, final String description, final BenefitType benefitType){
+    @CreatedDate
+    @Property("created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Property("updated_at")
+    private LocalDateTime updatedAt;
+
+    public static SingleBenefit of(final String name, final String description,
+            final BenefitType benefitType) {
 
         return SingleBenefit.builder()
                 .name(name)

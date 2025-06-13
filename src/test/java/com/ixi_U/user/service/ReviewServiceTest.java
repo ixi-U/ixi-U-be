@@ -3,6 +3,7 @@ package com.ixi_U.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -14,6 +15,7 @@ import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
@@ -64,14 +66,14 @@ class ReviewServiceTest {
             @Test
             @DisplayName("리뷰를 저장한다")
             void it_saves_review() {
-                
+
                 // given
                 given(planRepository.findById(any())).willReturn(Optional.of(Plan.of(
                         "플랜1", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider")));
+                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(false);
                 ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -104,7 +106,7 @@ class ReviewServiceTest {
                                 0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
                         )));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider")));
+                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(false);
 
                 // when
@@ -130,7 +132,7 @@ class ReviewServiceTest {
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider")));
+                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(true);
 
@@ -181,6 +183,30 @@ class ReviewServiceTest {
             assertThat(result.hasNextPage()).isFalse();
             assertThat(result.reviewResponseList()).hasSize(2);
             assertThat(result.reviewResponseList().get(0).comment()).isEqualTo("리뷰1");
+        }
+    }
+
+    @Nested
+    @DisplayName("showReviewStats 메서드는")
+    class Describe_showReview_stats {
+
+        @Test
+        @DisplayName("리뷰 개수와 평점을 반환한다.")
+        void it_returns_review_count_and_rating() {
+
+            // given
+            double averagePoint = 3.5;
+            int totalCount = 3;
+            given(userRepository.findAveragePointAndReviewCount(anyString())).willReturn(
+                    ShowReviewStatsResponse.of(averagePoint, totalCount));
+
+            //when
+            ShowReviewStatsResponse showReviewStatsResponse = reviewService.showReviewStats(
+                    "plan-id");
+
+            //then
+            assertThat(showReviewStatsResponse.averagePoint()).isEqualTo(averagePoint);
+            assertThat(showReviewStatsResponse.totalCount()).isEqualTo(totalCount);
         }
     }
 }

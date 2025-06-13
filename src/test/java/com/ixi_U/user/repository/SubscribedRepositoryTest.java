@@ -8,6 +8,8 @@ import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -28,11 +29,8 @@ import org.testcontainers.utility.DockerImageName;
 @Transactional
 class SubscribedRepositoryTest {
 
-    @Container
-    private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
-            DockerImageName.parse("neo4j:5.24"))
-            .withAdminPassword("1q2w3e4r");
 
+    private static Neo4jContainer<?> neo4jContainer;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -40,13 +38,29 @@ class SubscribedRepositoryTest {
     @Autowired
     SubscribedRepository subscribedRepository;
 
-    @DynamicPropertySource
-    static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
+    @BeforeAll
+    static void initializeNeo4j() {
 
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
-        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
-        registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
+        neo4jContainer = new Neo4jContainer<>(DockerImageName.parse("neo4j:5.24"))
+                .withAdminPassword("haruharu");
+
+        neo4jContainer.start();
     }
+
+    @AfterAll
+    static void stopNeo4j() {
+
+        neo4jContainer.close();
+    }
+
+    @DynamicPropertySource
+    static void neo4jProperties(DynamicPropertyRegistry registry) {
+
+        registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
+        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
+        registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
+    }
+
 
     @Nested
     @DisplayName("구독 관계가 존재하는지 확인할 때")
@@ -60,7 +74,7 @@ class SubscribedRepositoryTest {
             @DisplayName("true를 반환한다")
             void it_returns_true() {
                 //given
-                User user = User.of("jinu", "jinu@mail.com", "kakao");
+                User user = User.of("jinu", "jinu@mail.com", "kakao", 123L);
                 Plan savedPlan = planRepository.save(Plan.of(
                         "요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
@@ -88,7 +102,7 @@ class SubscribedRepositoryTest {
             @DisplayName("false를 반환한다")
             void it_returns_false() {
                 //given
-                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao"));
+                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L));
                 Plan savedPlan = planRepository.save(Plan.of(
                         "요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
