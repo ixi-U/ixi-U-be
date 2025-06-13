@@ -6,10 +6,13 @@ import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateSubscribedRequest;
+import com.ixi_U.user.dto.response.ShowSubscribedHistoryResponse;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,5 +48,15 @@ public class SubscribedService {
         user.addSubscribed(Subscribed.of(plan));
 
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ShowSubscribedHistoryResponse> findSubscribedHistoryByUserId(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+        List<Subscribed> subscribeds = user.getSubscribedHistory();
+        return subscribeds.stream()
+                .map(ShowSubscribedHistoryResponse::from)
+                .collect(Collectors.toList());
     }
 }
