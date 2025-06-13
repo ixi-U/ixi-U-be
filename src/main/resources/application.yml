@@ -1,6 +1,23 @@
 spring:
   profiles:
     active: dev
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_REST_API_KEY}
+            client-name: Kakao
+            redirect-uri: ${KAKAO_REDIRECT}
+            authorization-grant-type: authorization_code
+            scope: profile_nickname
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
   neo4j:
     uri: ${GRAPH_DB_URL}
@@ -18,6 +35,11 @@ spring:
         options:
           model: ${OPEN_AI_CHAT_MODEL}
 
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-expiration-time: ${ACCESS_TOKEN_EXP}
+  refresh-token-expiration-days: ${REFRESH_TOKEN_EXP}
+
 ---
 spring:
   config:
@@ -31,3 +53,8 @@ spring:
     import: classpath:application-prod.properties
     activate:
       on-profile: prod
+
+
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY}
+  redirect-uri: ${KAKAO_REDIRECT_URI}

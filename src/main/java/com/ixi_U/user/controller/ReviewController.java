@@ -2,6 +2,7 @@ package com.ixi_U.user.controller;
 
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
+import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,14 @@ public class ReviewController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(reviewService.showReview(planId, pageable));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ShowReviewStatsResponse> showReviewStats(
+            @RequestParam("planId") final String planId) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(reviewService.showReviewStats(planId));
     }
 
 }
