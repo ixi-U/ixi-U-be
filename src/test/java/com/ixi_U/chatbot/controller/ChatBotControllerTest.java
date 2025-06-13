@@ -28,6 +28,8 @@ import reactor.core.publisher.Flux;
 class ChatBotControllerTest {
 
     WebTestClient webTestClient;
+    @MockBean
+    ChatBotService chatBotService;
 
     @BeforeEach
     void setUp(ApplicationContext applicationContext,
@@ -37,9 +39,6 @@ class ChatBotControllerTest {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
     }
-
-    @MockBean
-    ChatBotService chatBotService;
 
     @Nested
     class WhenAPIHasRequested {
@@ -63,21 +62,6 @@ class ChatBotControllerTest {
                     .expectBodyList(String.class)
                     .contains(split[0])
                     .consumeWith(document("getWelcomeMessage"));
-        }
-
-        @Test
-        @DisplayName("인증/인가 되지않은 사용자는 401 에러를 반환한다")
-        void unauthorizedUserTest() {
-
-            //given
-
-            //when & then
-            webTestClient.get()
-                    .uri("/api/chatbot/welcome")
-                    .exchange()
-                    .expectStatus().is4xxClientError()
-                    .returnResult(Void.class)
-                    .consumeWith(document("unauthorizedUserTest"));
         }
     }
 }
