@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.test.context.support.WithMockUser;
-
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -60,8 +59,25 @@ class ChatBotControllerTest {
                     .accept(MediaType.TEXT_EVENT_STREAM)
                     .exchange()
                     .expectStatus().isOk()
-                    .returnResult(String.class)
+                    .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
+                    .expectBodyList(String.class)
+                    .contains(split[0])
                     .consumeWith(document("getWelcomeMessage"));
+        }
+
+        @Test
+        @DisplayName("인증/인가 되지않은 사용자는 401 에러를 반환한다")
+        void unauthorizedUserTest() {
+
+            //given
+
+            //when & then
+            webTestClient.get()
+                    .uri("/api/chatbot/welcome")
+                    .exchange()
+                    .expectStatus().is4xxClientError()
+                    .returnResult(Void.class)
+                    .consumeWith(document("unauthorizedUserTest"));
         }
     }
 }
