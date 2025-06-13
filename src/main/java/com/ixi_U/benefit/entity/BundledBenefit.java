@@ -43,9 +43,9 @@ public class BundledBenefit {
                 .build();
     }
 
-    public void addSingleBenefit(final SingleBenefit singleBenefit){
+    public void addAllSingleBenefit(final List<SingleBenefit> newSingleBenefits){
 
-        singleBenefits.add(singleBenefit);
+        singleBenefits.addAll(newSingleBenefits);
     }
 }
 

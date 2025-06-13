@@ -1,5 +1,7 @@
 package com.ixi_U.benefit.service;
 
+import com.ixi_U.benefit.dto.request.SaveBundledBenefitRequest;
+import com.ixi_U.benefit.dto.request.SaveSingleBenefitRequest;
 import com.ixi_U.benefit.dto.response.FindBundledBenefitResponse;
 import com.ixi_U.benefit.dto.response.FindSingleBenefitResponse;
 import com.ixi_U.benefit.entity.BundledBenefit;
@@ -35,6 +37,48 @@ public class BenefitService {
         List<SingleBenefit> singleBenefits = singleBenefitRepository.findAll();
 
         return singleBenefitEntityToDto(singleBenefits);
+    }
+
+    /**
+     * 단일 혜택 저장
+     */
+    public void saveSingleBenefit(final SaveSingleBenefitRequest request) {
+
+        SingleBenefit singleBenefit = singleBenefitDtoToEntity(request);
+
+        singleBenefitRepository.save(singleBenefit);
+    }
+
+    /**
+     * 묶음 혜택 저장
+     */
+    public void saveBundledBenefit(final SaveBundledBenefitRequest request) {
+
+        BundledBenefit bundledBenefit = bundledBenefitDtoToEntity(request);
+
+        bundledBenefitRepository.save(bundledBenefit);
+    }
+
+    private BundledBenefit bundledBenefitDtoToEntity(final SaveBundledBenefitRequest request) {
+
+        List<String> singleBenefitIds = request.singleBenefitIds();
+
+        List<SingleBenefit> singleBenefits = singleBenefitRepository.findAllById(singleBenefitIds);
+
+        BundledBenefit bundledBenefit = BundledBenefit.create(
+                request.name(),
+                request.subscript(),
+                request.choice()
+        );
+
+        bundledBenefit.addAllSingleBenefit(singleBenefits);
+
+        return bundledBenefit;
+    }
+
+    private SingleBenefit singleBenefitDtoToEntity(final SaveSingleBenefitRequest request) {
+
+        return SingleBenefit.create(request.name(), request.subscript(), request.benefitType());
     }
 
     private List<FindBundledBenefitResponse> bundledBenefitEntityToDto(
