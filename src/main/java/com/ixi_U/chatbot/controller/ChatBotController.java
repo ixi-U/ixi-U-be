@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ChatBotController {
 
-    private final static String TEXT_EVENT_STREAM_VALUE = "text/event-stream;charset=UTF-8";
+    private static final String TEXT_EVENT_STREAM_VALUE = "text/event-stream;charset=UTF-8";
 
     private final ChatBotService chatBotService;
 

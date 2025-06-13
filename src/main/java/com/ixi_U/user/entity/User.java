@@ -29,7 +29,6 @@ public class User {
     private final String id;
 
     @Property(name = "name")
-
     private final String name;
 
     @Property(name = "email")
@@ -46,6 +45,12 @@ public class User {
     @Property("updated_at")
     private LocalDateTime updatedAt;
 
+    @Property(name = "kakao_id")
+    private final Long kakaoId;
+
+    @Property(name = "refresh_token")
+    private String refreshToken;
+
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
     private List<Reviewed> reviewedHistory = new ArrayList<>();
@@ -54,16 +59,20 @@ public class User {
     @Relationship(type = "SUBSCRIBED", direction = Relationship.Direction.OUTGOING)
     private List<Subscribed> subscribedHistory = new ArrayList<>();
 
-    public static User of(final String name, final String email, final String provider) {
-
+    public static User of(final String name, final String email, final String provider, final Long kakaoId) {
         return User.builder()
                 .name(name)
                 .email(email)
                 .provider(provider)
+                .kakaoId(kakaoId)
                 .build();
     }
 
-    public void addReviewed(final Reviewed reviewed) {
+    public User updateRefreshToken(String refreshToken) {
+        return this.withRefreshToken(refreshToken);
+    }
+
+    public void addReviewed(final Reviewed reviewed){
 
         reviewedHistory.add(reviewed);
     }
