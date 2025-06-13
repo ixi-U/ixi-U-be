@@ -12,7 +12,7 @@ import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
-import com.ixi_U.user.dto.CreateSubscribedRequest;
+import com.ixi_U.user.dto.request.CreateSubscribedRequest;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
 import java.util.List;
@@ -53,7 +53,7 @@ class SubscribedServiceTest {
                     PlanType.ONLINE, "주의사항", 400,
                     0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
             );
-            
+
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             when(planRepository.findById(planId)).thenReturn(Optional.of(plan));
             when(userRepository.save(any(User.class))).thenAnswer(

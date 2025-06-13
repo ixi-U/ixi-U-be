@@ -9,7 +9,7 @@ import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
-import com.ixi_U.user.dto.CreateSubscribedRequest;
+import com.ixi_U.user.dto.request.CreateSubscribedRequest;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.service.SubscribedService;

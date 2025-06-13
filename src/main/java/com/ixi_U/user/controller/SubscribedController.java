@@ -1,6 +1,6 @@
 package com.ixi_U.user.controller;
 
-import com.ixi_U.user.dto.CreateSubscribedRequest;
+import com.ixi_U.user.dto.request.CreateSubscribedRequest;
 import com.ixi_U.user.service.SubscribedService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

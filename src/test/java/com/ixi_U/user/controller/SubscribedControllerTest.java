@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.common.config.FakeNeo4jAuditingConfig;
-import com.ixi_U.user.dto.CreateSubscribedRequest;
+import com.ixi_U.user.dto.request.CreateSubscribedRequest;
 import com.ixi_U.user.service.SubscribedService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
