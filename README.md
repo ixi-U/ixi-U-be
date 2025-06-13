@@ -18,8 +18,7 @@
 ---
 
 ## ⚙️ 기술 스택
-
-<img src="https://github.com/user-attachments/assets/16421396-523c-4ec5-87dd-9e8a2c663875" width="600">
+<img src="https://github.com/user-attachments/assets/e0f30a52-b1c0-4c40-8f9f-4ea6af9e20c9" width="600">
 
 ## 🛠️ 시스템 아키텍처
 
