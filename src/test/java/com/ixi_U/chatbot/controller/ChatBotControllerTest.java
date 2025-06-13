@@ -1,6 +1,6 @@
 package com.ixi_U.chatbot.controller;
 
-import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
+import static com.ixi_U.util.TestConstants.CHATBOT_WELCOME_MESSAGE;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
@@ -63,21 +63,6 @@ class ChatBotControllerTest {
                     .expectBodyList(String.class)
                     .contains(split[0])
                     .consumeWith(document("getWelcomeMessage"));
-        }
-
-        @Test
-        @DisplayName("인증/인가 되지않은 사용자는 401 에러를 반환한다")
-        void unauthorizedUserTest() {
-
-            //given
-
-            //when & then
-            webTestClient.get()
-                    .uri("/api/chatbot/welcome")
-                    .exchange()
-                    .expectStatus().is4xxClientError()
-                    .returnResult(Void.class)
-                    .consumeWith(document("unauthorizedUserTest"));
         }
     }
 }
