@@ -69,7 +69,7 @@ class UserRepositoryTest {
             // 저장된 리뷰 점수는 : 5,4,3,2,1,5 => 20 / 6 => 3.33 => 소숫점 첫 째 자리 반올림 3.3
             for (int i = 0; i < totalReviewCount; i++) {
                 User user = userRepository.save(
-                        User.of("user" + i, "user" + i + "@mail.com", "kakao"));
+                        User.of("user" + i, "user" + i + "@mail.com", "kakao", 123L));
 
                 int reviewPoint = 5 - i % 5;
                 sumOfReviewPoint += reviewPoint;
