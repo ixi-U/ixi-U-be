@@ -3,6 +3,7 @@ package com.ixi_U.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -14,6 +15,7 @@ import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
@@ -64,7 +66,7 @@ class ReviewServiceTest {
             @Test
             @DisplayName("리뷰를 저장한다")
             void it_saves_review() {
-                
+
                 // given
                 given(planRepository.findById(any())).willReturn(Optional.of(Plan.of(
                         "플랜1", 20000, 300, 200, 100, 29000,
@@ -181,6 +183,30 @@ class ReviewServiceTest {
             assertThat(result.hasNextPage()).isFalse();
             assertThat(result.reviewResponseList()).hasSize(2);
             assertThat(result.reviewResponseList().get(0).comment()).isEqualTo("리뷰1");
+        }
+    }
+
+    @Nested
+    @DisplayName("showReviewStats 메서드는")
+    class Describe_showReview_stats {
+
+        @Test
+        @DisplayName("리뷰 개수와 평점을 반환한다.")
+        void it_returns_review_count_and_rating() {
+
+            // given
+            double averagePoint = 3.5;
+            int totalCount = 3;
+            given(userRepository.findAveragePointAndReviewCount(anyString())).willReturn(
+                    ShowReviewStatsResponse.of(averagePoint, totalCount));
+
+            //when
+            ShowReviewStatsResponse showReviewStatsResponse = reviewService.showReviewStats(
+                    "plan-id");
+
+            //then
+            assertThat(showReviewStatsResponse.averagePoint()).isEqualTo(averagePoint);
+            assertThat(showReviewStatsResponse.totalCount()).isEqualTo(totalCount);
         }
     }
 }
