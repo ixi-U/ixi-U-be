@@ -1,5 +1,6 @@
 package com.ixi_U.user.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -7,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -39,6 +42,14 @@ public class User {
 
     @Property(name = "refresh_token")
     private String refreshToken;
+  
+    @CreatedDate
+    @Property("created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Property("updated_at")
+    private LocalDateTime updatedAt;
 
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
@@ -66,7 +77,7 @@ public class User {
         reviewedHistory.add(reviewed);
     }
 
-    public void addSubscribed(final Subscribed subscribed){
+    public void addSubscribed(final Subscribed subscribed) {
 
         subscribedHistory.add(subscribed);
     }

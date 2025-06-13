@@ -53,3 +53,8 @@ spring:
     import: classpath:application-prod.properties
     activate:
       on-profile: prod
+
+
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
