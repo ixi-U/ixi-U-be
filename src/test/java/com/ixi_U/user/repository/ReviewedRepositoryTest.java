@@ -11,6 +11,8 @@ import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +27,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -35,11 +36,8 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 class ReviewedRepositoryTest {
 
+    private static Neo4jContainer<?> neo4jContainer;
 
-    @Container
-    private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>(
-            DockerImageName.parse("neo4j:5.24"))
-            .withAdminPassword("1q2w3e4r");
     @Autowired
     ReviewedRepository reviewedRepository;
     @Autowired
@@ -47,13 +45,29 @@ class ReviewedRepositoryTest {
     @Autowired
     PlanRepository planRepository;
 
-    @DynamicPropertySource
-    static void overrideNeo4jProperties(DynamicPropertyRegistry registry) {
+    @BeforeAll
+    static void initializeNeo4j() {
 
-        registry.add("spring.neo4j.uri", neo4j::getBoltUrl);
-        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
-        registry.add("spring.neo4j.authentication.password", () -> "1q2w3e4r");
+        neo4jContainer = new Neo4jContainer<>(DockerImageName.parse("neo4j:5.24"))
+                .withAdminPassword("haruharu");
+
+        neo4jContainer.start();
     }
+
+    @AfterAll
+    static void stopNeo4j() {
+
+        neo4jContainer.close();
+    }
+
+    @DynamicPropertySource
+    static void neo4jProperties(DynamicPropertyRegistry registry) {
+
+        registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
+        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
+        registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
+    }
+
 
     @Nested
     @DisplayName("리뷰를 저장할 때")
@@ -62,7 +76,7 @@ class ReviewedRepositoryTest {
         @Test
         @DisplayName("정상적으로 리뷰가 저장된다")
         void it_saves_review() {
-            
+
             // given
             User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L));
             Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
