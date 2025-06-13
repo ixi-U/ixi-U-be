@@ -10,6 +10,7 @@ import com.ixi_U.user.dto.response.ShowSubscribedHistoryResponse;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -56,6 +57,7 @@ public class SubscribedService {
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         List<Subscribed> subscribeds = user.getSubscribedHistory();
         return subscribeds.stream()
+                .sorted(Comparator.comparing(Subscribed::getCreatedAt).reversed())
                 .map(ShowSubscribedHistoryResponse::from)
                 .collect(Collectors.toList());
     }
