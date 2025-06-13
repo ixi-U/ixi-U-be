@@ -23,15 +23,15 @@ public class SingleBenefit {
 
     private final String name;
 
-    private final String description;
+    private final String subscript;
 
     private final BenefitType benefitType;
 
-    public static SingleBenefit of(final String name, final String description, final BenefitType benefitType){
+    public static SingleBenefit create(final String name, final String subscript, final BenefitType benefitType){
 
         return SingleBenefit.builder()
                 .name(name)
-                .description(description)
+                .subscript(subscript)
                 .benefitType(benefitType)
                 .build();
     }

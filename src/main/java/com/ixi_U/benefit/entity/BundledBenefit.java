@@ -26,7 +26,7 @@ public class BundledBenefit {
 
     private final String name;
 
-    private final String description;
+    private final String subscript;
 
     private final int choice;
 
@@ -34,11 +34,11 @@ public class BundledBenefit {
     @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-    public static BundledBenefit of(final String name, final String description, final int choice){
+    public static BundledBenefit create(final String name, final String subscript, final int choice){
 
         return BundledBenefit.builder()
                 .name(name)
-                .description(description)
+                .subscript(subscript)
                 .choice(choice)
                 .build();
     }
