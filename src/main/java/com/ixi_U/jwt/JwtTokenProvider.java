@@ -79,22 +79,4 @@ public class JwtTokenProvider {
     public long getRefreshTokenExp() {
         return REFRESH_TOKEN_EXP;
     }
-
-    // JWT의 모든 정보 확인
-//    public Claims getClaims(String token) {
-//        return Jwts.parser()
-//                .verifyWith(key)
-//                .build()
-//                .parseSignedClaims(token)
-//                .getPayload();
-//    }
-
-//    public Long getUserIdFromToken(String token) {
-//        if (Objects.isNull(token) && !validateToken(token)) {
-//            throw new GeneralException(JwtErrorCode.TOKEN_IS_EMPTY);
-//        }
-//
-//        Claims claims = getClaims(token);
-//        return Long.valueOf(claims.getSubject());
-//    }
 }

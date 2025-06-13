@@ -1,7 +1,8 @@
 package com.ixi_U.user.controller;
 
 import com.ixi_U.plan.entity.Plan;
-import com.ixi_U.user.entity.Subscribed;
+import com.ixi_U.user.dto.response.PlanResponse;
+import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +19,15 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getMyPlan() {
-        List<Subscribed> subscribedList = userService.getMySubscribedPlans();
+        List<SubscribedResponse> subscribedList = userService.getMySubscribedPlans();
 
         if (subscribedList.isEmpty()) {
             return ResponseEntity.ok("아직 등록된 요금제가 없습니다.");
+
         }
 
         // 하나만 있다고 가정
-        Plan plan = subscribedList.get(0).getPlan();
+        PlanResponse plan = subscribedList.get(0).plan();
         return ResponseEntity.ok(plan);
     }
 }

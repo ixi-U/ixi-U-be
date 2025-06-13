@@ -38,7 +38,7 @@ public class User {
     private final Long kakaoId;
 
     @Property(name = "refresh_token")
-    private final String refreshToken;
+    private String refreshToken;
 
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
