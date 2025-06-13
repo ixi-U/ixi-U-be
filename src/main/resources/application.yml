@@ -8,7 +8,7 @@ spring:
           kakao:
             client-id: ${KAKAO_REST_API_KEY}
             client-name: Kakao
-            redirect-uri: ${KAKAO_REDIRECT}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             authorization-grant-type: authorization_code
             scope: profile_nickname
 
@@ -53,8 +53,3 @@ spring:
     import: classpath:application-prod.properties
     activate:
       on-profile: prod
-
-
-kakao:
-  rest-api-key: ${KAKAO_REST_API_KEY}
-  redirect-uri: ${KAKAO_REDIRECT_URI}
