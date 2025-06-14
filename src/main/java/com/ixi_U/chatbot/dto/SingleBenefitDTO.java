@@ -4,7 +4,7 @@ import com.ixi_U.benefit.entity.BenefitType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record SingleBenefitRequest(
+public record SingleBenefitDTO(
 
         @NotBlank
         String id,
@@ -18,12 +18,12 @@ public record SingleBenefitRequest(
         @NotNull
         BenefitType benefitType) {
 
-    public static SingleBenefitRequest create(
+    public static SingleBenefitDTO create(
             final String id,
             final String name,
             final String subscript,
             final BenefitType benefitType) {
 
-        return new SingleBenefitRequest(id, name, subscript, benefitType);
+        return new SingleBenefitDTO(id, name, subscript, benefitType);
     }
 }

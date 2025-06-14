@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
 import java.util.List;
 
 public record GeneratePlanDescriptionRequest(
@@ -15,9 +16,6 @@ public record GeneratePlanDescriptionRequest(
         @NotBlank
         String name,
 
-        @NotBlank
-        String subscript,
-
         @NotNull
         int dataAmount,
 
@@ -26,22 +24,20 @@ public record GeneratePlanDescriptionRequest(
 
         @Valid
         @NotEmpty
-        List<BundledBenefitRequest> bundledBenefits,
+        List<BundledBenefitDTO> bundledBenefits,
 
         @Valid
         @NotEmpty
-        List<SingleBenefitRequest> singleBenefits) {
+        List<SingleBenefitDTO> singleBenefits) {
 
     public static GeneratePlanDescriptionRequest create(
             final String id,
             final String name,
-            final String subscript,
             final int dataAmount,
             final int monthlyPrice,
-            final List<BundledBenefitRequest> bundledBenefits,
-            final List<SingleBenefitRequest> singleBenefits) {
+            final List<BundledBenefitDTO> bundledBenefits,
+            final List<SingleBenefitDTO> singleBenefits) {
 
-        return new GeneratePlanDescriptionRequest(id, name, subscript, dataAmount, monthlyPrice, bundledBenefits,
-                singleBenefits);
+        return new GeneratePlanDescriptionRequest(id, name, dataAmount, monthlyPrice, bundledBenefits, singleBenefits);
     }
 }

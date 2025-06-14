@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 
-public record BundledBenefitRequest(
+public record BundledBenefitDTO(
 
         @NotBlank
         String id,
@@ -24,15 +24,15 @@ public record BundledBenefitRequest(
 
         @Valid
         @NotEmpty
-        List<SingleBenefitRequest> singleBenefits) {
+        List<SingleBenefitDTO> singleBenefits) {
 
-    public static BundledBenefitRequest create(
+    public static BundledBenefitDTO create(
             final String id,
             final String name,
             final String subscript,
             final int choice,
-            final List<SingleBenefitRequest> singleBenefits) {
+            final List<SingleBenefitDTO> singleBenefits) {
 
-        return new BundledBenefitRequest(id, name, subscript, choice, singleBenefits);
+        return new BundledBenefitDTO(id, name, subscript, choice, singleBenefits);
     }
 }
