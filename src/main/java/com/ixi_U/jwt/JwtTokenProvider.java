@@ -1,5 +1,6 @@
 package com.ixi_U.jwt;
 
+import com.ixi_U.user.entity.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -29,10 +30,10 @@ public class JwtTokenProvider {
     }
 
     // JWT token 생성
-    public String generateAccessToken(String userId, String role) {
+    public String generateAccessToken(String userId, UserRole userRole) {
         return Jwts.builder()
                 .setSubject(userId)
-                .claim("role", role)
+                .claim("role", userRole.getUserRole())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXP))
                 .signWith(key, SignatureAlgorithm.HS512)
