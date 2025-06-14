@@ -78,7 +78,7 @@ public class ForbiddenWordFilter {
         return (int) Math.floor(length * 0.25);
     }
 
-    public boolean containsBadWords(String input) {
+    public boolean containsForbiddenWords(String input) {
 
         String cleanedInput = input;
 
