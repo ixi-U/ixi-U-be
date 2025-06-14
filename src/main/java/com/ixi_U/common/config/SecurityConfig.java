@@ -4,7 +4,6 @@ import com.ixi_U.auth.handler.OAuth2SuccessHandler;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.jwt.JwtAuthenticationFilter;
 import com.ixi_U.jwt.JwtTokenProvider;
-import com.ixi_U.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,21 +24,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
-    public CustomOAuth2UserService customOAuth2UserService(UserRepository userRepository) {
-        return new CustomOAuth2UserService(userRepository);
-    }
-
-    @Bean
-    public OAuth2SuccessHandler oAuth2SuccessHandler(JwtTokenProvider jwtTokenProvider) {
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
         return new OAuth2SuccessHandler(jwtTokenProvider);
-    }
-
-    @Bean
-    public JwtTokenProvider jwtTokenProvider() {
-        return new JwtTokenProvider();
     }
 
     @Bean
@@ -65,15 +55,15 @@ public class SecurityConfig {
         ;
         // JWT 필터
         http
-                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider()),
+                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider),
                         OAuth2LoginAuthenticationFilter.class);
 
         // OAuth2 필터
         http
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService(userRepository)))
-                        .successHandler(oAuth2SuccessHandler(jwtTokenProvider()))
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler())
                 );
         // 인가 필터
         http
