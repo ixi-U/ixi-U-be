@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -18,7 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ixi_U.auth.handler.OAuth2SuccessHandler;
+import com.ixi_U.auth.service.CustomOAuth2UserService;
+import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
@@ -39,9 +44,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,6 +61,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @WebMvcTest(value = {ReviewController.class})
+@Import(SecurityConfig.class)
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @ActiveProfiles("test")
 class ReviewControllerTest {
@@ -67,12 +78,22 @@ class ReviewControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    JwtTokenProvider oAuth2SuccessHandler;
+
+    @MockBean
+    CustomOAuth2UserService customOAuth2UserService;
+
+
+
+
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .addFilter(new CharacterEncodingFilter("utf-8", true))
                 .apply(documentationConfiguration(restDocumentation))
+                .apply(springSecurity())
                 .build();
     }
 
@@ -88,13 +109,15 @@ class ReviewControllerTest {
             @DisplayName("리뷰를 저장하고 201을 반환한다")
             void it_returns_201_created() throws Exception {
                 //given
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5,
                         "안녕하십니까....저는 이 리뷰를 좋아합니다");
 
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document("createReview-success"))
