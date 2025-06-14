@@ -72,9 +72,6 @@ dependencies {
 	// Bean Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	// Bean Validation
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
 	// Reactor Test
 	testImplementation 'io.projectreactor:reactor-test:3.6.5'
 
