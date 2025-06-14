@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<Void> createReview(@RequestParam("userId") String userId,
+    public ResponseEntity<Void> createReview(@AuthenticationPrincipal String userId,
             @RequestBody @Valid CreateReviewRequest createReviewRequest) {
 
         reviewService.createReview(userId, createReviewRequest);
