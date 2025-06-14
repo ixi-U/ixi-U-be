@@ -14,8 +14,12 @@ public interface UserRepository extends Neo4jRepository<User, String> {
 
     Optional<User> findByNameAndProvider(String nickname, String provider);
 
-
-    Optional<User> findByKakaoId(Long kakao_id);
+    @Query("""
+            MATCH (u:User)
+            WHERE u.kakaoId = $kakaoId
+            RETURN u;
+            """)
+    Optional<User> findByKakaoId(@Param("kakaoId") Long kakaoId);
 
     @Query("""
             MATCH (u:User)-[r:REVIEWED]->(p:Plan) where p.id = $planId

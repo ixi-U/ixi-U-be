@@ -1,31 +1,41 @@
 package com.ixi_U.auth.handler;
 
+import com.ixi_U.auth.dto.CustomOAuth2User;
 import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.user.entity.UserRole;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-@Component
+@Slf4j
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        String userId = oAuth2User.getAttribute("id").toString();
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId, "ROLE_USER");
+        CustomOAuth2User CustomOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+
+        String userId = CustomOAuth2User.getUserId();
+        UserRole userRole = CustomOAuth2User.getUserRole();
+
+        log.info("userId = {}", userId);
+        log.info("userRole = {}", userRole);
+
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, userRole);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+
+        log.info("AccessToken = {}", accessToken);
+        log.info("RefreshToken = {}", refreshToken);
 
         Cookie accessCookie = new Cookie("access_token", accessToken);
         accessCookie.setHttpOnly(true);
