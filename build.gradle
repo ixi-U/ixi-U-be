@@ -59,6 +59,9 @@ dependencies {
     // Spring AOP
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+    // Spring Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
