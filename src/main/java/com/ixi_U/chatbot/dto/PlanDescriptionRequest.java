@@ -6,52 +6,42 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PlanDescriptionRequest {
+public record PlanDescriptionRequest(
 
-    @NotBlank
-    private final String id;
+        @NotBlank
+        String id,
 
-    @NotBlank
-    private final String name;
+        @NotBlank
+        String name,
 
-    @NotBlank
-    private final String subscript;
+        @NotBlank
+        String subscript,
 
-    @NotNull
-    private final Integer data;
+        @NotNull
+        int dataAmount,
 
-    @Positive
-    private final Integer price;
+        @Positive
+        int monthlyPrice,
 
-    @Valid
-    @NotEmpty
-    private final List<BundledBenefitRequest> bundledBenefits;
+        @Valid
+        @NotEmpty
+        List<BundledBenefitRequest> bundledBenefits,
 
-    @Valid
-    @NotEmpty
-    private final List<SingleBenefitRequest> singleBenefits;
+        @Valid
+        @NotEmpty
+        List<SingleBenefitRequest> singleBenefits) {
 
-    public static PlanDescriptionRequest of(final String id, final String name,
+    public static PlanDescriptionRequest create(
+            final String id,
+            final String name,
             final String subscript,
-            final int data, final int price,
+            final int dataAmount,
+            final int monthlyPrice,
             final List<BundledBenefitRequest> bundledBenefits,
             final List<SingleBenefitRequest> singleBenefits) {
-        return PlanDescriptionRequest.builder()
-                .id(id)
-                .name(name)
-                .subscript(subscript)
-                .data(data)
-                .price(price)
-                .bundledBenefits(bundledBenefits)
-                .singleBenefits(singleBenefits)
-                .build();
+
+        return new PlanDescriptionRequest(id, name, subscript, dataAmount, monthlyPrice, bundledBenefits,
+                singleBenefits);
     }
 }

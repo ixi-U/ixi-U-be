@@ -1,6 +1,5 @@
 package com.ixi_U.chatbot.controller;
 
-import static com.ixi_U.util.TestConstants.CHATBOT_WELCOME_MESSAGE;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;

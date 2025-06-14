@@ -6,42 +6,33 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class BundledBenefitRequest {
+public record BundledBenefitRequest(
 
-    @NotBlank
-    private final String id;
+        @NotBlank
+        String id,
 
-    @NotBlank
-    private final String name;
+        @NotBlank
+        String name,
 
-    @NotBlank
-    private final String subscript;
+        @NotBlank
+        String subscript,
 
-    @Positive
-    @NotNull
-    private final Integer choice;
+        @Positive
+        @NotNull
+        int choice,
 
-    @Valid
-    @NotEmpty
-    private final List<SingleBenefitRequest> singleBenefits;
+        @Valid
+        @NotEmpty
+        List<SingleBenefitRequest> singleBenefits) {
 
-    public static BundledBenefitRequest of(final String id, final String name,
+    public static BundledBenefitRequest create(
+            final String id,
+            final String name,
             final String subscript,
-            final int choice, final List<SingleBenefitRequest> singleBenefits) {
-        return BundledBenefitRequest.builder()
-                .id(id)
-                .name(name)
-                .subscript(subscript)
-                .choice(choice)
-                .singleBenefits(singleBenefits)
-                .build();
+            final int choice,
+            final List<SingleBenefitRequest> singleBenefits) {
+
+        return new BundledBenefitRequest(id, name, subscript, choice, singleBenefits);
     }
 }
