@@ -39,6 +39,10 @@ operation::plans-get-invalid-plan-type[]
 
 operation::plans-get-invalid-size-parameter[]
 
+==== 요금제 상세 정보 조회
+
+operation::plans-get-details[]
+
 === 요금제 리뷰
 
 ==== 요금제 리뷰 저장 성공
