@@ -40,6 +40,9 @@ jwt:
   access-token-expiration-time: ${ACCESS_TOKEN_EXP}
   refresh-token-expiration-days: ${REFRESH_TOKEN_EXP}
 
+server:
+  forward-headers-strategy: native
+
 ---
 spring:
   config:
