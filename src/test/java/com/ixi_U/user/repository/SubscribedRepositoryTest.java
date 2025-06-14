@@ -7,6 +7,7 @@ import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
+import com.ixi_U.user.entity.UserRole;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -74,7 +75,7 @@ class SubscribedRepositoryTest {
             @DisplayName("true를 반환한다")
             void it_returns_true() {
                 //given
-                User user = User.of("jinu", "jinu@mail.com", "kakao", 123L);
+                User user = User.of("jinu", "jinu@mail.com", "kakao", 123L, UserRole.ROLE_USER);
                 Plan savedPlan = planRepository.save(Plan.of(
                         "요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
@@ -102,7 +103,7 @@ class SubscribedRepositoryTest {
             @DisplayName("false를 반환한다")
             void it_returns_false() {
                 //given
-                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L));
+                User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L,UserRole.ROLE_USER));
                 Plan savedPlan = planRepository.save(Plan.of(
                         "요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,

@@ -14,6 +14,7 @@ import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateSubscribedRequest;
 import com.ixi_U.user.entity.User;
+import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,7 @@ class SubscribedServiceTest {
             // given
             String userId = "user-1";
             String planId = "plan-1";
-            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L);
+            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L, UserRole.ROLE_USER);
             Plan plan = Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                     PlanType.ONLINE, "주의사항", 400,
                     0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
@@ -93,7 +94,7 @@ class SubscribedServiceTest {
             // given
             String userId = "user-1";
             String planId = "not-exist";
-            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L);
+            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER);
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             when(planRepository.findById(planId)).thenReturn(Optional.empty());
             CreateSubscribedRequest request = new CreateSubscribedRequest(planId);
@@ -110,7 +111,7 @@ class SubscribedServiceTest {
             // given
             String userId = "user-1";
             String planId = null;
-            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L);
+            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER);
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             CreateSubscribedRequest request = new CreateSubscribedRequest(planId);
 
@@ -125,7 +126,7 @@ class SubscribedServiceTest {
             // given
             String userId = "user-1";
             String planId = "";
-            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L);
+            User user = User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER);
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             CreateSubscribedRequest request = new CreateSubscribedRequest(planId);
 
