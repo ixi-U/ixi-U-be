@@ -1,13 +1,27 @@
 package com.ixi_U.common.filter;
 
 import lombok.RequiredArgsConstructor;
+import org.ahocorasick.trie.Trie;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ForbiddenWordFilter {
 
     private final ForbiddenWordLoader forbiddenWordLoader;
+    private final Trie trie;
+
+    @Autowired
+    public ForbiddenWordFilter(ForbiddenWordLoader forbiddenWordLoader) {
+        // TrieBuilder를 통해 단어 등록
+
+        this.forbiddenWordLoader = forbiddenWordLoader;
+
+        this.trie = Trie.builder()
+                .addKeywords(forbiddenWordLoader.getForbiddenWords())
+                .build();
+
+    }
 
     private static int levenshtein(String a, String b) {
 
@@ -63,4 +77,16 @@ public class ForbiddenWordFilter {
 
         return (int) Math.floor(length * 0.25);
     }
+
+    public boolean containsBadWords(String input) {
+
+        String cleanedInput = input;
+
+        for (WordPreprocessingPolicy policy : WordPreprocessingPolicy.values()) {
+            cleanedInput = policy.apply(cleanedInput);
+        }
+
+        return trie.containsMatch(cleanedInput);
+    }
+
 }
