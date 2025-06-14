@@ -1,4 +1,4 @@
-= Connect API Document
+= ixi-U API 명세서
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -38,6 +38,10 @@ operation::plans-get-invalid-plan-type[]
 ==== 유효하지 않은 파라미터(size) 실패
 
 operation::plans-get-invalid-size-parameter[]
+
+=== 요금제 상세 정보 조회
+
+operation::plans-get-details[]
 
 === 요금제 리뷰
 

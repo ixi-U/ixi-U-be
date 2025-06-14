@@ -10,14 +10,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
+import com.ixi_U.plan.dto.response.BundledBenefitResponse;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.SingleBenefitResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
 import jakarta.servlet.Filter;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -67,7 +74,7 @@ class PlanControllerTest {
     }
 
     @Nested
-    class GetPlans {
+    class GetPlansTest {
 
         @Test
         @DisplayName("요금제 목록을 정렬 조건으로 조회할 수 있다")
@@ -181,6 +188,74 @@ class PlanControllerTest {
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
                     .andDo(document("plans-get-invalid-size-parameter"));
+        }
+    }
+
+    @DisplayName("요금제 상세 내역 조회 시 ")
+    @Nested
+    class GetPlanDetailTest {
+
+        @DisplayName("성공한다.")
+        @Test
+        public void success() throws Exception {
+            // given
+            String name = "혜택 이름";
+            String description = "혜택 설명";
+
+            SingleBenefitResponse singleBenefit = new SingleBenefitResponse(name, description,
+                    BenefitType.DEVICE.getType());
+            List<SingleBenefitResponse> singleBenefits = IntStream.range(0, 3)
+                    .mapToObj(i -> singleBenefit)
+                    .toList();
+
+            BundledBenefitResponse bundledBenefit = new BundledBenefitResponse(name,
+                    description, 1, singleBenefits);
+            List<BundledBenefitResponse> bundledBenefits = IntStream.range(0, 3)
+                    .mapToObj(i -> bundledBenefit)
+                    .toList();
+
+            PlanDetailResponse response = new PlanDetailResponse(name, 100, 100,
+                    100, 100, 30000,
+                    PlanType.ONLINE.getPlanType(), "이용 시 유의사항", 100,
+                    20, 40, 10,
+                    "기타사항", bundledBenefits, singleBenefits);
+
+            String planId = UUID.randomUUID().toString();
+            given(planService.findPlanDetail(planId)).willReturn(response);
+
+            // when, then
+            mockMvc.perform(get("/plans/details/" + planId))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name").value(response.name()))
+                    .andExpect(jsonPath("$.mobileDataLimitMb").value(response.mobileDataLimitMb()))
+                    .andExpect(jsonPath("$.sharedMobileDataLimitMb")
+                            .value(response.sharedMobileDataLimitMb()))
+                    .andExpect(jsonPath("$.callLimitMinutes").value(response.callLimitMinutes()))
+                    .andExpect(jsonPath("$.messageLimit").value(response.messageLimit()))
+                    .andExpect(jsonPath("$.monthlyPrice").value(response.monthlyPrice()))
+                    .andExpect(jsonPath("$.planType").value(response.planType()))
+                    .andExpect(jsonPath("$.usageCautions").value(response.usageCautions()))
+                    .andExpect(jsonPath("$.mobileDataThrottleSpeedKbps")
+                            .value(response.mobileDataThrottleSpeedKbps()))
+                    .andExpect(jsonPath("$.minAge").value(response.minAge()))
+                    .andExpect(jsonPath("$.maxAge").value(response.maxAge()))
+                    .andExpect(jsonPath("$.pricePerKb").value(response.pricePerKb()))
+                    .andExpect(jsonPath("$.etcInfo").value(response.etcInfo()))
+                    .andExpect(jsonPath("$.bundledBenefits.length()")
+                            .value(bundledBenefits.size()))
+                    .andExpect(jsonPath("$.bundledBenefits[0].name")
+                            .value(bundledBenefit.name()))
+                    .andExpect(jsonPath("$.bundledBenefits[0].description")
+                            .value(bundledBenefit.description()))
+                    .andExpect(jsonPath("$.bundledBenefits[0].singleBenefits.length()")
+                            .value(singleBenefits.size()))
+                    .andExpect(jsonPath("$.singleBenefits.length()").value(singleBenefits.size()))
+                    .andExpect(jsonPath("$.singleBenefits[0].name").value(singleBenefit.name()))
+                    .andExpect(jsonPath("$.singleBenefits[0].description")
+                            .value(singleBenefit.description()))
+                    .andExpect(jsonPath("$.singleBenefits[0].benefitType")
+                            .value(singleBenefit.benefitType()))
+                    .andDo(document("plans-get-details"));
         }
     }
 }
