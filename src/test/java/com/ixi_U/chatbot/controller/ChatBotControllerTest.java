@@ -28,6 +28,8 @@ import reactor.core.publisher.Flux;
 class ChatBotControllerTest {
 
     WebTestClient webTestClient;
+    @MockBean
+    ChatBotService chatBotService;
 
     @BeforeEach
     void setUp(ApplicationContext applicationContext,
@@ -37,9 +39,6 @@ class ChatBotControllerTest {
                 .filter(documentationConfiguration(restDocumentation))
                 .build();
     }
-
-    @MockBean
-    ChatBotService chatBotService;
 
     @Nested
     class WhenAPIHasRequested {
