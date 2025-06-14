@@ -6,7 +6,7 @@ public record SingleBenefitResponse(String name, String description, String bene
 
     public static SingleBenefitResponse from(SingleBenefit singleBenefit) {
 
-        return new SingleBenefitResponse(singleBenefit.getName(), singleBenefit.getDescription(),
+        return new SingleBenefitResponse(singleBenefit.getName(), singleBenefit.getSubscript(),
                 singleBenefit.getBenefitType().getType());
     }
 }
