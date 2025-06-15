@@ -5,6 +5,7 @@ import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
@@ -77,6 +78,27 @@ public class ReviewService {
     public ShowReviewStatsResponse showReviewStats(String planId) {
 
         return userRepository.findAveragePointAndReviewCount(planId);
+    }
+
+    @Transactional
+    public void updateReview(String userId, UpdateReviewRequest updateReviewRequest){
+
+        checkReviewOwner(userId,updateReviewRequest);
+
+        reviewedRepository.updateReviewed(updateReviewRequest.reviewId(), updateReviewRequest.comment());
+    }
+
+    private void checkReviewOwner(String userId, UpdateReviewRequest updateReviewRequest){
+
+        User reviewedOner = userRepository.findOwnerByReviewedId(updateReviewRequest.reviewId())
+                .orElseThrow(()->new GeneralException(ReviewedException.REVIEW_NOT_FOUND));
+
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new GeneralException(
+                UserException.USER_NOT_FOUND));
+
+        if(!reviewedOner.getId().equals(findUser.getId())){
+            throw new GeneralException(ReviewedException.REVIEW_NOT_OWNER);
+        }
     }
 
 }

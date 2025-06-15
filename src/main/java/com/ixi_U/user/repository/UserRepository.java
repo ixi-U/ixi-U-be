@@ -28,4 +28,10 @@ public interface UserRepository extends Neo4jRepository<User, String> {
     ShowReviewStatsResponse findAveragePointAndReviewCount(
             @Param("planId") String planId);
 
+    @Query("""
+            MATCH (u:User)-[r:REVIEWED]->(p:Plan) where id(r) = $reviewedId
+            RETURN u
+            """)
+    Optional<User> findOwnerByReviewedId(Long reviewedId);
+
 }

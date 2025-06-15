@@ -1,6 +1,7 @@
 package com.ixi_U.user.controller;
 
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.service.ReviewService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +49,15 @@ public class ReviewController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(reviewService.showReviewStats(planId));
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> updateReview(@AuthenticationPrincipal String userId,@RequestBody @Valid
+            UpdateReviewRequest updateReviewRequest){
+
+        reviewService.updateReview(userId, updateReviewRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

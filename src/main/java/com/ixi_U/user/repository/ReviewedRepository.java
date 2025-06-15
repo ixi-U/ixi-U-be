@@ -25,4 +25,10 @@ public interface ReviewedRepository extends Neo4jRepository<Reviewed, Long> {
     Slice<ShowReviewResponse> findReviewedByPlanWithPaging(@Param("planId") String planId,
             Pageable pageable);
 
+    @Query("""
+           MATCH (u:User)-[r:REVIEWED]->(p:Plan)
+           WHERE id(r) = $reviewId
+           SET r.comment = $comment
+           """)
+    void updateReviewed(Long reviewId,String comment);
 }
