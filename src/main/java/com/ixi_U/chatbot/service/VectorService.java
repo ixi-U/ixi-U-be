@@ -1,6 +1,5 @@
 package com.ixi_U.chatbot.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.chatbot.dto.BundledBenefitDTO;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
@@ -30,7 +29,6 @@ public class VectorService {
     private static final String COMMA = ", ";
     private static final String SINGLE_BENEFIT_NAMES = "SingleBenefitNames";
     private static final String BENEFIT_TYPES = "BenefitTypes";
-    private final ObjectMapper objectMapper;
     private final ChatBotService chatBotService;
     private final Neo4jVectorStore vectorStore;
 
@@ -53,35 +51,45 @@ public class VectorService {
      * metadata 에 넣기 위한 평탄화 로직
      */
     private Map<String, Object> flattenMetadata(Object request) {
+
         Map<String, Object> result = new HashMap<>();
 
         // request 의 모든 필드 순차 탐색
         for (Field field : request.getClass().getDeclaredFields()) {
+
             field.setAccessible(true);
+
             try {
+
                 Object value = field.get(request);
+
                 if (value == null) continue;
 
                 String fieldName = field.getName(); // id, name ...
 
                 // List<BundledBenefitDTO> 처리
                 if (value instanceof List<?> list && !list.isEmpty()) {
+
                     Object firstItem = list.get(0);
 
                     if (firstItem instanceof BundledBenefitDTO) {
+
                         processBundledBenefitList(result, fieldName, (List<BundledBenefitDTO>) list);
                     }
                     // List<SingleBenefitDTO> 처리
                     else if (firstItem instanceof SingleBenefitDTO) {
+
                         processSingleBenefitList(result, fieldName, (List<SingleBenefitDTO>) list);
                     }
                     // 기타 DTO 리스트 처리 (name 필드가 있는 경우)
                     else if (isDto(firstItem)) {
+
                         processGenericDtoList(result, fieldName, list);
                     }
                 }
                 // 기본 타입, 래퍼 클래스, String, Enum 처리
                 else if (isPrimitiveOrWrapperOrStringOrEnum(value.getClass())) {
+
                     result.put(fieldName, value);
                 }
 
@@ -97,18 +105,17 @@ public class VectorService {
 
         // List를 JSON 문자열로 변환하여 저장
         try {
-            List<String> ids = new ArrayList<>();
+
             List<String> names = new ArrayList<>();
-            List<Integer> choices = new ArrayList<>();
             List<String> allSingleBenefitNames = new ArrayList<>();
 
             for (BundledBenefitDTO bundledBenefit : bundledBenefits) {
-                ids.add(bundledBenefit.id());
+
                 names.add(bundledBenefit.name());
-                choices.add(bundledBenefit.choice());
 
                 // 각 BundledBenefit 안의 SingleBenefit들의 이름 수집
                 for (SingleBenefitDTO singleBenefit : bundledBenefit.singleBenefits()) {
+
                     allSingleBenefitNames.add(singleBenefit.name());
                 }
             }
@@ -125,13 +132,13 @@ public class VectorService {
     }
 
     private void processSingleBenefitList(Map<String, Object> result, String fieldName, List<SingleBenefitDTO> singleBenefits) {
+
         try {
-            List<String> ids = new ArrayList<>();
+
             List<String> names = new ArrayList<>();
             List<String> benefitTypes = new ArrayList<>();
 
             for (SingleBenefitDTO singleBenefit : singleBenefits) {
-                ids.add(singleBenefit.id());
                 names.add(singleBenefit.name());
                 benefitTypes.add(singleBenefit.benefitType().name());
             }
@@ -148,23 +155,31 @@ public class VectorService {
     }
 
     private void processGenericDtoList(Map<String, Object> result, String fieldName, List<?> list) {
+
         List<String> names = new ArrayList<>();
 
         for (Object item : list) {
+
             try {
+
                 Field nameField = item.getClass().getDeclaredField("name");
                 nameField.setAccessible(true);
                 Object nameValue = nameField.get(item);
+
                 if (nameValue instanceof String) {
+
                     names.add((String) nameValue);
                 }
             } catch (Exception e) {
+
                 // name 필드가 없는 경우 무시
             }
         }
 
         if (!names.isEmpty()) {
+
             try {
+
                 result.put(fieldName + NAMES, String.join(COMMA, names));
                 result.put(fieldName + COUNT, names.size());
             } catch (Exception e) {
@@ -175,14 +190,16 @@ public class VectorService {
     }
 
     private boolean isDto(Object obj) {
+
         if (obj == null) return false;
+
         String className = obj.getClass().getSimpleName();
         // DTO 판별 조건
-        return className.endsWith(DTO) ||
-                className.endsWith(REQUEST);
+        return className.endsWith(DTO) || className.endsWith(REQUEST);
     }
 
     private boolean isPrimitiveOrWrapperOrStringOrEnum(Class<?> type) {
+
         return type.isPrimitive() ||
                 type == Boolean.class ||
                 type == Integer.class ||
