@@ -96,6 +96,9 @@ dependencies {
 
     // oauthAdd commentMore actions
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    //ahocorasick
+    implementation 'org.ahocorasick:ahocorasick:0.6.3'
 }
 
 dependencyManagement {
