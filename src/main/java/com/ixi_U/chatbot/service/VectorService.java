@@ -23,6 +23,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VectorService {
 
+    private static final String DTO = "DTO";
+    private static final String REQUEST = "Request";
+    private static final String NAMES = "Names";
+    private static final String COUNT = "Count";
+    private static final String COMMA = ", ";
+    private static final String SINGLE_BENEFIT_NAMES = "SingleBenefitNames";
+    private static final String BENEFIT_TYPES = "BenefitTypes";
     private final ObjectMapper objectMapper;
     private final ChatBotService chatBotService;
     private final Neo4jVectorStore vectorStore;
@@ -80,13 +87,14 @@ public class VectorService {
 
             } catch (Exception e) {
 
-                log.error("평퇀화 에러 = {} : {}", field.getName(), e.getMessage());
+                log.error("평탄화 에러 = {} : {}", field.getName(), e.getMessage());
             }
         }
         return result;
     }
 
     private void processBundledBenefitList(Map<String, Object> result, String fieldName, List<BundledBenefitDTO> bundledBenefits) {
+
         // List를 JSON 문자열로 변환하여 저장
         try {
             List<String> ids = new ArrayList<>();
@@ -105,19 +113,14 @@ public class VectorService {
                 }
             }
 
-            // JSON 문자열로 변환하여 저장
-            result.put(fieldName + "Ids", objectMapper.writeValueAsString(ids));
-            result.put(fieldName + "Names", objectMapper.writeValueAsString(names));
-            result.put(fieldName + "Choices", objectMapper.writeValueAsString(choices));
-            result.put(fieldName + "AllSingleBenefitNames", objectMapper.writeValueAsString(allSingleBenefitNames));
-
-            // 추가: 검색을 위한 단일 문자열 필드
-            result.put(fieldName + "NamesText", String.join(", ", names));
-            result.put(fieldName + "SingleBenefitNamesText", String.join(", ", allSingleBenefitNames));
-            result.put(fieldName + "Count", bundledBenefits.size());
+            // 검색을 위한 단일 문자열 필드
+            result.put(fieldName + NAMES, String.join(COMMA, names));
+            result.put(fieldName + SINGLE_BENEFIT_NAMES, String.join(COMMA, allSingleBenefitNames));
+            result.put(fieldName + COUNT, bundledBenefits.size());
 
         } catch (Exception e) {
-            System.err.println("Error processing bundled benefits: " + e.getMessage());
+
+            log.error("BundledBenefit 평탄화 오류 = {}", e.getMessage());
         }
     }
 
@@ -130,21 +133,17 @@ public class VectorService {
             for (SingleBenefitDTO singleBenefit : singleBenefits) {
                 ids.add(singleBenefit.id());
                 names.add(singleBenefit.name());
-                benefitTypes.add(singleBenefit.benefitType().name()); // Enum을 String으로 변환
+                benefitTypes.add(singleBenefit.benefitType().name());
             }
 
-            // JSON 문자열로 변환하여 저장
-            result.put(fieldName + "Ids", objectMapper.writeValueAsString(ids));
-            result.put(fieldName + "Names", objectMapper.writeValueAsString(names));
-            result.put(fieldName + "BenefitTypes", objectMapper.writeValueAsString(benefitTypes));
-
-            // 추가: 검색을 위한 단일 문자열 필드
-            result.put(fieldName + "NamesText", String.join(", ", names));
-            result.put(fieldName + "BenefitTypesText", String.join(", ", benefitTypes));
-            result.put(fieldName + "Count", singleBenefits.size());
+            // 검색을 위한 단일 문자열 필드
+            result.put(fieldName + NAMES, String.join(COMMA, names));
+            result.put(fieldName + BENEFIT_TYPES, String.join(COMMA, benefitTypes));
+            result.put(fieldName + COUNT, singleBenefits.size());
 
         } catch (Exception e) {
-            System.err.println("Error processing single benefits: " + e.getMessage());
+
+            log.error("SingleBenefit 평탄화 오류 = {}", e.getMessage());
         }
     }
 
@@ -166,11 +165,11 @@ public class VectorService {
 
         if (!names.isEmpty()) {
             try {
-                result.put(fieldName + "Names", objectMapper.writeValueAsString(names));
-                result.put(fieldName + "NamesText", String.join(", ", names));
-                result.put(fieldName + "Count", names.size());
+                result.put(fieldName + NAMES, String.join(COMMA, names));
+                result.put(fieldName + COUNT, names.size());
             } catch (Exception e) {
-                System.err.println("Error processing generic DTO list: " + e.getMessage());
+
+                log.error("일반 평탄화 오류 = {}", e.getMessage());
             }
         }
     }
@@ -178,10 +177,9 @@ public class VectorService {
     private boolean isDto(Object obj) {
         if (obj == null) return false;
         String className = obj.getClass().getSimpleName();
-        // DTO 판별 조건을 더 포괄적으로 수정
-        return className.endsWith("DTO") ||
-                className.endsWith("Request") ||
-                className.endsWith("Response");
+        // DTO 판별 조건
+        return className.endsWith(DTO) ||
+                className.endsWith(REQUEST);
     }
 
     private boolean isPrimitiveOrWrapperOrStringOrEnum(Class<?> type) {
