@@ -50,7 +50,7 @@ public class PlanController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<PlanEmbeddedResponse> savePlan(@RequestBody SavePlanRequest request) throws JsonProcessingException {
+    public ResponseEntity<PlanEmbeddedResponse> savePlan(@RequestBody SavePlanRequest request) {
 
         PlanEmbeddedResponse planEmbeddedResponse = planService.savePlan(request);
 

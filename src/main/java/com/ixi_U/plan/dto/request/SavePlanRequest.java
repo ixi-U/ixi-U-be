@@ -1,8 +1,8 @@
 package com.ixi_U.plan.dto.request;
 
-
 import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
+
 import java.util.List;
 
 public record SavePlanRequest(
