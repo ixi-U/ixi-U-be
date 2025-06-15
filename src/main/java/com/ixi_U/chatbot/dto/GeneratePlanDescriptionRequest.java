@@ -17,7 +17,7 @@ public record GeneratePlanDescriptionRequest(
         String name,
 
         @NotNull
-        int dataAmount,
+        int mobileDataLimitMb,
 
         @Positive
         int monthlyPrice,
@@ -33,11 +33,11 @@ public record GeneratePlanDescriptionRequest(
     public static GeneratePlanDescriptionRequest create(
             final String id,
             final String name,
-            final int dataAmount,
+            final int mobileDataLimitMb,
             final int monthlyPrice,
             final List<BundledBenefitDTO> bundledBenefits,
             final List<SingleBenefitDTO> singleBenefits) {
 
-        return new GeneratePlanDescriptionRequest(id, name, dataAmount, monthlyPrice, bundledBenefits, singleBenefits);
+        return new GeneratePlanDescriptionRequest(id, name, mobileDataLimitMb, monthlyPrice, bundledBenefits, singleBenefits);
     }
 }
