@@ -41,7 +41,7 @@ public class BundledBenefit {
     private LocalDateTime updatedAt;
 
     @Builder.Default
-    @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)
+    @Relationship(type = "INCLUDED", direction = Relationship.Direction.OUTGOING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
     public static BundledBenefit create(final String name, final String subscript, final int choice){

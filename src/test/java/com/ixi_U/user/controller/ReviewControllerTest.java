@@ -97,7 +97,6 @@ class ReviewControllerTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .addFilter(new CharacterEncodingFilter("utf-8", true))
                 .apply(documentationConfiguration(restDocumentation))
-                .apply(springSecurity())
                 .build();
     }
 
