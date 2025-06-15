@@ -43,7 +43,9 @@ public class PlanService {
      * 요금제 저장 & 벡터 저장소에 저장
      */
     @Transactional
-    public PlanEmbeddedResponse savePlan(SavePlanRequest request) {
+    public PlanEmbeddedResponse savePlan(final SavePlanRequest request) {
+
+        validateSamePlanName(request);
 
         List<BundledBenefit> bundledBenefits = bundledBenefitRepository.findAllById(request.bundledBenefits());
 
@@ -65,6 +67,13 @@ public class PlanService {
         GeneratePlanDescriptionRequest generatePlanDescriptionRequest = planEntityToDto(save);
 
         return vectorService.saveEmbeddedPlan(generatePlanDescriptionRequest);
+    }
+
+    private void validateSamePlanName(final SavePlanRequest request) {
+
+        if (planRepository.existsByName(request.name())) {
+            throw new GeneralException(PlanException.PLAN_NAME_DUPLE);
+        }
     }
 
     private GeneratePlanDescriptionRequest planEntityToDto(Plan plan) {

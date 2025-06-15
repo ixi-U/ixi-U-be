@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlanRepository extends Neo4jRepository<Plan, String>, PlanCustomRepository {
 
+    boolean existsByName(String name);
 }
