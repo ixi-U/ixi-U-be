@@ -31,4 +31,11 @@ public interface ReviewedRepository extends Neo4jRepository<Reviewed, Long> {
            SET r.comment = $comment
            """)
     void updateReviewed(Long reviewId,String comment);
+
+    @Query("""
+           MATCH (u:User)-[r:REVIEWED]->(p:Plan)
+           WHERE id(r) = $reviewId
+           DELETE r
+           """)
+    void deleteReviewedById(Long reviewId);
 }

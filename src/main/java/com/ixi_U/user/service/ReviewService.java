@@ -83,14 +83,14 @@ public class ReviewService {
     @Transactional
     public void updateReview(String userId, UpdateReviewRequest updateReviewRequest){
 
-        checkReviewOwner(userId,updateReviewRequest);
+        checkReviewOwner(userId,updateReviewRequest.reviewId());
 
         reviewedRepository.updateReviewed(updateReviewRequest.reviewId(), updateReviewRequest.comment());
     }
 
-    private void checkReviewOwner(String userId, UpdateReviewRequest updateReviewRequest){
+    private void checkReviewOwner(String userId, Long reviewId){
 
-        User reviewedOner = userRepository.findOwnerByReviewedId(updateReviewRequest.reviewId())
+        User reviewedOner = userRepository.findOwnerByReviewedId(reviewId)
                 .orElseThrow(()->new GeneralException(ReviewedException.REVIEW_NOT_FOUND));
 
         User findUser = userRepository.findById(userId).orElseThrow(() -> new GeneralException(
@@ -99,6 +99,14 @@ public class ReviewService {
         if(!reviewedOner.getId().equals(findUser.getId())){
             throw new GeneralException(ReviewedException.REVIEW_NOT_OWNER);
         }
+    }
+
+    @Transactional
+    public void delete(String userId, Long reviewId){
+
+        checkReviewOwner(userId,reviewId);
+
+        reviewedRepository.deleteReviewedById(reviewId);
     }
 
 }
