@@ -1,14 +1,15 @@
 package com.ixi_U.user.controller;
 
+import com.ixi_U.auth.dto.CustomOAuth2User;
 import com.ixi_U.user.dto.response.PlanResponse;
 import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,9 +34,10 @@ public class UserController {
         return ResponseEntity.ok(plan);
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable String userId) {
-        userService.deleteUserById(userId);
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUserById(@AuthenticationPrincipal CustomOAuth2User user) {
+        userService.deleteUserById(user.getUserId());
         return ResponseEntity.noContent().build();
     }
+
 }
