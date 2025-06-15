@@ -3,6 +3,7 @@ package com.ixi_U.user.service;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private SubscribedRepository subscribedRepository;
 
     @InjectMocks
     private UserService userService;
@@ -31,6 +35,7 @@ class UserServiceTest {
         userService.deleteUserById(userId);
 
         // then
+        verify(subscribedRepository).deleteAllByUserId(userId);
         verify(userRepository).deleteById(userId);
     }
 }
