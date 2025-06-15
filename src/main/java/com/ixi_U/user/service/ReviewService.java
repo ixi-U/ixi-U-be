@@ -5,9 +5,11 @@ import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
+import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
@@ -74,9 +76,43 @@ public class ReviewService {
         return ShowReviewListResponse.of(reviewedList.getContent(), reviewedList.hasNext());
     }
 
-    public ShowReviewStatsResponse showReviewStats(String planId) {
+    public ShowReviewSummaryResponse showReviewSummary(String userId, String planId) {
 
-        return userRepository.findAveragePointAndReviewCount(planId);
+        ShowReviewResponse myReviewResponse = null;
+        if(userId!=null && !userId.equals("anonymousUser")){
+            myReviewResponse = reviewedRepository.showMyReview(userId,planId);
+        }
+
+        return ShowReviewSummaryResponse.of(userRepository.findAveragePointAndReviewCount(planId),myReviewResponse);
+    }
+
+    @Transactional
+    public void updateReview(String userId, UpdateReviewRequest updateReviewRequest){
+
+        checkReviewOwner(userId,updateReviewRequest.reviewId());
+
+        reviewedRepository.updateReviewed(updateReviewRequest.reviewId(), updateReviewRequest.comment());
+    }
+
+    private void checkReviewOwner(String userId, Long reviewId){
+
+        User reviewedOner = userRepository.findOwnerByReviewedId(reviewId)
+                .orElseThrow(()->new GeneralException(ReviewedException.REVIEW_NOT_FOUND));
+
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new GeneralException(
+                UserException.USER_NOT_FOUND));
+
+        if(!reviewedOner.getId().equals(findUser.getId())){
+            throw new GeneralException(ReviewedException.REVIEW_NOT_OWNER);
+        }
+    }
+
+    @Transactional
+    public void delete(String userId, Long reviewId){
+
+        checkReviewOwner(userId,reviewId);
+
+        reviewedRepository.deleteReviewedById(reviewId);
     }
 
 }
