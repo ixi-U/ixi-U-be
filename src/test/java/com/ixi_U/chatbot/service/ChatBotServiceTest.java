@@ -1,6 +1,6 @@
 package com.ixi_U.chatbot.service;
 
-import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
+import static com.ixi_U.util.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,7 +10,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ixi_U.chatbot.dto.PlanDescriptionRequest;
+import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.testutil.TestDataFactory;
 import com.ixi_U.common.exception.GeneralException;
 import jakarta.validation.ConstraintViolation;
@@ -66,14 +66,14 @@ class ChatBotServiceTest {
     }
 
     @Nested
-    class WhenPlanDescriptionRequested {
+    class WhenGeneratePlanDescriptionRequested {
 
         @Test
         @DisplayName("LLM 응답이 null일 경우 예외를 발생한다")
         public void getPlanDescription() throws Exception {
 
             //given
-            PlanDescriptionRequest plan = TestDataFactory.createValidPlan();
+            GeneratePlanDescriptionRequest plan = TestDataFactory.createValidPlan();
 
             //Mocking
             ChatClient.ChatClientRequestSpec requestSpec = mock(
@@ -96,10 +96,10 @@ class ChatBotServiceTest {
         public void validPlanRequest() {
 
             //given
-            PlanDescriptionRequest plan = TestDataFactory.createValidPlan();
+            GeneratePlanDescriptionRequest plan = TestDataFactory.createValidPlan();
 
             //when
-            Set<ConstraintViolation<PlanDescriptionRequest>> validate = validator.validate(plan);
+            Set<ConstraintViolation<GeneratePlanDescriptionRequest>> validate = validator.validate(plan);
 
             //then
             assertTrue(validate.isEmpty());
@@ -110,10 +110,10 @@ class ChatBotServiceTest {
         public void exceptNullPlan() {
 
             //given
-            PlanDescriptionRequest plan = TestDataFactory.createNullFieldPlan();
+            GeneratePlanDescriptionRequest plan = TestDataFactory.createNullFieldPlan();
 
             //when
-            Set<ConstraintViolation<PlanDescriptionRequest>> validate = validator.validate(plan);
+            Set<ConstraintViolation<GeneratePlanDescriptionRequest>> validate = validator.validate(plan);
 
             //then
             assertFalse(validate.isEmpty());

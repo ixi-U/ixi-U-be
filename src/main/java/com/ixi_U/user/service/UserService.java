@@ -35,7 +35,7 @@ public class UserService {
         return user.getSubscribedHistory().stream()
                 .map(subscribed -> SubscribedResponse.builder()
                         .planName(subscribed.getPlan().getName())
-                        .planState(String.valueOf(subscribed.getPlan().getState()))
+                        .planState(String.valueOf(subscribed.getPlan().getPlanState()))
                         .build())
                 .collect(Collectors.toList());
     }

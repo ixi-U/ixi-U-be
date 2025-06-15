@@ -4,7 +4,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 
-import com.ixi_U.chatbot.constants.TestConstants;
+import com.ixi_U.util.constants.TestConstants;
 import com.ixi_U.chatbot.service.ChatBotService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

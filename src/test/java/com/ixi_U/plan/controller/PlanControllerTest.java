@@ -1,30 +1,17 @@
 package com.ixi_U.plan.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
-import com.ixi_U.plan.dto.response.BundledBenefitResponse;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.SingleBenefitResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.request.SavePlanRequest;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
+import com.ixi_U.util.constants.TestConstants;
 import jakarta.servlet.Filter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,6 +33,24 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(PlanController.class)
@@ -57,7 +63,10 @@ class PlanControllerTest {
     @MockBean
     private PlanService planService;
 
+    @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
@@ -71,6 +80,58 @@ class PlanControllerTest {
                         .withRequestDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
+    }
+
+    @Nested
+    class SavePlanTest {
+
+        @Test
+        @DisplayName("요금제를 저장할 수 있다")
+        public void savePlan() throws Exception {
+
+            //given
+            SavePlanRequest request = TestConstants.createSavePlanRequest();
+            String description = TestConstants.createDescription();
+            List<String> bundledBenefitNames = TestConstants.createBundledBenefitNames();
+            List<String> singleBenefitNames = TestConstants.createSingleBenefitNames();
+            List<String> singleBenefitTypes = TestConstants.createSingleBenefitTypes();
+
+            System.out.println("bundledBenefitNames = " + bundledBenefitNames);
+            System.out.println("singleBenefitTypes = " + singleBenefitTypes);
+            System.out.println("singleBenefitNames = " + singleBenefitNames);
+
+            Map<String, Object> metaData = Map.of(
+                    "id", TestConstants.createPlanId(),
+                    "name", request.name(),
+                    "mobileDataLimitMb", request.mobileDataLimitMb(),
+                    "monthlyPrice", request.monthlyPrice(),
+                    "bundledBenefitNames", bundledBenefitNames,
+                    "singleBenefitNames", singleBenefitNames,
+                    "singleBenefitTypes", singleBenefitTypes
+            );
+
+            given(planService.savePlan(any(SavePlanRequest.class)))
+                    .willReturn(PlanEmbeddedResponse.create(description, metaData));
+
+            //when & then
+            mockMvc.perform(post("/plans/save")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.description").value(description))
+                    .andExpect(jsonPath("$.metaData.id").value(TestConstants.createPlanId()))
+                    .andExpect(jsonPath("$.metaData.name").value(request.name()))
+                    .andExpect(jsonPath("$.metaData.mobileDataLimitMb").value(request.mobileDataLimitMb()))
+                    .andExpect(jsonPath("$.metaData.monthlyPrice").value(request.monthlyPrice()))
+                    .andExpect(jsonPath("$.metaData.bundledBenefitNames").isArray())
+                    .andExpect(jsonPath("$.metaData.bundledBenefitNames", hasSize(bundledBenefitNames.size())))
+                    .andExpect(jsonPath("$.metaData.singleBenefitNames").isArray())
+                    .andExpect(jsonPath("$.metaData.singleBenefitNames", hasSize(singleBenefitNames.size())))
+                    .andExpect(jsonPath("$.metaData.singleBenefitTypes").isArray())
+                    .andExpect(jsonPath("$.metaData.singleBenefitTypes", hasSize(singleBenefitTypes.size())))
+                    .andDo(document("plans-save"));
+        }
     }
 
     @Nested
