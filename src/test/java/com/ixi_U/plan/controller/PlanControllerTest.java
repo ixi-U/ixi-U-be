@@ -127,7 +127,6 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes").isArray())
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes", hasSize(singleBenefitTypes.size())))
                     .andDo(document("plans-save"));
-            ;
         }
     }
 
