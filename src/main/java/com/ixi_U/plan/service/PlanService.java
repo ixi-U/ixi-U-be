@@ -89,6 +89,7 @@ public class PlanService {
     }
 
     private List<BundledBenefitDTO> bundledBenefitEntityToDto(List<BundledBenefit> bundledBenefits) {
+
         return bundledBenefits.stream()
                 .map(entity ->
                         BundledBenefitDTO.create(
@@ -101,6 +102,7 @@ public class PlanService {
     }
 
     private List<SingleBenefitDTO> singleBenefitEntityToDto(List<SingleBenefit> singleBenefits) {
+
         return singleBenefits.stream()
                 .map(entity ->
                         SingleBenefitDTO.create(
