@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +26,7 @@ import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
@@ -422,6 +424,169 @@ class ReviewControllerTest {
                     .andExpect(jsonPath("$.totalCount").value(reviewCount));
         }
 
+    }
+
+    @Nested
+    @DisplayName("리뷰 수정 요청은")
+    class Describe_updateReview {
+
+        @BeforeEach
+        public void initSecurity(){
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        @Nested
+        @DisplayName("정상적인 요청일 경우")
+        class Context_with_valid_request {
+
+            @Test
+            @DisplayName("리뷰를 수정하고 200을 반환한다")
+            void it_returns_200_updated() throws Exception {
+                //given
+                UpdateReviewRequest request = UpdateReviewRequest.of(Long.valueOf(213),
+                        "안녕하십니까....저는 이 리뷰를 좋아합니다");
+
+                // when
+                ResultActions result = mockMvc.perform(patch(REVIEW_URL)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document("updateReview-success"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isOk());
+                verify(reviewService, times(1)).updateReview("userId", request);
+            }
+
+        }
+
+        @Nested
+        @DisplayName("요청이 잘못된 경우")
+        class Context_with_invalid_request {
+
+            @Test
+            @DisplayName("리뷰 내용이 null이면 400을 반환한다")
+            void it_returns_400_if_comment_empty() throws Exception {
+                // given
+                doNothing().when(reviewService).updateReview(any(), any(UpdateReviewRequest.class));
+                String comment = null;
+                UpdateReviewRequest request = UpdateReviewRequest.of(Long.valueOf(213),
+                        comment);
+
+                // when
+                ResultActions result = mockMvc.perform(patch(REVIEW_URL)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "updateReview-error-review-content-null"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message")
+                                .value("comment: comment를 입력해 주세요"));
+            }
+
+            @Test
+            @DisplayName("리뷰 내용이 20자 미만이면 400을 반환한다")
+            void it_returns_400_if_comment_too_short() throws Exception {
+                // given
+                doNothing().when(reviewService).updateReview(any(), any(UpdateReviewRequest.class));
+                String comment = "아".repeat(19);
+                UpdateReviewRequest request = UpdateReviewRequest.of(Long.valueOf(213),
+                        comment);
+
+                // when
+                ResultActions result = mockMvc.perform(patch(REVIEW_URL)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "updateReview-error-review-letter-too-short"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message")
+                                .value("comment: comment는 최소 20자에서 200자까지 입력 가능합니다."));
+            }
+
+            @Test
+            @DisplayName("리뷰 내용이 200자 초과면 400을 반환한다")
+            void it_returns_400_if_comment_too_long() throws Exception {
+                // given
+                String comment = "아".repeat(201);
+                UpdateReviewRequest request = UpdateReviewRequest.of(Long.valueOf(213),
+                        comment);
+
+                // when
+                ResultActions result = mockMvc.perform(patch(REVIEW_URL)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "updateReview-error-review-letter-too-long"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message")
+                                .value("comment: comment는 최소 20자에서 200자까지 입력 가능합니다."));
+            }
+
+            @Test
+            @DisplayName("reviewId가 비어있으면 400을 반환한다")
+            void it_returns_400_if_reviewId_missing() throws Exception {
+                // given
+                UpdateReviewRequest request = UpdateReviewRequest.of(null,
+                        "111112222233333444445555566");
+                // when
+                ResultActions result = mockMvc.perform(patch(REVIEW_URL)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "updateReview-error-review-id-null"))
+                        .andDo(print());
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message")
+                                .value("reviewId: reviewId는 필수입니다."));
+            }
+
+            @Test
+            @DisplayName("자신이 작성하지 않은 리뷰에 대해 수정 요청하면 에러 반환한다.")
+            void it_returns_400_when_not_my_review() throws Exception {
+                // given
+                doThrow(new GeneralException(ReviewedException.REVIEW_NOT_OWNER))
+                        .when(reviewService).updateReview(any(), any());
+
+                UpdateReviewRequest request = UpdateReviewRequest.of(Long.valueOf(213),
+                        "111112222233333444445555566");
+
+                // when
+                ResultActions result = mockMvc.perform(patch(REVIEW_URL)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andDo(document(
+                                "updateReview-error-when-not-myReview"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message")
+                                .value(ReviewedException.REVIEW_NOT_OWNER.getMessage()));
+            }
+
+        }
     }
 
 
