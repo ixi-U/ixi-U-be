@@ -1,6 +1,6 @@
 package com.ixi_U.chatbot.service;
 
-import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
+import static com.ixi_U.util.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
