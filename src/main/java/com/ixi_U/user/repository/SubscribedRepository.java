@@ -7,6 +7,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface SubscribedRepository extends Neo4jRepository<Subscribed, Long> {
 
+    @Query("MATCH (:User {id: $userId})-[r:SUBSCRIBED]->() DELETE r")
+    void deleteAllByUserId(String userId);
+
     @Query("""
             RETURN EXISTS {
                MATCH (u:User {id: $userId})-[:SUBSCRIBED]->(p:Plan {id: $planId})
