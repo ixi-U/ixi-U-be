@@ -57,7 +57,7 @@ public class ChatBotConfig {
 
         return chatClientBuilder
                 .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory()).build()
+                        MessageChatMemoryAdvisor.builder(chatMemory()).build(),
                         QuestionAnswerAdvisor.builder(vectorStore)
                                 .searchRequest(SearchRequest.builder()
                                         .similarityThreshold(0.1)
