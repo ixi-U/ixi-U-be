@@ -31,6 +31,7 @@ import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
+import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.service.ReviewService;
@@ -414,28 +415,32 @@ class ReviewControllerTest {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         @Test
-        @DisplayName("리뷰 개수와 리뷰 평균 별점을 반환한다")
-        void it_returns_review_count_and_average() throws Exception {
+        @DisplayName("리뷰 개수와 리뷰 평균 별점 및 나의 리뷰를 반환한다")
+        void it_returns_review_count_and_average_and_my_review() throws Exception {
 
             //given
             double averageRating = 3.5;
             int reviewCount = 3;
-            given(reviewService.showReviewStats(anyString())).willReturn(
-                    ShowReviewStatsResponse.of(averageRating, reviewCount));
+            ShowReviewResponse showReviewResponse = ShowReviewResponse.of(1L,"jinu",5,"comment",
+                    LocalDateTime.now());
+            given(reviewService.showReviewSummary(anyString(),anyString())).willReturn(
+                    ShowReviewSummaryResponse.of(ShowReviewStatsResponse.of(averageRating,reviewCount),
+                            showReviewResponse));
 
             //when
             ResultActions result = mockMvc.perform(
-                            get(REVIEW_URL + "/stats")
+                            get(REVIEW_URL + "/summary")
                                     .param("planId", "plan-001")
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(document(
-                            "showReviewStats-success"))
+                            "showReviewSummary-success"))
                     .andDo(print());
 
             //then
             result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.averagePoint").value(averageRating))
-                    .andExpect(jsonPath("$.totalCount").value(reviewCount));
+                    .andExpect(jsonPath("$.showReviewStatsResponse.averagePoint").value(averageRating))
+                    .andExpect(jsonPath("$.showReviewStatsResponse.totalCount").value(reviewCount))
+                    .andExpect(jsonPath("$.myReviewResponse.point").value(5));
         }
 
     }
