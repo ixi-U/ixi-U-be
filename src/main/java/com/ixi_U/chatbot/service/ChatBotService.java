@@ -5,15 +5,17 @@ import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
 import com.ixi_U.common.exception.GeneralException;
 import jakarta.validation.Valid;
-import java.io.IOException;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
+
+import java.io.IOException;
+import java.time.Duration;
 
 @Service
 @Slf4j
@@ -28,16 +30,33 @@ public class ChatBotService {
             예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
             """;
 
-
     @Qualifier("descriptionClient")
     private final ChatClient descriptionClient;
+    @Qualifier("recommendClient")
+    private final ChatClient recommendClient;
     private final ObjectMapper objectMapper;
 
     public Flux<String> getWelcomeMessage() {
 
         return Flux.fromStream(CHATBOT_WELCOME_MESSAGE.chars()
-                .mapToObj(c -> String.valueOf((char) c)))
+                        .mapToObj(c -> String.valueOf((char) c)))
                 .delayElements(Duration.ofMillis(50));
+    }
+
+    public Flux<String> recommendPlan(String userId, String request) {
+
+        Flux<String> content = recommendClient.prompt()
+                .user(request)
+                .advisors(advisor -> {
+                    advisor.param(ChatMemory.CONVERSATION_ID, userId);
+//                    if (filter != null && !filter.isBlank()) {
+//                        advisor.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, filter);
+//                    }
+                })
+                .stream()
+                .content();
+
+        return content;
     }
 
     public String getPlanDescription(@Valid GeneratePlanDescriptionRequest request) {
