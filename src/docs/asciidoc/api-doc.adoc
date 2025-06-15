@@ -108,4 +108,8 @@ operation::updateReview-error-review-letter-too-short[]
 === 요금제 리뷰 수정 실패 - 자신의 리뷰가 아닌 경우
 operation::updateReview-error-when-not-myReview[]
 
+=== 요금제 리뷰 삭제 성공
+
+operation::deleteReview-success[]
+
 
