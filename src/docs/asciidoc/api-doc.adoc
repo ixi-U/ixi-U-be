@@ -87,7 +87,7 @@ operation::showReview-success[]
 
 === 요금제 리뷰 개수 및 평균 별점 조회
 
-operation::showReviewStats-success[]
+operation::showReviewSummary-success[]
 
 === 요금제 리뷰 수정 성공
 
