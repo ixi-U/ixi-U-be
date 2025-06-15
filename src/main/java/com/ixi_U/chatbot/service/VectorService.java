@@ -12,23 +12,17 @@ import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class VectorService {
 
-    private static final String DTO = "DTO";
-    private static final String REQUEST = "Request";
-    private static final String NAMES = "Names";
-    private static final String COUNT = "Count";
-    private static final String COMMA = ", ";
     private static final String SINGLE_BENEFIT_NAMES = "SingleBenefitNames";
-    private static final String BENEFIT_TYPES = "BenefitTypes";
+    private static final String BUNDLED_BENEFIT_NAMES = "BundledBenefitNames";
+    private static final String SINGLE_BENEFIT_TYPES = "SingleBenefitTypes";
+
     private final ChatBotService chatBotService;
     private final Neo4jVectorStore vectorStore;
 
@@ -74,17 +68,12 @@ public class VectorService {
 
                     if (firstItem instanceof BundledBenefitDTO) {
 
-                        processBundledBenefitList(result, fieldName, (List<BundledBenefitDTO>) list);
+                        processBundledBenefitList(result, (List<BundledBenefitDTO>) list);
                     }
                     // List<SingleBenefitDTO> 처리
                     else if (firstItem instanceof SingleBenefitDTO) {
 
-                        processSingleBenefitList(result, fieldName, (List<SingleBenefitDTO>) list);
-                    }
-                    // 기타 DTO 리스트 처리 (name 필드가 있는 경우)
-                    else if (isDto(firstItem)) {
-
-                        processGenericDtoList(result, fieldName, list);
+                        processSingleBenefitList(result, (List<SingleBenefitDTO>) list);
                     }
                 }
                 // 기본 타입, 래퍼 클래스, String, Enum 처리
@@ -101,13 +90,15 @@ public class VectorService {
         return result;
     }
 
-    private void processBundledBenefitList(Map<String, Object> result, String fieldName, List<BundledBenefitDTO> bundledBenefits) {
+    private void processBundledBenefitList(Map<String, Object> result, List<BundledBenefitDTO> bundledBenefits) {
 
         // List를 JSON 문자열로 변환하여 저장
         try {
 
-            List<String> names = new ArrayList<>();
-            List<String> allSingleBenefitNames = new ArrayList<>();
+            Set<String> names = new HashSet<>();
+            Set<String> allSingleBenefitNames = new HashSet<>();
+            Set<String> allSingleBenefitTypes = new HashSet<>();
+
 
             for (BundledBenefitDTO bundledBenefit : bundledBenefits) {
 
@@ -117,13 +108,17 @@ public class VectorService {
                 for (SingleBenefitDTO singleBenefit : bundledBenefit.singleBenefits()) {
 
                     allSingleBenefitNames.add(singleBenefit.name());
+                    allSingleBenefitTypes.add(singleBenefit.benefitType().getType());
                 }
             }
 
             // 검색을 위한 단일 문자열 필드
-            result.put(fieldName + NAMES, String.join(COMMA, names));
-            result.put(fieldName + SINGLE_BENEFIT_NAMES, String.join(COMMA, allSingleBenefitNames));
-            result.put(fieldName + COUNT, bundledBenefits.size());
+            result.put(BUNDLED_BENEFIT_NAMES, names);
+            result.put(SINGLE_BENEFIT_NAMES, allSingleBenefitNames);
+
+            HashSet<String> previousValue = (HashSet<String>) result.getOrDefault(SINGLE_BENEFIT_TYPES, new HashSet<>());
+            previousValue.addAll(allSingleBenefitTypes);
+            result.put(SINGLE_BENEFIT_TYPES, previousValue);
 
         } catch (Exception e) {
 
@@ -131,71 +126,32 @@ public class VectorService {
         }
     }
 
-    private void processSingleBenefitList(Map<String, Object> result, String fieldName, List<SingleBenefitDTO> singleBenefits) {
+    private void processSingleBenefitList(Map<String, Object> result, List<SingleBenefitDTO> singleBenefits) {
 
         try {
 
-            List<String> names = new ArrayList<>();
-            List<String> benefitTypes = new ArrayList<>();
+            Set<String> names = new HashSet<>();
+            Set<String> benefitTypes = new HashSet<>();
 
             for (SingleBenefitDTO singleBenefit : singleBenefits) {
                 names.add(singleBenefit.name());
-                benefitTypes.add(singleBenefit.benefitType().name());
+                benefitTypes.add(singleBenefit.benefitType().getType());
             }
 
-            // 검색을 위한 단일 문자열 필드
-            result.put(fieldName + NAMES, String.join(COMMA, names));
-            result.put(fieldName + BENEFIT_TYPES, String.join(COMMA, benefitTypes));
-            result.put(fieldName + COUNT, singleBenefits.size());
+            // 검색을 위한 단일 문자열
+            HashSet<String> previousSingleBenefit = (HashSet<String>) result.getOrDefault(SINGLE_BENEFIT_NAMES, new HashSet<>());
+            previousSingleBenefit.addAll(names);
+
+            result.put(SINGLE_BENEFIT_NAMES, previousSingleBenefit);
+
+            HashSet<String> previousValue = (HashSet<String>) result.getOrDefault(SINGLE_BENEFIT_TYPES, new HashSet<>());
+            previousValue.addAll(benefitTypes);
+            result.put(SINGLE_BENEFIT_TYPES, previousValue);
 
         } catch (Exception e) {
 
             log.error("SingleBenefit 평탄화 오류 = {}", e.getMessage());
         }
-    }
-
-    private void processGenericDtoList(Map<String, Object> result, String fieldName, List<?> list) {
-
-        List<String> names = new ArrayList<>();
-
-        for (Object item : list) {
-
-            try {
-
-                Field nameField = item.getClass().getDeclaredField("name");
-                nameField.setAccessible(true);
-                Object nameValue = nameField.get(item);
-
-                if (nameValue instanceof String) {
-
-                    names.add((String) nameValue);
-                }
-            } catch (Exception e) {
-
-                // name 필드가 없는 경우 무시
-            }
-        }
-
-        if (!names.isEmpty()) {
-
-            try {
-
-                result.put(fieldName + NAMES, String.join(COMMA, names));
-                result.put(fieldName + COUNT, names.size());
-            } catch (Exception e) {
-
-                log.error("일반 평탄화 오류 = {}", e.getMessage());
-            }
-        }
-    }
-
-    private boolean isDto(Object obj) {
-
-        if (obj == null) return false;
-
-        String className = obj.getClass().getSimpleName();
-        // DTO 판별 조건
-        return className.endsWith(DTO) || className.endsWith(REQUEST);
     }
 
     private boolean isPrimitiveOrWrapperOrStringOrEnum(Class<?> type) {
