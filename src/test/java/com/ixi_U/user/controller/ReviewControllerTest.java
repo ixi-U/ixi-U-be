@@ -366,9 +366,9 @@ class ReviewControllerTest {
         void it_returns_review_list_and_hasNext() throws Exception {
             // given
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse("유저1", 5, "좋았어요",
+                    new ShowReviewResponse(123L,"유저1", 5, "좋았어요",
                             LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
-                    new ShowReviewResponse("유저2", 3, "괜찮아요",
+                    new ShowReviewResponse(456L,"유저2", 3, "괜찮아요",
                             LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 

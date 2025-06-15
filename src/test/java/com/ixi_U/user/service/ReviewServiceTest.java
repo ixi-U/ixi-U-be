@@ -168,9 +168,9 @@ class ReviewServiceTest {
             Pageable pageable = PageRequest.of(0, 5);
 
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse("유저1", 4, "리뷰1",
+                    new ShowReviewResponse(123L,"유저1", 4, "리뷰1",
                             LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
-                    new ShowReviewResponse("유저2", 5, "리뷰2",
+                    new ShowReviewResponse(456L,"유저2", 5, "리뷰2",
                             LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 
