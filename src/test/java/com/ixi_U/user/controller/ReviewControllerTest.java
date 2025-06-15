@@ -101,6 +101,13 @@ class ReviewControllerTest {
     @DisplayName("리뷰 저장 요청은")
     class Describe_createReview {
 
+        @BeforeEach
+        public void initSecurity(){
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
         @Nested
         @DisplayName("정상적인 요청일 경우")
         class Context_with_valid_request {
@@ -109,9 +116,6 @@ class ReviewControllerTest {
             @DisplayName("리뷰를 저장하고 201을 반환한다")
             void it_returns_201_created() throws Exception {
                 //given
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
                 CreateReviewRequest request = CreateReviewRequest.of("plan-001", 5,
                         "안녕하십니까....저는 이 리뷰를 좋아합니다");
 
@@ -141,7 +145,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(print());
@@ -166,7 +169,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -191,7 +193,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -215,7 +216,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -240,7 +240,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -264,7 +263,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -286,7 +284,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -311,7 +308,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
@@ -337,7 +333,6 @@ class ReviewControllerTest {
                 // when
                 ResultActions result = mockMvc.perform(post(REVIEW_URL)
                                 .with(csrf())
-                                .param("userId", "userId")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
