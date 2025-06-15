@@ -12,6 +12,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -353,6 +354,13 @@ class ReviewControllerTest {
     @DisplayName("리뷰 목록 조회 요청은")
     class Describe_showReviewList {
 
+        @BeforeEach
+        public void initSecurity(){
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
         @Test
         @DisplayName("리뷰 목록과 hasNext를 반환한다")
         void it_returns_review_list_and_hasNext() throws Exception {
@@ -399,6 +407,12 @@ class ReviewControllerTest {
     @DisplayName("리뷰 stats 요청은 ")
     class Describe_showReviewStats {
 
+        @BeforeEach
+        public void initSecurity(){
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
         @Test
         @DisplayName("리뷰 개수와 리뷰 평균 별점을 반환한다")
         void it_returns_review_count_and_average() throws Exception {
@@ -584,6 +598,43 @@ class ReviewControllerTest {
                 result.andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message")
                                 .value(ReviewedException.REVIEW_NOT_OWNER.getMessage()));
+            }
+
+        }
+    }
+
+    @Nested
+    @DisplayName("리뷰 삭제 요청은")
+    class Describe_deleteReview {
+
+        @BeforeEach
+        public void initSecurity() {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("userId", null,
+                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        @Nested
+        @DisplayName("정상적인 요청일 경우")
+        class Context_with_valid_request {
+
+            @Test
+            @DisplayName("리뷰를 삭제하고 200을 반환한다")
+            void it_returns_200_deleted() throws Exception {
+                //given
+                Long reviewId = 53L;
+
+                // when
+                ResultActions result = mockMvc.perform(delete(REVIEW_URL + "/{reviewId}", reviewId)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andDo(document("deleteReview-success"))
+                        .andDo(print());
+
+                // then
+                result.andExpect(status().isOk());
+                verify(reviewService, times(1)).delete("userId", reviewId);
             }
 
         }
