@@ -9,6 +9,7 @@ import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
+import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.entity.Reviewed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
@@ -75,9 +76,14 @@ public class ReviewService {
         return ShowReviewListResponse.of(reviewedList.getContent(), reviewedList.hasNext());
     }
 
-    public ShowReviewStatsResponse showReviewStats(String planId) {
+    public ShowReviewSummaryResponse showReviewSummary(String userId, String planId) {
 
-        return userRepository.findAveragePointAndReviewCount(planId);
+        ShowReviewResponse myReviewResponse = null;
+        if(userId!=null && !userId.equals("anonymousUser")){
+            myReviewResponse = reviewedRepository.showMyReview(userId,planId);
+        }
+
+        return ShowReviewSummaryResponse.of(userRepository.findAveragePointAndReviewCount(planId),myReviewResponse);
     }
 
     @Transactional

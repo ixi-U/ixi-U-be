@@ -38,4 +38,10 @@ public interface ReviewedRepository extends Neo4jRepository<Reviewed, Long> {
            DELETE r
            """)
     void deleteReviewedById(Long reviewId);
+
+    @Query("""
+           MATCH (u:User {id: $userId})-[r:REVIEWED]->(p:Plan {id: $planId})
+           RETURN id(r) as reviewId, r.comment as comment, u.name as userName, r.point as point, r.createdAt as createdAt
+           """)
+    ShowReviewResponse showMyReview(@Param("userId") String userId, @Param("planId") String planId);
 }

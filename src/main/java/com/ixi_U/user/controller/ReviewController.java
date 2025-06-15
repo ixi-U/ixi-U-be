@@ -4,6 +4,7 @@ import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
+import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,12 +46,13 @@ public class ReviewController {
                 .body(reviewService.showReview(planId, pageable));
     }
 
-    @GetMapping("/stats")
-    public ResponseEntity<ShowReviewStatsResponse> showReviewStats(
+    @GetMapping("/summary")
+    public ResponseEntity<ShowReviewSummaryResponse> showReviewStats(
+            @AuthenticationPrincipal String userId,
             @RequestParam("planId") final String planId) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(reviewService.showReviewStats(planId));
+                .body(reviewService.showReviewSummary(userId,planId));
     }
 
     @PatchMapping
