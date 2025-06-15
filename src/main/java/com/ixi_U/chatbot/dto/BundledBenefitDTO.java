@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
 import java.util.List;
 
 public record BundledBenefitDTO(
@@ -14,9 +15,6 @@ public record BundledBenefitDTO(
 
         @NotBlank
         String name,
-
-        @NotBlank
-        String subscript,
 
         @Positive
         @NotNull
@@ -29,10 +27,9 @@ public record BundledBenefitDTO(
     public static BundledBenefitDTO create(
             final String id,
             final String name,
-            final String subscript,
             final int choice,
             final List<SingleBenefitDTO> singleBenefits) {
 
-        return new BundledBenefitDTO(id, name, subscript, choice, singleBenefits);
+        return new BundledBenefitDTO(id, name, choice, singleBenefits);
     }
 }
