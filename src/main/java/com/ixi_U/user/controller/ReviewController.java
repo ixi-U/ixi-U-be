@@ -1,8 +1,10 @@
 package com.ixi_U.user.controller;
 
 import com.ixi_U.user.dto.request.CreateReviewRequest;
+import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
+import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,12 +46,30 @@ public class ReviewController {
                 .body(reviewService.showReview(planId, pageable));
     }
 
-    @GetMapping("/stats")
-    public ResponseEntity<ShowReviewStatsResponse> showReviewStats(
+    @GetMapping("/summary")
+    public ResponseEntity<ShowReviewSummaryResponse> showReviewStats(
+            @AuthenticationPrincipal String userId,
             @RequestParam("planId") final String planId) {
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(reviewService.showReviewStats(planId));
+                .body(reviewService.showReviewSummary(userId,planId));
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> updateReview(@AuthenticationPrincipal String userId,@RequestBody @Valid
+            UpdateReviewRequest updateReviewRequest){
+
+        reviewService.updateReview(userId, updateReviewRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@AuthenticationPrincipal String userId,@PathVariable("reviewId") Long reviewId){
+
+        reviewService.delete(userId,reviewId);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
