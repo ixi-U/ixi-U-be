@@ -19,9 +19,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class VectorService {
 
-    private static final String SINGLE_BENEFIT_NAMES = "SingleBenefitNames";
-    private static final String BUNDLED_BENEFIT_NAMES = "BundledBenefitNames";
-    private static final String SINGLE_BENEFIT_TYPES = "SingleBenefitTypes";
+    private static final String SINGLE_BENEFIT_NAMES = "singleBenefitNames";
+    private static final String BUNDLED_BENEFIT_NAMES = "bundledBenefitNames";
+    private static final String SINGLE_BENEFIT_TYPES = "singleBenefitTypes";
 
     private final ChatBotService chatBotService;
     private final Neo4jVectorStore vectorStore;

@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -91,23 +92,26 @@ class PlanControllerTest {
             //given
             SavePlanRequest request = TestConstants.createSavePlanRequest();
             String description = TestConstants.createDescription();
+            List<String> bundledBenefitNames = TestConstants.createBundledBenefitNames();
+            List<String> singleBenefitNames = TestConstants.createSingleBenefitNames();
+            List<String> singleBenefitTypes = TestConstants.createSingleBenefitTypes();
+
+            System.out.println("bundledBenefitNames = " + bundledBenefitNames);
+            System.out.println("singleBenefitTypes = " + singleBenefitTypes);
+            System.out.println("singleBenefitNames = " + singleBenefitNames);
+
+            Map<String, Object> metaData = Map.of(
+                    "id", TestConstants.createPlanId(),
+                    "name", request.name(),
+                    "mobileDataLimitMb", request.mobileDataLimitMb(),
+                    "monthlyPrice", request.monthlyPrice(),
+                    "bundledBenefitNames", bundledBenefitNames,
+                    "singleBenefitNames", singleBenefitNames,
+                    "singleBenefitTypes", singleBenefitTypes
+            );
 
             given(planService.savePlan(any(SavePlanRequest.class)))
-                    .willReturn(PlanEmbeddedResponse.create(
-                            description,
-                            Map.of(
-                                    "id", TestConstants.createPlanId(),
-                                    "name", request.name(),
-                                    "mobileDataLimitMb", request.mobileDataLimitMb(),
-                                    "monthlyPrice", request.monthlyPrice(),
-                                    "bundledBenefitsNamesText", TestConstants.createBundledBenefitNamesText(),
-                                    "bundledBenefitsSingleBenefitNamesText", TestConstants.createBundledBenefitsSingleBenefitNameText(),
-                                    "bundledBenefitsCount", TestConstants.createBundledBenefitCount(),
-                                    "singleBenefitsNamesText", TestConstants.createSingleBenefitNamesText(),
-                                    "singleBenefitsBenefitTypesText", TestConstants.createSingleBenefitBenefitTypeText(),
-                                    "singleBenefitsCount", TestConstants.createSingleBenefitCount()
-                            )
-                    ));
+                    .willReturn(PlanEmbeddedResponse.create(description, metaData));
 
             //when & then
             mockMvc.perform(post("/plans/save")
@@ -120,16 +124,13 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.metaData.name").value(request.name()))
                     .andExpect(jsonPath("$.metaData.mobileDataLimitMb").value(request.mobileDataLimitMb()))
                     .andExpect(jsonPath("$.metaData.monthlyPrice").value(request.monthlyPrice()))
-                    .andExpect(jsonPath("$.metaData.bundledBenefitsNamesText").value(TestConstants.createBundledBenefitNamesText()))
-                    .andExpect(jsonPath("$.metaData.bundledBenefitsSingleBenefitNamesText").value(TestConstants.createBundledBenefitsSingleBenefitNameText()))
-                    .andExpect(jsonPath("$.metaData.bundledBenefitsCount").value(TestConstants.createBundledBenefitCount()))
-                    .andExpect(jsonPath("$.metaData.singleBenefitsNamesText").value(TestConstants.createSingleBenefitNamesText()))
-                    .andExpect(jsonPath("$.metaData.singleBenefitsBenefitTypesText").value(TestConstants.createSingleBenefitBenefitTypeText()))
-                    .andExpect(jsonPath("$.metaData.singleBenefitsCount").value(TestConstants.createSingleBenefitCount()))
-
-                    .andDo(document("plans-save"))
-                    .andDo(print())
-            ;
+                    .andExpect(jsonPath("$.metaData.bundledBenefitNames").isArray())
+                    .andExpect(jsonPath("$.metaData.bundledBenefitNames", hasSize(bundledBenefitNames.size())))
+                    .andExpect(jsonPath("$.metaData.singleBenefitNames").isArray())
+                    .andExpect(jsonPath("$.metaData.singleBenefitNames", hasSize(singleBenefitNames.size())))
+                    .andExpect(jsonPath("$.metaData.singleBenefitTypes").isArray())
+                    .andExpect(jsonPath("$.metaData.singleBenefitTypes", hasSize(singleBenefitTypes.size())))
+                    .andDo(document("plans-save"));
         }
     }
 
