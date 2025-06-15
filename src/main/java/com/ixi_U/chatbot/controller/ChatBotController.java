@@ -22,4 +22,11 @@ public class ChatBotController {
 
         return ResponseEntity.ok().body(chatBotService.getWelcomeMessage());
     }
+
+    @SSEEndpoint
+    @GetMapping(value = "/api/chatbot/recommend", produces = TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<Flux<String>> recommendPlan(String userId, String request) {
+
+        return ResponseEntity.ok().body(chatBotService.recommendPlan(userId, request));
+    }
 }
