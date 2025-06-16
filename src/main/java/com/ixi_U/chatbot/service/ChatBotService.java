@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +15,7 @@ import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -45,18 +45,11 @@ public class ChatBotService {
 
     public Flux<String> recommendPlan(String userId, String request) {
 
-        Flux<String> content = recommendClient.prompt()
+        return recommendClient.prompt()
                 .user(request)
-                .advisors(advisor -> {
-                    advisor.param(ChatMemory.CONVERSATION_ID, userId);
-//                    if (filter != null && !filter.isBlank()) {
-//                        advisor.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, filter);
-//                    }
-                })
+                .toolContext(Map.of("userId", userId))
                 .stream()
                 .content();
-
-        return content;
     }
 
     public String getPlanDescription(@Valid GeneratePlanDescriptionRequest request) {
