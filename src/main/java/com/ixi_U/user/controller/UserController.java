@@ -1,6 +1,5 @@
 package com.ixi_U.user.controller;
 
-import com.ixi_U.auth.dto.CustomOAuth2User;
 import com.ixi_U.user.dto.response.PlanResponse;
 import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.service.UserService;
@@ -35,8 +34,9 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteUserById(@AuthenticationPrincipal CustomOAuth2User user) {
-        userService.deleteUserById(user.getUserId());
+    public ResponseEntity<Void> deleteUserById(@AuthenticationPrincipal String userId) {
+        userService.deleteUserById(userId);
+
         return ResponseEntity.noContent().build();
     }
 
