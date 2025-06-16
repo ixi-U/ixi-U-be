@@ -72,12 +72,12 @@ public class UserService {
 
     @Transactional
     public void deleteUserById(String userId) {
-        userRepository.findById(userId)
-                .ifPresentOrElse(
-                        userRepository::delete,
-                        () -> {
-                            throw new GeneralException(UserException.USER_NOT_FOUND);
-                        }
-                );
+        if (!userRepository.existsById(userId)) {
+            throw new GeneralException(UserException.USER_NOT_FOUND);
+        }
+
+        subscribedRepository.deleteAllByUserId(userId);
+
+        userRepository.deleteById(userId);
     }
 }
