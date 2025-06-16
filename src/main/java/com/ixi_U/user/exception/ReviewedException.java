@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ReviewedException implements BaseException {
 
-    REVIEW_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 요금제에 대해 리뷰를 작성하였습니다");
+    REVIEW_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 요금제에 대해 리뷰를 작성하였습니다"),
+    REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST,"리뷰를 찾을 수 없습니다"),
+    REVIEW_NOT_OWNER(HttpStatus.BAD_REQUEST,"해당 리뷰를 작성하지 않은 분은 수정,삭제를 진행할 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final String message;
