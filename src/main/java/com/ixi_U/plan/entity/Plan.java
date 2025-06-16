@@ -34,33 +34,33 @@ public class Plan {
 
     private final PlanState planState;
 
-    private final int mobileDataLimitMb;
+    private final Integer mobileDataLimitMb;
 
-    private final int sharedMobileDataLimitMb;
+    private final Integer sharedMobileDataLimitMb;
 
-    private final int callLimitMinutes;
+    private final Integer callLimitMinutes;
 
-    private final int messageLimit;
+    private final Integer messageLimit;
 
-    private final int monthlyPrice;
+    private final Integer monthlyPrice;
 
     private final PlanType planType;
 
     private final String usageCautions;
 
-    private final int mobileDataThrottleSpeedKbps;
+    private final Integer mobileDataThrottleSpeedKbps;
 
-    private final int minAge;
+    private final Integer minAge;
 
-    private final int maxAge;
+    private final Integer maxAge;
 
-    private final boolean isActiveDuty;
+    private final Boolean isActiveDuty;
 
-    private final int pricePerKb;
+    private final Integer pricePerKb;
 
     private final String etcInfo;
 
-    private final int priority;
+    private final Integer priority;
 
     @CreatedDate
     @Property("created_at")

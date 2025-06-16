@@ -80,26 +80,43 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    // 사용자가 온보딩 화면에서 입력한 요금제로 업데이트
+//    // 사용자가 온보딩 화면에서 입력한 요금제로 업데이트
+//    @Transactional
+//    public void updateOnboardingInfo(String userId, String email, String planName) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+//
+//        // 1. 이메일 업데이트 (withEmail 필요 시 생성자에 추가)
+//        User updatedUser = user.withEmail(email);
+//        userRepository.save(updatedUser);
+//
+//        // 2. 유저가 선택한 Plan 정보 조회
+//        Plan plan = planRepository.findByName(planName)
+//                .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
+//
+//        // 3. SUBSCRIBED 관계 생성
+//        Subscribed subscribed = Subscribed.of(plan);
+//        user.addSubscribed(subscribed);
+//
+//        userRepository.save(user);
+//
+//        subscribedRepository.save(subscribed);
+
     @Transactional
-    public void updateOnboardingInfo(String userId, String email, String planName) {
+    public void updateOnboardingInfo(String userId, String email, String planId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        // 1. 이메일 업데이트 (withEmail 필요 시 생성자에 추가)
         User updatedUser = user.withEmail(email);
         userRepository.save(updatedUser);
 
-        // 2. 유저가 선택한 Plan 정보 조회
-        Plan plan = planRepository.findByName(planName)
+        Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
-        // 3. SUBSCRIBED 관계 생성
         Subscribed subscribed = Subscribed.of(plan);
-        user.addSubscribed(subscribed);
+        updatedUser.addSubscribed(subscribed);
 
-        userRepository.save(user);
-
+        userRepository.save(updatedUser);
         subscribedRepository.save(subscribed);
     }
 }

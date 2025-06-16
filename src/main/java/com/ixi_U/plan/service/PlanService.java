@@ -9,12 +9,11 @@ import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
 import com.ixi_U.chatbot.service.VectorService;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -158,10 +158,7 @@ public class PlanService {
         return PlanDetailResponse.from(plan);
     }
 
-    // plan 이름을 기반으로 요금제 이름 list 조회
-    public List<String> getAllPlanNames() {
-        return planRepository.findAll().stream()
-                .map(Plan::getName)
-                .toList();
+    public List<PlanNameDto> getPlanNameList() {
+        return planRepository.findAllPlanNames();
     }
 }

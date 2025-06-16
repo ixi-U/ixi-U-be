@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
@@ -83,6 +84,30 @@ class PlanControllerTest {
                         .withRequestDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
+    }
+
+    @Nested
+    @DisplayName("요금제 이름 목록 조회")
+    class GetPlanNamesTest {
+
+        @Test
+        @DisplayName("요금제 이름 목록을 조회할 수 있다")
+        void getPlanNames() throws Exception {
+            // given
+            PlanNameDto planA = new PlanNameDto("plan-A", "A 요금제");
+            PlanNameDto planB = new PlanNameDto("plan-B", "B 요금제");
+            given(planService.getPlanNameList()).willReturn(List.of(planA, planB));
+
+            // when, then
+            mockMvc.perform(get("/plans/summaries")
+                            .with(user("tester").roles("USER")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].id").value("plan-A"))
+                    .andExpect(jsonPath("$[0].name").value("A 요금제"))
+                    .andExpect(jsonPath("$[1].id").value("plan-B"))
+                    .andExpect(jsonPath("$[1].name").value("B 요금제"))
+                    .andDo(document("plans-get-names"));
+        }
     }
 
     @Nested
