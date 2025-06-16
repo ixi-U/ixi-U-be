@@ -5,13 +5,13 @@ import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
+import com.ixi_U.auth.dto.CustomOAuth2User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -24,9 +24,15 @@ public class UserService {
 
     public List<SubscribedResponse> getMySubscribedPlans() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = principal instanceof String
-                ? (String) principal
-                : String.valueOf(principal);
+
+        String userId;
+        if (principal instanceof String) {
+            userId = (String) principal;
+        } else if (principal instanceof CustomOAuth2User) {
+            userId = ((CustomOAuth2User) principal).getUserId();
+        } else {
+            throw new RuntimeException("알 수 없는 사용자 인증 정보입니다.");
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
@@ -44,9 +50,20 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 
-        // setter 없이 withName으로 새 객체 생성
         User updated = user.withName(newName);
 
         return userRepository.save(updated);
     }
+
+    // UserService.java
+    @Transactional
+    public void deleteRefreshToken(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        User updated = user.withRefreshToken(null); // null로 초기화 (or 빈 문자열 ..)
+        userRepository.save(updated);
+    }
 }
+
+
