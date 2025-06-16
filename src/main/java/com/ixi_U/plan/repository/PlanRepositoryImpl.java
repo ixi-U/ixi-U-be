@@ -35,17 +35,26 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
                 cursorSortValue);
 
         Node p = Cypher.node("Plan").named("p");
-        Node b = Cypher.node("SingleBenefit").named("b");
-        Relationship relationship = p.relationshipTo(b, "HAS_BENEFIT");
+        Node sb = Cypher.node("SingleBenefit").named("sb");
+        Node bb = Cypher.node("BundledBenefit").named("bb");
+        Relationship singleRelationship = p.relationshipTo(sb, "HAS_BENEFIT");
+        Relationship bundledRelationship = p.relationshipTo(bb, "HAS_BENEFIT");
 
         Statement statement = Cypher.match(p)
                 .where(condition)
-                .optionalMatch(relationship)
+                .optionalMatch(singleRelationship)
                 .with(p, Cypher.collect(Cypher.mapOf(
-                        "id", b.property("id"),
-                        "name", b.property("name"),
-                        "description", b.property("description")
+                        "id", sb.property("id"),
+                        "name", sb.property("name")
                 )).as("singleBenefits"))
+                .optionalMatch(bundledRelationship)
+                .with(p,
+                        Cypher.name("singleBenefits"),
+                        Cypher.collect(Cypher.mapOf(
+                                "id", bb.property("id"),
+                                "name", bb.property("name")
+                        )).as("bundledBenefits"))
+                .withDistinct(p, Cypher.name("singleBenefits"), Cypher.name("bundledBenefits"))
                 .returning(
                         p.property("id").as("id"),
                         p.property("name").as("name"),
@@ -55,8 +64,8 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
                         p.property("messageLimit").as("messageLimit"),
                         p.property("monthlyPrice").as("monthlyPrice"),
                         p.property("priority").as("priority"),
-                        Cypher.name("singleBenefits")
-                )
+                        Cypher.name("singleBenefits"),
+                        Cypher.name("bundledBenefits").as("bundledBenefits"))
                 .orderBy(planSortOption.getOrder() == SortOrder.ASC
                                 ? p.property(planSortOption.getField()).ascending()
                                 : p.property(planSortOption.getField()).descending(),

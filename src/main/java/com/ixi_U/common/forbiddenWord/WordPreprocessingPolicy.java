@@ -1,4 +1,4 @@
-package com.ixi_U.common.filter;
+package com.ixi_U.common.forbiddenWord;
 
 public enum WordPreprocessingPolicy {
 
