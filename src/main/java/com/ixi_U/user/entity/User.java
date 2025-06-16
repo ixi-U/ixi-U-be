@@ -17,7 +17,7 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 @Getter
 @With
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -33,26 +33,26 @@ public class User {
 
     private final String provider;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
     private final Long kakaoId;
 
-    private String refreshToken;
+    private final String refreshToken;
+
+    @CreatedDate
+    private final LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private final LocalDateTime updatedAt;
 
     @Builder.Default
     @Relationship(type = "REVIEWED", direction = Relationship.Direction.OUTGOING)
-    private List<Reviewed> reviewedHistory = new ArrayList<>();
+    private final List<Reviewed> reviewedHistory = new ArrayList<>();
 
     @Builder.Default
     @Relationship(type = "SUBSCRIBED", direction = Relationship.Direction.OUTGOING)
-    private List<Subscribed> subscribedHistory = new ArrayList<>();
+    private final List<Subscribed> subscribedHistory = new ArrayList<>();
 
     public static User of(final String name, final String email, final String provider,
-            final Long kakaoId, final UserRole userRole) {
+                          final Long kakaoId, final UserRole userRole) {
         return User.builder()
                 .name(name)
                 .email(email)
@@ -67,12 +67,10 @@ public class User {
     }
 
     public void addReviewed(final Reviewed reviewed) {
-
         reviewedHistory.add(reviewed);
     }
 
     public void addSubscribed(final Subscribed subscribed) {
-
         subscribedHistory.add(subscribed);
     }
 }
