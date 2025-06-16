@@ -157,4 +157,11 @@ public class PlanService {
 
         return PlanDetailResponse.from(plan);
     }
+
+    // plan 이름을 기반으로 요금제 이름 list 조회
+    public List<String> getAllPlanNames() {
+        return planRepository.findAll().stream()
+                .map(Plan::getName)
+                .toList();
+    }
 }

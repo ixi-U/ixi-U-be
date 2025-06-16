@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Validated
 @RestController
 @RequestMapping("/plans")
@@ -55,5 +57,12 @@ public class PlanController {
         PlanEmbeddedResponse planEmbeddedResponse = planService.savePlan(request);
 
         return ResponseEntity.ok(planEmbeddedResponse);
+    }
+
+    // 요금제 목록(제목) 조회
+    @GetMapping("/names")
+    public ResponseEntity<List<String>> getAllPlanNames() {
+        List<String> planNames = planService.getAllPlanNames();
+        return ResponseEntity.ok(planNames);
     }
 }

@@ -68,7 +68,7 @@ public class SecurityConfig {
         // 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/**").permitAll()
+                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/names/**", "/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 );
