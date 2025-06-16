@@ -1,14 +1,16 @@
 package com.ixi_U.user.controller;
 
-import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.user.dto.response.PlanResponse;
 import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.service.UserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
@@ -30,4 +32,12 @@ public class UserController {
         PlanResponse plan = subscribedList.get(0).plan();
         return ResponseEntity.ok(plan);
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUserById(@AuthenticationPrincipal String userId) {
+        userService.deleteUserById(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

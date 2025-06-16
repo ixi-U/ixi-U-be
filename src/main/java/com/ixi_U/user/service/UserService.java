@@ -1,25 +1,26 @@
 package com.ixi_U.user.service;
 
-import com.ixi_U.user.dto.response.SubscribedResponse;
-import com.ixi_U.user.entity.User;
-import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
+import com.ixi_U.user.dto.response.SubscribedResponse;
+import com.ixi_U.user.entity.User;
+import com.ixi_U.user.repository.SubscribedRepository;
+import com.ixi_U.user.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SubscribedRepository subscribedRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository) {
         this.userRepository = userRepository;
+        this.subscribedRepository = subscribedRepository;
     }
 
     public List<SubscribedResponse> getMySubscribedPlans() {
@@ -48,5 +49,16 @@ public class UserService {
         User updated = user.withName(newName);
 
         return userRepository.save(updated);
+    }
+
+    @Transactional
+    public void deleteUserById(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new GeneralException(UserException.USER_NOT_FOUND);
+        }
+
+        subscribedRepository.deleteAllByUserId(userId);
+
+        userRepository.deleteById(userId);
     }
 }

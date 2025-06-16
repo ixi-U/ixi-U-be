@@ -9,6 +9,7 @@ public record PlanSummaryDto(String id, String name, int mobileDataLimitMb,
                              int messageLimit,
                              int monthlyPrice,
                              int priority,
-                             List<Map<String, Object>> singleBenefits) {
+                             List<Map<String, Object>> singleBenefits,
+                             List<Map<String, Object>> bundledBenefits) {
 
 }
