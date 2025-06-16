@@ -27,6 +27,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -38,6 +39,19 @@ public class PlanService {
     private final BundledBenefitRepository bundledBenefitRepository;
     private final SingleBenefitRepository singleBenefitRepository;
     private final VectorService vectorService;
+
+    public void embedAllPlan(){
+
+        List<Plan> all = planRepository.findAll();
+
+        List<GeneratePlanDescriptionRequest> requests = new ArrayList<>();
+
+        for (Plan plan : all) {
+            requests.add(planEntityToDto(plan));
+        }
+
+        vectorService.embedAllPlan(requests);
+    }
 
     /**
      * 요금제 저장 & 벡터 저장소에 저장
