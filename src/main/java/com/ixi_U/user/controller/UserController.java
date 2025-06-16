@@ -21,7 +21,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<?> getMyPlan(Authentication authentication) {
         // 1. 인증 여부 확인
-        if (authentication == null || !authentication.isAuthenticated()) { // todo !authentication.isAuthenticated() 에서 null
+        if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
@@ -42,5 +42,3 @@ public class UserController {
         }
     }
 }
-
-
