@@ -1,6 +1,5 @@
 package com.ixi_U.chatbot.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.chatbot.dto.BundledBenefitDTO;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
@@ -25,7 +24,7 @@ public class VectorService {
     private static final String SINGLE_BENEFIT_TYPES = "singleBenefitTypes";
 
     private final ChatBotService chatBotService;
-    private final Neo4jVectorStore vectorStore;
+    private final Neo4jVectorStore neo4jVectorStore;
 
     public PlanEmbeddedResponse saveEmbeddedPlan(@Valid GeneratePlanDescriptionRequest request) {
 
@@ -37,9 +36,30 @@ public class VectorService {
 
         log.info("metadata = {}", metadata);
 
-        vectorStore.add(List.of(new Document(planDescription, metadata)));
+        neo4jVectorStore.add(List.of(new Document(planDescription, metadata)));
 
         return PlanEmbeddedResponse.create(planDescription, metadata);
+    }
+
+    /**
+     * 저장된 요금제 일괄 벡터 저장소에 저장
+     */
+    public void embedAllPlan(List<GeneratePlanDescriptionRequest> requests) {
+
+        List<Document> documents = new ArrayList<>();
+
+        for (GeneratePlanDescriptionRequest request : requests) {
+
+            String planDescription = chatBotService.getPlanDescription(request);
+
+            Map<String, Object> metadata = flattenMetadata(request);
+
+            Document document = new Document(planDescription, metadata);
+
+            documents.add(document);
+        }
+
+        neo4jVectorStore.add(documents);
     }
 
     /**
