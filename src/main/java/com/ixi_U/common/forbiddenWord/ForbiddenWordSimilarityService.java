@@ -16,24 +16,28 @@ public class ForbiddenWordSimilarityService {
     private final ForbiddenWordLoader forbiddenWordLoader;
     private final Neo4jVectorStore vectorStore;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void initOnce() {
-        // 1) 이미 'forbidden' type 문서가 하나라도 있으면 스킵
-        long existing = vectorStore.searchByMetadata("type", "forbidden")
-                .stream().count();
-        if (existing > 0) {
-            return;
-        }
-
-        // 2) 없으면 최초 한 번만 로드
-        List<Document> docs = forbiddenWordLoader.getForbiddenWords().stream()
-                .map(w -> new Document(
-                        w,                                  // content
-                        Map.of("id", w, "type", "forbidden")
-                ))
-                .toList();
-        vectorStore.add(docs);
-    }
+//    public void run(ApplicationArguments args) throws Exception {
+//        // load all forbidden words, but filter out those already in the vector store by checking for an existing ID match
+//        List<Document> docsToAdd = forbiddenWordLoader.getForbiddenWords().stream()
+//                .filter(w -> vectorStore.similaritySearch(
+//                                SearchRequest.builder()
+//                                        .query(w)
+//                                        .topK(1)
+//                                        .filterExpression("id == '" + w + "'")
+//                                        .build()
+//                        ).isEmpty()
+//                )
+//                .map(w -> new Document(
+//                        w,
+//                        Map.of("id", w, "type", "forbidden")
+//                ))
+//                .toList();
+//
+//        // only add if there are new entries
+//        if (!docsToAdd.isEmpty()) {
+//            vectorStore.add(docsToAdd);
+//        }
+//    }
 
     public List<Document> findSimilarForbiddenWords(String text) {
 
