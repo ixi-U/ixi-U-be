@@ -12,12 +12,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
-@Node(value = "User")
 @Getter
 @With
 @Builder(access = AccessLevel.PRIVATE)
@@ -28,27 +25,22 @@ public class User {
     @GeneratedValue(UUIDStringGenerator.class)
     private final String id;
 
-    @Property(name = "name")
     private final String name;
 
-    @Property(name = "email")
     private final String email;
 
-    @Property(name = "provider")
+    private final UserRole userRole;
+
     private final String provider;
 
     @CreatedDate
-    @Property("created_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Property("updated_at")
     private LocalDateTime updatedAt;
 
-    @Property(name = "kakao_id")
     private final Long kakaoId;
 
-    @Property(name = "refresh_token")
     private String refreshToken;
 
     @Builder.Default
@@ -59,12 +51,14 @@ public class User {
     @Relationship(type = "SUBSCRIBED", direction = Relationship.Direction.OUTGOING)
     private List<Subscribed> subscribedHistory = new ArrayList<>();
 
-    public static User of(final String name, final String email, final String provider, final Long kakaoId) {
+    public static User of(final String name, final String email, final String provider,
+            final Long kakaoId, final UserRole userRole) {
         return User.builder()
                 .name(name)
                 .email(email)
                 .provider(provider)
                 .kakaoId(kakaoId)
+                .userRole(userRole)
                 .build();
     }
 
@@ -72,7 +66,7 @@ public class User {
         return this.withRefreshToken(refreshToken);
     }
 
-    public void addReviewed(final Reviewed reviewed){
+    public void addReviewed(final Reviewed reviewed) {
 
         reviewedHistory.add(reviewed);
     }

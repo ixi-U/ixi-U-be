@@ -1,6 +1,10 @@
 package com.ixi_U.plan.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
+import com.ixi_U.plan.dto.request.SavePlanRequest;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.service.PlanService;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
@@ -38,5 +39,21 @@ public class PlanController {
         SortedPlanResponse response = planService.findPlans(pageable, request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/details/{planId}")
+    public ResponseEntity<PlanDetailResponse> getPlanDetail(@PathVariable String planId) {
+
+        PlanDetailResponse response = planService.findPlanDetail(planId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<PlanEmbeddedResponse> savePlan(@RequestBody SavePlanRequest request) {
+
+        PlanEmbeddedResponse planEmbeddedResponse = planService.savePlan(request);
+
+        return ResponseEntity.ok(planEmbeddedResponse);
     }
 }

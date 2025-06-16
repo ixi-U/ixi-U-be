@@ -16,7 +16,9 @@ import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
+import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.entity.User;
+import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.repository.ReviewedRepository;
@@ -73,7 +75,8 @@ class ReviewServiceTest {
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L)));
+                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
+                                UserRole.ROLE_USER)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(false);
                 ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -106,7 +109,8 @@ class ReviewServiceTest {
                                 0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
                         )));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L)));
+                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
+                                UserRole.ROLE_USER)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(false);
 
                 // when
@@ -132,7 +136,8 @@ class ReviewServiceTest {
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L)));
+                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
+                                UserRole.ROLE_USER)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(true);
 
@@ -164,9 +169,9 @@ class ReviewServiceTest {
             Pageable pageable = PageRequest.of(0, 5);
 
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse("유저1", 4, "리뷰1",
+                    new ShowReviewResponse(123L,"유저1", 4, "리뷰1",
                             LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
-                    new ShowReviewResponse("유저2", 5, "리뷰2",
+                    new ShowReviewResponse(456L,"유저2", 5, "리뷰2",
                             LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 
@@ -187,12 +192,12 @@ class ReviewServiceTest {
     }
 
     @Nested
-    @DisplayName("showReviewStats 메서드는")
-    class Describe_showReview_stats {
+    @DisplayName("showReviewSummary 메서드는")
+    class Describe_showReview_summary {
 
         @Test
-        @DisplayName("리뷰 개수와 평점을 반환한다.")
-        void it_returns_review_count_and_rating() {
+        @DisplayName("리뷰 개수와 평점 및 나의 리뷰를 반환한다.")
+        void it_returns_review_count_and_rating_and_my_review() {
 
             // given
             double averagePoint = 3.5;
@@ -200,13 +205,18 @@ class ReviewServiceTest {
             given(userRepository.findAveragePointAndReviewCount(anyString())).willReturn(
                     ShowReviewStatsResponse.of(averagePoint, totalCount));
 
+            given(reviewedRepository.showMyReview(anyString(),anyString())).willReturn(
+                    ShowReviewResponse.of(1L,"jinu",5,"comment",LocalDateTime.now())
+            );
+
             //when
-            ShowReviewStatsResponse showReviewStatsResponse = reviewService.showReviewStats(
-                    "plan-id");
+            ShowReviewSummaryResponse showReviewSummary = reviewService.showReviewSummary(
+                    "user-id","plan-id");
 
             //then
-            assertThat(showReviewStatsResponse.averagePoint()).isEqualTo(averagePoint);
-            assertThat(showReviewStatsResponse.totalCount()).isEqualTo(totalCount);
+            assertThat(showReviewSummary.showReviewStatsResponse().averagePoint()).isEqualTo(averagePoint);
+            assertThat(showReviewSummary.showReviewStatsResponse().totalCount()).isEqualTo(totalCount);
+            assertThat(showReviewSummary.myReviewResponse().reviewId()).isEqualTo(1L);
         }
     }
 }

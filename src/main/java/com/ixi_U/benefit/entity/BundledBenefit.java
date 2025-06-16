@@ -30,34 +30,32 @@ public class BundledBenefit {
 
     private final String name;
 
-    private final String description;
+    private final String subscript;
 
     private final int choice;
 
     @CreatedDate
-    @Property("created_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Property("updated_at")
     private LocalDateTime updatedAt;
 
     @Builder.Default
-    @Relationship(type = "BUNDLED", direction = Relationship.Direction.INCOMING)
+    @Relationship(type = "INCLUDED", direction = Relationship.Direction.OUTGOING)
     private List<SingleBenefit> singleBenefits = new ArrayList<>();
 
-    public static BundledBenefit of(final String name, final String description, final int choice) {
+    public static BundledBenefit create(final String name, final String subscript, final int choice){
 
         return BundledBenefit.builder()
                 .name(name)
-                .description(description)
+                .subscript(subscript)
                 .choice(choice)
                 .build();
     }
 
-    public void addSingleBenefit(final SingleBenefit singleBenefit) {
+    public void addAllSingleBenefit(final List<SingleBenefit> newSingleBenefits){
 
-        singleBenefits.add(singleBenefit);
+        singleBenefits.addAll(newSingleBenefits);
     }
 }
 

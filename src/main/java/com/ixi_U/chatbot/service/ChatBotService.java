@@ -1,7 +1,7 @@
 package com.ixi_U.chatbot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ixi_U.chatbot.dto.PlanDescriptionRequest;
+import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
 import com.ixi_U.common.exception.GeneralException;
 import jakarta.validation.Valid;
@@ -40,7 +40,7 @@ public class ChatBotService {
                 .delayElements(Duration.ofMillis(50));
     }
 
-    public String getPlanDescription(@Valid PlanDescriptionRequest request) {
+    public String getPlanDescription(@Valid GeneratePlanDescriptionRequest request) {
 
         try {
             String planInfo = objectMapper.writeValueAsString(request);

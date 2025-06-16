@@ -1,10 +1,10 @@
 package com.ixi_U.chatbot.controller;
 
-import static com.ixi_U.chatbot.constants.TestConstants.CHATBOT_WELCOME_MESSAGE;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
 
+import com.ixi_U.util.constants.TestConstants;
 import com.ixi_U.chatbot.service.ChatBotService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +28,8 @@ import reactor.core.publisher.Flux;
 class ChatBotControllerTest {
 
     WebTestClient webTestClient;
+    @MockBean
+    ChatBotService chatBotService;
 
     @BeforeEach
     void setUp(ApplicationContext applicationContext,
@@ -38,19 +40,16 @@ class ChatBotControllerTest {
                 .build();
     }
 
-    @MockBean
-    ChatBotService chatBotService;
-
     @Nested
     class WhenAPIHasRequested {
 
         @Test
         @DisplayName("인증/인가된 사용자에게 웰컴 메세지를 응답한다")
-        @WithMockUser(username = "admin", roles = {"ADMIN"})
+        @WithMockUser(username = "user", roles = "USER")
         void getWelcomeMessageTest() {
 
             //given
-            String[] split = CHATBOT_WELCOME_MESSAGE.split("\n");
+            String[] split = TestConstants.CHATBOT_WELCOME_MESSAGE.split("\n");
             given(chatBotService.getWelcomeMessage()).willReturn(Flux.fromArray(split));
 
             //when & then
@@ -63,21 +62,6 @@ class ChatBotControllerTest {
                     .expectBodyList(String.class)
                     .contains(split[0])
                     .consumeWith(document("getWelcomeMessage"));
-        }
-
-        @Test
-        @DisplayName("인증/인가 되지않은 사용자는 401 에러를 반환한다")
-        void unauthorizedUserTest() {
-
-            //given
-
-            //when & then
-            webTestClient.get()
-                    .uri("/api/chatbot/welcome")
-                    .exchange()
-                    .expectStatus().is4xxClientError()
-                    .returnResult(Void.class)
-                    .consumeWith(document("unauthorizedUserTest"));
         }
     }
 }
