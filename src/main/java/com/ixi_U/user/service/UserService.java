@@ -69,4 +69,15 @@ public class UserService {
         User updated = user.withRefreshToken(null); // null로 초기화 (or 빈 문자열 ..)
         userRepository.save(updated);
     }
+
+    @Transactional
+    public void deleteUserById(String userId) {
+        userRepository.findById(userId)
+                .ifPresentOrElse(
+                        userRepository::delete,
+                        () -> {
+                            throw new GeneralException(UserException.USER_NOT_FOUND);
+                        }
+                );
+    }
 }
