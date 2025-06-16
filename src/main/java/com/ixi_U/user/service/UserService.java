@@ -1,7 +1,10 @@
 package com.ixi_U.user.service;
 
+import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.entity.User;
+import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
@@ -17,9 +20,11 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SubscribedRepository subscribedRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository) {
         this.userRepository = userRepository;
+        this.subscribedRepository = subscribedRepository;
     }
 
     public List<SubscribedResponse> getMySubscribedPlans() {
@@ -65,5 +70,3 @@ public class UserService {
         userRepository.save(updated);
     }
 }
-
-
