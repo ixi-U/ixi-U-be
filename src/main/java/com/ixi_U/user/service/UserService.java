@@ -110,13 +110,15 @@ public class UserService {
         User updatedUser = user.withEmail(email);
         userRepository.save(updatedUser);
 
-        Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
+        // 요금제 선택은 온보딩에서 필수 사항이 아님
+        if (planId != null && !planId.isBlank()) {
+            Plan plan = planRepository.findById(planId)
+                    .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
-        Subscribed subscribed = Subscribed.of(plan);
-        updatedUser.addSubscribed(subscribed);
-
+            Subscribed subscribed = Subscribed.of(plan);
+            updatedUser.addSubscribed(subscribed);
+            subscribedRepository.save(subscribed);
+        }
         userRepository.save(updatedUser);
-        subscribedRepository.save(subscribed);
     }
 }

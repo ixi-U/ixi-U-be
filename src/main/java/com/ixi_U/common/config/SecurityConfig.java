@@ -68,7 +68,7 @@ public class SecurityConfig {
         // 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/names/**", "/**").permitAll()
+                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/names/**", "/api/user/onboarding/**", "/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 );
@@ -82,7 +82,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
+//                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://localhost:3000", "https://ixi-u.site")
                         .allowedMethods("*")
                         .allowCredentials(true);
             }

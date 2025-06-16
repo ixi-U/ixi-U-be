@@ -20,9 +20,5 @@ public interface PlanRepository extends Neo4jRepository<Plan, String>, PlanCusto
     MATCH (p:Plan)
     RETURN p.id AS id, p.name AS name
     """)
-//    @Query("""
-//            MATCH (p:Plan)
-//            RETURN p
-//            """)
     List<PlanNameDto> findAllPlanNames();
 }

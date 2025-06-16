@@ -6,10 +6,12 @@ import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class UserController {
     @PostMapping("/onboarding")
     public ResponseEntity<Void> onboarding(@RequestBody OnboardingRequest request,
                                            @AuthenticationPrincipal String userId) {
+        log.info("[Onboarding] userId: {}", userId);
         userService.updateOnboardingInfo(userId, request.email(), request.planId());
         return ResponseEntity.ok().build();
     }
