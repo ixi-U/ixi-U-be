@@ -81,10 +81,9 @@ public class RecommendTool {
     private List<Document> similaritySearchPlan(String request){
 
         //--start 키워드 추출을 위한 필터식 생성 로직 (미완)
-        FilterConditions filterConditions = metadataExtractorImpl.extractFilters(request);
-        FilterExpressionBuilder b = new FilterExpressionBuilder();
-        Filter.Expression build = b.eq("test", "BG").build();
-        //--end 키워드 추출을 위한 필터식 생성 로직 (미완)
+//        FilterConditions filterConditions = metadataExtractorImpl.extractFilters(request);
+//        FilterExpressionBuilder b = new FilterExpressionBuilder();
+//        Filter.Expression build = b.eq("test", "BG").build();
 
         List<Document> documents = neo4jVectorStore.similaritySearch(
                 SearchRequest.builder()
