@@ -57,7 +57,7 @@ public class UserService {
 
     // UserService.java
     @Transactional
-    public void deleteRefreshToken(String userId) {
+    public void removeRefreshToken(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
 

@@ -21,10 +21,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    // 필터 동작 안하도록
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+//
+//        return true;
+//    }
 
-        return true;
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // 예외 URI 정의 (예: 로그인 관련 URI 등은 필터 패스)
+        String uri = request.getRequestURI();
+        return uri.startsWith("/oauth2") || uri.startsWith("/login") || uri.equals("/favicon.ico");
     }
 
     @Override
@@ -53,10 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //            Authentication auth = jwtTokenProvider.getAuthentication(userId, role);
 //            SecurityContextHolder.getContext().setAuthentication(auth);
 
-            filterChain.doFilter(request, response);
+
 
         }
-        throw new IllegalArgumentException("인증되지 않은 사용자 입니다"); // Todo 로그아웃된 사용자에 대해서도 예외처리를 해버림
+//        throw new IllegalArgumentException("인증되지 않은 사용자 입니다"); // Todo 로그아웃된 사용자에 대해서도 예외처리를 해버림
+        filterChain.doFilter(request, response);
     }
 
     private String extractTokenFromCookie(HttpServletRequest request) {
