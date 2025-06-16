@@ -6,8 +6,6 @@ import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
-import com.ixi_U.common.exception.GeneralException;
-import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.auth.dto.CustomOAuth2User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
