@@ -93,16 +93,6 @@ dependencies {
 
     // ahocorasick
     implementation 'org.ahocorasick:ahocorasick:0.6.3'
-
-    // Embedding Client
-    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-
-    // VectorStore
-    implementation 'org.springframework.ai:spring-ai-starter-vector-store-neo4j'
-
-    // RAG 전용 통합 모듈
-    implementation 'org.springframework.ai:spring-ai-retriever'
-    implementation 'org.springframework.ai:spring-ai-rag'
 }
 
 dependencyManagement {
