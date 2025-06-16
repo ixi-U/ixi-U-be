@@ -1,6 +1,5 @@
-package com.ixi_U.common.filter;
+package com.ixi_U.common.forbiddenWord;
 
-import lombok.RequiredArgsConstructor;
 import org.ahocorasick.trie.Trie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
