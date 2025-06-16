@@ -83,9 +83,6 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient:3.0.3'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
-    //validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'

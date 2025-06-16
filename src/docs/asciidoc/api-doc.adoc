@@ -17,6 +17,10 @@ operation::unauthorizedUserTest[]
 
 == 요금제 API
 
+=== 요금제 저장
+
+operation::plans-save[]
+
 === 요금제 목록
 
 ==== 정렬 조건으로 요금제 목록 조회 성공
@@ -87,4 +91,29 @@ operation::showReview-success[]
 
 === 요금제 리뷰 개수 및 평균 별점 조회
 
-operation::showReviewStats-success[]
+operation::showReviewSummary-success[]
+
+=== 요금제 리뷰 수정 성공
+
+operation::updateReview-success[]
+
+=== 요금제 리뷰 수정 실패 - 리뷰 내용이 없을 경우
+operation::updateReview-error-review-content-null[]
+
+=== 요금제 리뷰 수정 실패 - 리뷰 id가 없을 경우
+operation::updateReview-error-review-id-null[]
+
+==== 요금제 리뷰 수정 실패 - 리뷰 글자가 200보다 큰 경우
+operation::updateReview-error-review-letter-too-long[]
+
+==== 요금제 리뷰 수정 실패 - 리뷰 글자가 20보다 작은 경우
+operation::updateReview-error-review-letter-too-short[]
+
+=== 요금제 리뷰 수정 실패 - 자신의 리뷰가 아닌 경우
+operation::updateReview-error-when-not-myReview[]
+
+=== 요금제 리뷰 삭제 성공
+
+operation::deleteReview-success[]
+
+

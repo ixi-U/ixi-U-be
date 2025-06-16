@@ -30,10 +30,9 @@ public class Plan {
     @GeneratedValue(UUIDStringGenerator.class)
     private final String id;
 
-    @Property(name = "name")
     private final String name;
 
-    private final State state;
+    private final PlanState planState;
 
     private final int mobileDataLimitMb;
 
@@ -101,7 +100,7 @@ public class Plan {
     ) {
         return Plan.builder()
                 .name(name)
-                .state(State.ABLE)
+                .planState(PlanState.ABLE)
                 .mobileDataLimitMb(mobileDataLimitMb)
                 .sharedMobileDataLimitMb(sharedMobileDataLimitMb)
                 .callLimitMinutes(callLimitMinutes)
