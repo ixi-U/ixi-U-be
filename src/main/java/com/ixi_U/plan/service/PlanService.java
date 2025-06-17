@@ -7,7 +7,7 @@ import com.ixi_U.benefit.repository.SingleBenefitRepository;
 import com.ixi_U.chatbot.dto.BundledBenefitDTO;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
-import com.ixi_U.chatbot.service.VectorService;
+import com.ixi_U.chatbot.service.VectorStoreService;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
@@ -38,7 +38,7 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final BundledBenefitRepository bundledBenefitRepository;
     private final SingleBenefitRepository singleBenefitRepository;
-    private final VectorService vectorService;
+    private final VectorStoreService vectorStoreService;
 
     public void embedAllPlan(){
 
@@ -50,7 +50,7 @@ public class PlanService {
             requests.add(planEntityToDto(plan));
         }
 
-        vectorService.embedAllPlan(requests);
+        vectorStoreService.embedAllPlan(requests);
     }
 
     /**
@@ -80,7 +80,7 @@ public class PlanService {
 
         GeneratePlanDescriptionRequest generatePlanDescriptionRequest = planEntityToDto(save);
 
-        return vectorService.saveEmbeddedPlan(generatePlanDescriptionRequest);
+        return vectorStoreService.saveEmbeddedPlan(generatePlanDescriptionRequest);
     }
 
     private void validateSamePlanName(final SavePlanRequest request) {
