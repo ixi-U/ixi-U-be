@@ -1,9 +1,9 @@
 package com.ixi_U.user.controller;
 
-import com.ixi_U.user.dto.response.PlanResponse;
-import com.ixi_U.user.dto.response.SubscribedResponse;
+import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
+import com.ixi_U.user.dto.response.ShowMyInfoResponse;
 import com.ixi_U.user.service.UserService;
-import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,18 +19,11 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
+    @GetMapping("/plan")
     public ResponseEntity<?> getMyPlan(@AuthenticationPrincipal String userId) {
-        List<SubscribedResponse> subscribedList = userService.getMySubscribedPlans(userId);
+        ShowCurrentSubscribedResponse subscribed = userService.findCurrentSubscribedPlan(userId);
 
-        if (subscribedList.isEmpty()) {
-            return ResponseEntity.ok("아직 등록된 요금제가 없습니다.");
-
-        }
-
-        // 하나만 있다고 가정
-        PlanResponse plan = subscribedList.get(0).plan();
-        return ResponseEntity.ok(plan);
+        return ResponseEntity.ok(Objects.requireNonNullElse(subscribed, "아직 등록된 요금제가 없습니다."));
     }
 
     @DeleteMapping
@@ -38,6 +31,13 @@ public class UserController {
         userService.deleteUserById(userId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
+        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
+
+        return ResponseEntity.ok(response);
     }
 
 }
