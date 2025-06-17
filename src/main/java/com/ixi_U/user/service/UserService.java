@@ -59,19 +59,8 @@ public class UserService {
                 user.getEmail(),
                 user.getUserRole(),
                 LocalDate.parse(
-                        user.getCreatedAt().format(DateTimeFormatter.ofPattern("YYYY-MM-dd")))
+                        user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
         );
-    }
-
-    @Transactional
-    public User changeName(String userId, String newName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-        // setter 없이 withName으로 새 객체 생성
-        User updated = user.withName(newName);
-
-        return userRepository.save(updated);
     }
 
     @Transactional
