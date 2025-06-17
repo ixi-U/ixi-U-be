@@ -61,7 +61,7 @@ class ChatBotControllerTest {
                     .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
                     .expectBodyList(String.class)
                     .contains(split[0])
-                    .consumeWith(document("getWelcomeMessage"));
+                    .consumeWith(document("get-welcome-message-success"));
         }
     }
 }

@@ -93,7 +93,7 @@ class SubscribedControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
-                    .andDo(document("createSubscribed-success"));
+                    .andDo(document("create-subscribed-success"));
 
             // then
             result.andExpect(status().isOk());
@@ -123,7 +123,7 @@ class SubscribedControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(invalidRequest)))
                     .andDo(print())
-                    .andDo(document("createSubscribed-error-plan-id-blank"));
+                    .andDo(document("create-subscribed-error-plan-id-blank"));
 
             // then
             result.andExpect(status().isBadRequest());
@@ -156,7 +156,7 @@ class SubscribedControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
-                    .andDo(document("createSubscribed-error-user-not-found"));
+                    .andDo(document("create-subscribed-error-user-not-found"));
 
             // then
             result.andExpect(status().isNotFound())
@@ -190,7 +190,7 @@ class SubscribedControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
-                    .andDo(document("createSubscribed-error-plan-not-found"));
+                    .andDo(document("create-subscribed-error-plan-not-found"));
 
             // then
             result.andExpect(status().isNotFound())
@@ -224,7 +224,7 @@ class SubscribedControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andDo(print())
-                    .andDo(document("createSubscribed-error-already-subscribed"));
+                    .andDo(document("create-subscribed-error-already-subscribed"));
 
             // then
             result.andExpect(status().isBadRequest())
@@ -271,7 +271,7 @@ class SubscribedControllerTest {
             ResultActions result = mockMvc.perform(get("/subscribed/history")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
-                    .andDo(document("getSubscribedHistory-success"));
+                    .andDo(document("get-subscribed-history-success"));
 
             // then
             result.andExpect(status().isOk())
@@ -301,7 +301,7 @@ class SubscribedControllerTest {
             ResultActions result = mockMvc.perform(get("/subscribed/history")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
-                    .andDo(document("getSubscribedHistory-error-user-not-found"));
+                    .andDo(document("get-subscribed-history-error-user-not-found"));
 
             // then
             result.andExpect(status().isNotFound())
