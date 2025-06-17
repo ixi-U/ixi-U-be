@@ -5,30 +5,21 @@
 :toc: right
 :toclevels: 2
 
-== 혜택 API
+== 유저 API
 
-=== 묶음 혜택 리스트 조회
+=== 나의 요금제 조회
+
 ==== 성공
-operation::get-bundled-benefit-list-success[]
 
-=== 단일 혜택 리스트 조회
+operation::get-my-plan-success[]
+
+
+=== 유저 삭제
+
 ==== 성공
-operation::get-single-benefit-list-success[]
 
-=== 단일 혜택 저장
-==== 성공
-operation::save-single-benefit-success[]
+operation::delete-my-user-success[]
 
-=== 묶음 혜택 저장
-==== 성공
-operation::save-bundled-benefit-success[]
-
-
-== 챗봇 API
-
-=== 웰컴 메시지 조회
-==== 성공
-operation::get-welcome-message-success[]
 
 == 요금제 API
 
@@ -118,6 +109,26 @@ operation::update-review-error-when-not-my-review[]
 ==== 성공
 operation::delete-review-success[]
 
+
+== 혜택 API
+
+=== 묶음 혜택 리스트 조회
+==== 성공
+operation::get-bundled-benefit-list-success[]
+
+=== 단일 혜택 리스트 조회
+==== 성공
+operation::get-single-benefit-list-success[]
+
+=== 단일 혜택 저장
+==== 성공
+operation::save-single-benefit-success[]
+
+=== 묶음 혜택 저장
+==== 성공
+operation::save-bundled-benefit-success[]
+
+
 == 구독 API
 
 === 구독 등록
@@ -145,17 +156,9 @@ operation::get-subscribed-history-success[]
 ==== 실패 - 존재하지 않는 userId
 operation::get-subscribed-history-error-user-not-found[]
 
-== 유저 API
 
-=== 나의 요금제 조회
+== 챗봇 API
 
+=== 웰컴 메시지 조회
 ==== 성공
-
-operation::get-my-plan-success[]
-
-
-=== 유저 삭제
-
-==== 성공
-
-operation::delete-my-user-success[]
+operation::get-welcome-message-success[]
