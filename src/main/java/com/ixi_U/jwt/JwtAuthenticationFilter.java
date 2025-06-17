@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 
 // jwt access token 에 대한 인가 확인 필터
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -43,8 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 1. 쿠키에서 토큰 추출
         String token = extractTokenFromCookie(request);
-
-        System.out.println("🔑 추출된 토큰: " + token);
+        log.info("🔑 추출된 토큰: {}", token);
 
         // 2. 쿠키 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
@@ -52,8 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 3. 토큰에서 사용자 정보 파싱
             String userId = jwtTokenProvider.getUserIdFromToken(token).toString(); // subject는 문자열
             String role = jwtTokenProvider.getRoleFromToken(token);
-
-            System.out.println("✅ 인증 성공 - userId: " + userId + ", role: " + role);
+            log.info("✅ 인증 성공 - userId: {}, role: {}", userId, role);
 
             // 4. 인증 객체 생성
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } else {
-            System.out.println("❌ 인증 실패 - 유효하지 않은 토큰");
+            log.info("❌ 인증 실패 - 유효하지 않은 토큰");
         }
         filterChain.doFilter(request, response);
     }
