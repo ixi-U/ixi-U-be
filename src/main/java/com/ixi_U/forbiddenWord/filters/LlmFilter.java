@@ -1,7 +1,6 @@
 package com.ixi_U.forbiddenWord.filters;
 
 import com.ixi_U.chatbot.service.ChatBotForBiddenWordDecisionService;
-import com.ixi_U.forbiddenWord.ForbiddenWordFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

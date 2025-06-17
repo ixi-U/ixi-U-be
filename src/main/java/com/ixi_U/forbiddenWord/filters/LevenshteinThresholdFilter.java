@@ -1,6 +1,5 @@
 package com.ixi_U.forbiddenWord.filters;
 
-import com.ixi_U.forbiddenWord.ForbiddenWordFilter;
 import com.ixi_U.forbiddenWord.ForbiddenWordLoader;
 import com.ixi_U.forbiddenWord.WordPreprocessingPolicy;
 import lombok.RequiredArgsConstructor;
@@ -11,31 +10,6 @@ import org.springframework.stereotype.Component;
 public class LevenshteinThresholdFilter implements ForbiddenWordFilter {
 
     private final ForbiddenWordLoader forbiddenWordLoader;
-
-    @Override
-    public boolean matches(String text) {
-
-        String cleanedInput = text;
-
-        for (WordPreprocessingPolicy policy : WordPreprocessingPolicy.values()) {
-            cleanedInput = policy.apply(cleanedInput);
-        }
-
-        for (String forbidden : forbiddenWordLoader.getForbiddenWords()) {
-            if (text.contains(forbidden) || cleanedInput.contains(forbidden)) {
-
-                return true;
-            }
-            int threshold = getThreshold(
-                    Math.max(cleanedInput.length(), forbidden.length()));
-            if (levenshtein(cleanedInput, forbidden) <= threshold) {
-
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private static int levenshtein(String a, String b) {
 
@@ -61,6 +35,31 @@ public class LevenshteinThresholdFilter implements ForbiddenWordFilter {
         }
 
         return dp[a.length()][b.length()];
+    }
+
+    @Override
+    public boolean matches(String text) {
+
+        String cleanedInput = text;
+
+        for (WordPreprocessingPolicy policy : WordPreprocessingPolicy.values()) {
+            cleanedInput = policy.apply(cleanedInput);
+        }
+
+        for (String forbidden : forbiddenWordLoader.getForbiddenWords()) {
+            if (text.contains(forbidden) || cleanedInput.contains(forbidden)) {
+
+                return true;
+            }
+            int threshold = getThreshold(
+                    Math.max(cleanedInput.length(), forbidden.length()));
+            if (levenshtein(cleanedInput, forbidden) <= threshold) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private int getThreshold(int length) {

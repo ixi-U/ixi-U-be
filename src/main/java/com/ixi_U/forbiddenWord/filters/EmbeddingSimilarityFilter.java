@@ -1,6 +1,5 @@
 package com.ixi_U.forbiddenWord.filters;
 
-import com.ixi_U.forbiddenWord.ForbiddenWordFilter;
 import com.ixi_U.forbiddenWord.ForbiddenWordLoader;
 import java.util.LinkedHashSet;
 import java.util.List;

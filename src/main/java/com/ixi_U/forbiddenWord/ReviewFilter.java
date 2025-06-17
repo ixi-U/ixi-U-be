@@ -1,8 +1,8 @@
 package com.ixi_U.forbiddenWord;
 
 import com.ixi_U.forbiddenWord.filters.AhoCorasickFilter;
+import com.ixi_U.forbiddenWord.filters.ForbiddenWordFilter;
 import com.ixi_U.forbiddenWord.filters.LevenshteinThresholdFilter;
-import com.ixi_U.forbiddenWord.ForbiddenWordLoader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

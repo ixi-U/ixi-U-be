@@ -1,6 +1,5 @@
 package com.ixi_U.forbiddenWord.filters;
 
-import com.ixi_U.forbiddenWord.ForbiddenWordFilter;
 import com.ixi_U.forbiddenWord.ForbiddenWordLoader;
 import com.ixi_U.forbiddenWord.WordPreprocessingPolicy;
 import org.ahocorasick.trie.Trie;
