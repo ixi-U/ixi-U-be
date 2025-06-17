@@ -17,15 +17,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
-import com.ixi_U.benefit.dto.request.SaveBundledBenefitRequest;
+import com.ixi_U.benefit.entity.BenefitType;
+import com.ixi_U.benefit.entity.BundledBenefit;
+import com.ixi_U.benefit.entity.SingleBenefit;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtTokenProvider;
-import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.PlanResponse;
-import com.ixi_U.user.dto.response.SubscribedResponse;
-import com.ixi_U.user.service.ReviewService;
+import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
 import com.ixi_U.user.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,11 +96,25 @@ class UserControllerTest {
         void it_returns_my_plan() throws Exception {
 
             //given
-            List<SubscribedResponse> subscribedResponses = List.of(new SubscribedResponse("요금제A","요금제 상태A",new PlanResponse("id","planName",300)));
-            given(userService.getMySubscribedPlans(any())).willReturn(subscribedResponses);
+            ShowCurrentSubscribedResponse response1 = ShowCurrentSubscribedResponse.of(
+                    "5G 프리미엄 요금제",
+                    200_000,
+                    85_000,
+                    5,
+                    List.of(
+                            BundledBenefit.create("스트리밍 혜택", "넷플릭스 포함", 1)
+                    ),
+                    List.of(
+                            SingleBenefit.create("데이터 리필 1GB", "월 1회 제공", BenefitType.SUBSCRIPTION),
+                            SingleBenefit.create("로밍 지원", "5일 무료", BenefitType.SUBSCRIPTION)
+                    )
+            );
+
+            //given
+            given(userService.findCurrentSubscribedPlan(any())).willReturn(response1);
 
             // when
-            ResultActions result = mockMvc.perform(get(USER_URL+"/me")
+            ResultActions result = mockMvc.perform(get(USER_URL+"/plan")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON))
                             .andDo(document("get-my-plan-success"))
@@ -109,8 +122,7 @@ class UserControllerTest {
 
             // then
             result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value("id"))
-                    .andExpect(jsonPath("$.name").value("planName"));
+                    .andExpect(jsonPath("$.name").value("5G 프리미엄 요금제"));
         }
 
     }
