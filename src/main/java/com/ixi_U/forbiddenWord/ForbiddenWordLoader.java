@@ -1,4 +1,4 @@
-package com.ixi_U.common.forbiddenWord;
+package com.ixi_U.forbiddenWord;
 
 import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -30,5 +30,4 @@ public class ForbiddenWordLoader {
             }
         }
     }
-
 }
