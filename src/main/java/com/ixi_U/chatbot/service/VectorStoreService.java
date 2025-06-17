@@ -8,7 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -17,14 +18,15 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VectorService {
+public class VectorStoreService {
 
     private static final String SINGLE_BENEFIT_NAMES = "singleBenefitNames";
     private static final String BUNDLED_BENEFIT_NAMES = "bundledBenefitNames";
     private static final String SINGLE_BENEFIT_TYPES = "singleBenefitTypes";
 
     private final ChatBotService chatBotService;
-    private final Neo4jVectorStore neo4jVectorStore;
+    @Qualifier("planVectorStore")
+    private final VectorStore planVectorStore;
 
     public PlanEmbeddedResponse saveEmbeddedPlan(@Valid GeneratePlanDescriptionRequest request) {
 
@@ -36,7 +38,7 @@ public class VectorService {
 
         log.info("metadata = {}", metadata);
 
-        neo4jVectorStore.add(List.of(new Document(planDescription, metadata)));
+        planVectorStore.add(List.of(new Document(planDescription, metadata)));
 
         return PlanEmbeddedResponse.create(planDescription, metadata);
     }
@@ -59,7 +61,7 @@ public class VectorService {
             documents.add(document);
         }
 
-        neo4jVectorStore.add(documents);
+        planVectorStore.add(documents);
     }
 
     /**
