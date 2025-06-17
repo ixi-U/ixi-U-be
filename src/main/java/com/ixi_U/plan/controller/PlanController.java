@@ -7,21 +7,23 @@ import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.service.PlanService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Validated
 @RestController
-@RequestMapping("/plans")
 @RequiredArgsConstructor
 public class PlanController {
 
     private final PlanService planService;
 
-    @GetMapping
+    @GetMapping("/plans")
     public ResponseEntity<SortedPlanResponse> getPlans(
             @RequestParam(defaultValue = "10") int size,
             @RequestParam String planTypeStr,
@@ -40,7 +42,7 @@ public class PlanController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/details/{planId}")
+    @GetMapping("/plans/details/{planId}")
     public ResponseEntity<PlanDetailResponse> getPlanDetail(@PathVariable String planId) {
 
         PlanDetailResponse response = planService.findPlanDetail(planId);
@@ -48,8 +50,9 @@ public class PlanController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/save")
+    @PostMapping("/admin/plans/save")
     public ResponseEntity<PlanEmbeddedResponse> savePlan(@RequestBody SavePlanRequest request) {
+        log.info("요금제 등록 요청 : {}", request.name());
 
         PlanEmbeddedResponse planEmbeddedResponse = planService.savePlan(request);
 

@@ -39,8 +39,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        System.out.println("🔍 JwtAuthenticationFilter 진입: " + request.getRequestURI());
+
         // 1. 쿠키에서 토큰 추출
         String token = extractTokenFromCookie(request);
+
+        System.out.println("🔑 추출된 토큰: " + token);
 
         // 2. 쿠키 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
@@ -48,6 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 3. 토큰에서 사용자 정보 파싱
             String userId = jwtTokenProvider.getUserIdFromToken(token).toString(); // subject는 문자열
             String role = jwtTokenProvider.getRoleFromToken(token);
+
+            System.out.println("✅ 인증 성공 - userId: " + userId + ", role: " + role);
 
             // 4. 인증 객체 생성
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -57,6 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 5. SecurityContext에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } else {
+            System.out.println("❌ 인증 실패 - 유효하지 않은 토큰");
         }
         filterChain.doFilter(request, response);
     }
