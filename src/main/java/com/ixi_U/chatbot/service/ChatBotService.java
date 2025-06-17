@@ -2,6 +2,7 @@ package com.ixi_U.chatbot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
+import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
 import com.ixi_U.common.exception.GeneralException;
 import jakarta.validation.Valid;
@@ -50,11 +51,11 @@ public class ChatBotService {
                 .delayElements(Duration.ofMillis(50));
     }
 
-    public Flux<String> recommendPlan(String userId, String request) {
+    public Flux<String> recommendPlan(String userId, RecommendPlanRequest request) {
 
         try {
             String llmResult = filterExpressionClient.prompt()
-                    .user(request)
+                    .user(request.userQuery())
                     .call()
                     .content();
 
@@ -63,7 +64,7 @@ public class ChatBotService {
             if (llmResult == null) throw new GeneralException(ChatBotException.CHAT_BOT_FILTER_EXPRESSION_ERROR);
 
             return recommendClient.prompt()
-                    .user(request)
+                    .user(request.userQuery())
                     .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
                     .toolContext(Map.of("userId", userId, "filterExpression", llmResult))
                     .stream()
