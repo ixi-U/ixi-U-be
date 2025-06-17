@@ -8,7 +8,6 @@ import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +22,7 @@ public class UserService {
         this.subscribedRepository = subscribedRepository;
     }
 
-    public List<SubscribedResponse> getMySubscribedPlans() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = principal instanceof String
-                ? (String) principal
-                : String.valueOf(principal);
-
+    public List<SubscribedResponse> getMySubscribedPlans(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
 
