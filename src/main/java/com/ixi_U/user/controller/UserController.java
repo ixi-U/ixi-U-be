@@ -20,8 +20,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<?> getMyPlan() {
-        List<SubscribedResponse> subscribedList = userService.getMySubscribedPlans();
+    public ResponseEntity<?> getMyPlan(@AuthenticationPrincipal String userId) {
+        List<SubscribedResponse> subscribedList = userService.getMySubscribedPlans(userId);
 
         if (subscribedList.isEmpty()) {
             return ResponseEntity.ok("아직 등록된 요금제가 없습니다.");

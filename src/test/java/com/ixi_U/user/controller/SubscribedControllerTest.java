@@ -8,6 +8,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +34,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -77,15 +80,27 @@ class SubscribedControllerTest {
             String userId = "test-user";
             CreateSubscribedRequest request = new CreateSubscribedRequest("plan-1");
 
+            // SecurityContext에 String principal로 직접 주입
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(post("/subscribed/{userId}", userId)
+            ResultActions result = mockMvc.perform(post("/subscribed")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andDo(print())
                     .andDo(document("createSubscribed-success"));
 
             // then
             result.andExpect(status().isOk());
             verify(subscribedService).updateSubscribed(eq(userId), eq(request));
+
+            System.out.println(
+                    ">>> 응답 바디: " + result.andReturn().getResponse().getContentAsString());
         }
 
         @Test
@@ -95,15 +110,27 @@ class SubscribedControllerTest {
             String userId = "test-user";
             CreateSubscribedRequest invalidRequest = new CreateSubscribedRequest("");
 
+            // SecurityContext에 String principal로 직접 주입
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(post("/subscribed/{userId}", userId)
+            ResultActions result = mockMvc.perform(post("/subscribed")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(invalidRequest)))
+                    .andDo(print())
                     .andDo(document("createSubscribed-error-plan-id-blank"));
 
             // then
             result.andExpect(status().isBadRequest());
             verifyNoInteractions(subscribedService);
+
+            System.out.println(
+                    ">>> 응답 바디: " + result.andReturn().getResponse().getContentAsString());
         }
 
         @Test
@@ -116,16 +143,28 @@ class SubscribedControllerTest {
             doThrow(new GeneralException(UserException.USER_NOT_FOUND))
                     .when(subscribedService).updateSubscribed(eq(userId), eq(request));
 
+            // SecurityContext에 String principal로 직접 주입
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(post("/subscribed/{userId}", userId)
+            ResultActions result = mockMvc.perform(post("/subscribed")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andDo(print())
                     .andDo(document("createSubscribed-error-user-not-found"));
 
             // then
             result.andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message")
                             .value(UserException.USER_NOT_FOUND.getMessage()));
+
+            System.out.println(
+                    ">>> 응답 바디: " + result.andReturn().getResponse().getContentAsString());
         }
 
         @Test
@@ -138,16 +177,28 @@ class SubscribedControllerTest {
             doThrow(new GeneralException(PlanException.PLAN_NOT_FOUND))
                     .when(subscribedService).updateSubscribed(eq(userId), eq(request));
 
+            // SecurityContext에 String principal로 직접 주입
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(post("/subscribed/{userId}", userId)
+            ResultActions result = mockMvc.perform(post("/subscribed")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andDo(print())
                     .andDo(document("createSubscribed-error-plan-not-found"));
 
             // then
             result.andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message")
                             .value(PlanException.PLAN_NOT_FOUND.getMessage()));
+
+            System.out.println(
+                    ">>> 응답 바디: " + result.andReturn().getResponse().getContentAsString());
         }
 
         @Test
@@ -160,16 +211,28 @@ class SubscribedControllerTest {
             doThrow(new GeneralException(PlanException.ALREADY_SUBSCRIBED_PLAN))
                     .when(subscribedService).updateSubscribed(eq(userId), eq(request));
 
+            // SecurityContext에 String principal로 직접 주입
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(post("/subscribed/{userId}", userId)
+            ResultActions result = mockMvc.perform(post("/subscribed")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andDo(print())
                     .andDo(document("createSubscribed-error-already-subscribed"));
 
             // then
             result.andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message")
                             .value(PlanException.ALREADY_SUBSCRIBED_PLAN.getMessage()));
+
+            System.out.println(
+                    ">>> 응답 바디: " + result.andReturn().getResponse().getContentAsString());
         }
     }
 
@@ -194,9 +257,20 @@ class SubscribedControllerTest {
             org.mockito.Mockito.when(subscribedService.findSubscribedHistoryByUserId(userId))
                     .thenReturn(responses);
 
+            // SecurityContext에 String userId를 principal로 직접 넣음
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+
+            // 로그: 테스트 시작 시 principal 출력
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(get("/subscribed/{userId}/history", userId)
+            ResultActions result = mockMvc.perform(get("/subscribed/history")
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andDo(document("getSubscribedHistory-success"));
 
             // then
@@ -214,15 +288,29 @@ class SubscribedControllerTest {
             doThrow(new GeneralException(UserException.USER_NOT_FOUND))
                     .when(subscribedService).findSubscribedHistoryByUserId(userId);
 
+            // SecurityContext에 String principal로 직접 주입
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of())
+            );
+            // principal 로그
+            System.out.println(
+                    ">>> 테스트 principal: " + SecurityContextHolder.getContext().getAuthentication()
+                            .getPrincipal());
+
             // when
-            ResultActions result = mockMvc.perform(get("/subscribed/{userId}/history", userId)
+            ResultActions result = mockMvc.perform(get("/subscribed/history")
                             .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
                     .andDo(document("getSubscribedHistory-error-user-not-found"));
 
             // then
             result.andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message")
                             .value(UserException.USER_NOT_FOUND.getMessage()));
+
+            // 응답 바디 로그
+            String responseBody = result.andReturn().getResponse().getContentAsString();
+            System.out.println(">>> 응답 바디: " + responseBody);
         }
     }
 }
