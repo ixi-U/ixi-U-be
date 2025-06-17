@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,8 @@ public class PlanController {
             @RequestParam(defaultValue = "PRIORITY") String planSortOptionStr,
             @RequestParam(required = false) String searchKeyword,
             @RequestParam(required = false) String planId,
-            @RequestParam(required = false) Integer cursorSortValue) {
+            @RequestParam(required = false) Integer cursorSortValue){
+//            @AuthenticationPrincipal(expression = "authorities[0].authority") String role) {
 
         GetPlansRequest.validate(size);
         Pageable pageable = PageRequest.ofSize(size);
@@ -57,5 +59,13 @@ public class PlanController {
         PlanEmbeddedResponse planEmbeddedResponse = planService.savePlan(request);
 
         return ResponseEntity.ok(planEmbeddedResponse);
+    }
+
+    // 요금제 상태 비가시화(비활성화)
+    @PatchMapping("/admin/plans/{planId}/disable")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> disablePlan(@PathVariable String planId) {
+        planService.disablePlan(planId);
+        return ResponseEntity.ok().build();
     }
 }

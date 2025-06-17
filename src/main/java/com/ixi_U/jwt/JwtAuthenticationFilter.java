@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
 // jwt access token 에 대한 인가 확인 필터
 @Slf4j
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        System.out.println("🔍 JwtAuthenticationFilter 진입: " + request.getRequestURI());
+        log.info("🔍 JwtAuthenticationFilter 진입: {}", request.getRequestURI());
 
         // 1. 쿠키에서 토큰 추출
         String token = extractTokenFromCookie(request);

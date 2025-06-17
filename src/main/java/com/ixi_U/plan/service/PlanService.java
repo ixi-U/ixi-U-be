@@ -17,6 +17,7 @@ import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
+import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -156,5 +157,12 @@ public class PlanService {
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
         return PlanDetailResponse.from(plan);
+    }
+
+    public void disablePlan(String planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
+        Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
+        planRepository.save(updatePlan);
     }
 }
