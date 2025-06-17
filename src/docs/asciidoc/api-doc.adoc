@@ -91,4 +91,66 @@ operation::showReview-success[]
 
 === 요금제 리뷰 개수 및 평균 별점 조회
 
-operation::showReviewStats-success[]
+operation::showReviewSummary-success[]
+
+=== 요금제 리뷰 수정 성공
+
+operation::updateReview-success[]
+
+=== 요금제 리뷰 수정 실패 - 리뷰 내용이 없을 경우
+
+operation::updateReview-error-review-content-null[]
+
+=== 요금제 리뷰 수정 실패 - 리뷰 id가 없을 경우
+
+operation::updateReview-error-review-id-null[]
+
+==== 요금제 리뷰 수정 실패 - 리뷰 글자가 200보다 큰 경우
+
+operation::updateReview-error-review-letter-too-long[]
+
+==== 요금제 리뷰 수정 실패 - 리뷰 글자가 20보다 작은 경우
+
+operation::updateReview-error-review-letter-too-short[]
+
+=== 요금제 리뷰 수정 실패 - 자신의 리뷰가 아닌 경우
+
+operation::updateReview-error-when-not-myReview[]
+
+=== 요금제 리뷰 삭제 성공
+
+operation::deleteReview-success[]
+
+== 구독(Subscribe) API
+
+=== 구독 등록(Subscribe)
+
+==== 구독 등록 성공
+
+operation::createSubscribed-success[]
+
+==== 구독 등록 실패 - planId가 비어있음
+
+operation::createSubscribed-error-plan-id-blank[]
+
+==== 구독 등록 실패 - 존재하지 않는 userId
+
+operation::createSubscribed-error-user-not-found[]
+
+==== 구독 등록 실패 - 존재하지 않는 planId
+
+operation::createSubscribed-error-plan-not-found[]
+
+==== 구독 등록 실패 - 이미 구독 중인 요금제
+
+operation::createSubscribed-error-already-subscribed[]
+
+=== 구독 히스토리 조회
+
+==== 구독 히스토리 조회 성공
+
+operation::getSubscribedHistory-success[]
+
+==== 구독 히스토리 조회 실패 - 존재하지 않는 userId
+
+operation::getSubscribedHistory-error-user-not-found[]
