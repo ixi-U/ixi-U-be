@@ -1,8 +1,9 @@
 package com.ixi_U.user.controller;
 
-import com.ixi_U.user.dto.response.PlanResponse;
-import com.ixi_U.user.dto.response.SubscribedResponse;
+import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
+import com.ixi_U.user.dto.response.ShowMyInfoResponse;
 import com.ixi_U.user.service.UserService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,12 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
+
+    @GetMapping("/plan")
+    public ResponseEntity<?> getMyPlan(@AuthenticationPrincipal String userId) {
+        ShowCurrentSubscribedResponse subscribed = userService.findCurrentSubscribedPlan(userId);
+
+        return ResponseEntity.ok(Objects.requireNonNullElse(subscribed, "아직 등록된 요금제가 없습니다."));
     }
 
     @DeleteMapping
@@ -54,3 +61,11 @@ public class UserController {
     }
 }
 
+    @GetMapping("/info")
+    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
+        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+}

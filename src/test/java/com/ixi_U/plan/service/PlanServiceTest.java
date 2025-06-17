@@ -52,11 +52,11 @@ class PlanServiceTest {
 
             // given
             PlanSummaryDto dto1 = new PlanSummaryDto("1", "요금제1", 10000, 2000,
-                    300, 200, 29000, 5, List.of());
+                    300, 200, 29000, 5, List.of(), List.of());
             PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000,
-                    200, 100, 19000, 3, List.of());
+                    200, 100, 19000, 3, List.of(), List.of());
             PlanSummaryDto dto3 = new PlanSummaryDto("3", "요금제3", 20000, 3000,
-                    500, 300, 49000, 1, List.of());
+                    500, 300, 49000, 1, List.of(), List.of());
 
             PageRequest pageable = PageRequest.ofSize(3);
             Slice<PlanSummaryDto> slice =

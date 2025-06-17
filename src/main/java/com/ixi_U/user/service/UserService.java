@@ -2,12 +2,17 @@ package com.ixi_U.user.service;
 
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
-import com.ixi_U.user.dto.response.SubscribedResponse;
+import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
+import com.ixi_U.user.dto.response.ShowMyInfoResponse;
+import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.auth.dto.CustomOAuth2User;
 import org.springframework.security.core.context.SecurityContextHolder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,25 +42,44 @@ public class UserService {
             throw new RuntimeException("알 수 없는 사용자 인증 정보입니다.");
         }
 
+    public ShowCurrentSubscribedResponse findCurrentSubscribedPlan(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
 
-        return user.getSubscribedHistory().stream()
-                .map(subscribed -> SubscribedResponse.builder()
-                        .planName(subscribed.getPlan().getName())
-                        .planState(String.valueOf(subscribed.getPlan().getPlanState()))
-                        .build())
-                .collect(Collectors.toList());
-    }
+        Subscribed latestSubscribed = user.getSubscribedHistory().stream()
+                .max(Comparator.comparing(Subscribed::getCreatedAt))
+                .orElse(null);
 
-    @Transactional
-    public User changeName(String userId, String newName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+        if (latestSubscribed == null) {
+            return null;
+        }
+
+        var plan = latestSubscribed.getPlan();
 
         User updated = user.withName(newName);
+      
+        return ShowCurrentSubscribedResponse.of(
+                plan.getName(),
+                plan.getMobileDataLimitMb(),
+                plan.getMonthlyPrice(),
+                plan.getPricePerKb(),
+                plan.getBundledBenefits(),
+                plan.getSingleBenefits()
+        );
+    }
 
-        return userRepository.save(updated);
+    @Transactional(readOnly = true)
+    public ShowMyInfoResponse findMyInfoByUserId(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+        return ShowMyInfoResponse.of(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getUserRole(),
+                LocalDate.parse(
+                        user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+        );
     }
 
     // UserService.java

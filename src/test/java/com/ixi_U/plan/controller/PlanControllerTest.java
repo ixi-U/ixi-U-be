@@ -1,17 +1,38 @@
 package com.ixi_U.plan.controller;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.*;
+import com.ixi_U.plan.dto.response.BundledBenefitResponse;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.SingleBenefitResponse;
+import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
 import com.ixi_U.util.constants.TestConstants;
 import jakarta.servlet.Filter;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,24 +54,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(PlanController.class)
@@ -122,15 +125,19 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.description").value(description))
                     .andExpect(jsonPath("$.metaData.id").value(TestConstants.createPlanId()))
                     .andExpect(jsonPath("$.metaData.name").value(request.name()))
-                    .andExpect(jsonPath("$.metaData.mobileDataLimitMb").value(request.mobileDataLimitMb()))
+                    .andExpect(jsonPath("$.metaData.mobileDataLimitMb").value(
+                            request.mobileDataLimitMb()))
                     .andExpect(jsonPath("$.metaData.monthlyPrice").value(request.monthlyPrice()))
                     .andExpect(jsonPath("$.metaData.bundledBenefitNames").isArray())
-                    .andExpect(jsonPath("$.metaData.bundledBenefitNames", hasSize(bundledBenefitNames.size())))
+                    .andExpect(jsonPath("$.metaData.bundledBenefitNames",
+                            hasSize(bundledBenefitNames.size())))
                     .andExpect(jsonPath("$.metaData.singleBenefitNames").isArray())
-                    .andExpect(jsonPath("$.metaData.singleBenefitNames", hasSize(singleBenefitNames.size())))
+                    .andExpect(jsonPath("$.metaData.singleBenefitNames",
+                            hasSize(singleBenefitNames.size())))
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes").isArray())
-                    .andExpect(jsonPath("$.metaData.singleBenefitTypes", hasSize(singleBenefitTypes.size())))
-                    .andDo(document("plans-save"));
+                    .andExpect(jsonPath("$.metaData.singleBenefitTypes",
+                            hasSize(singleBenefitTypes.size())))
+                    .andDo(document("save-plans-success"));
         }
     }
 
@@ -143,9 +150,9 @@ class PlanControllerTest {
 
             // given
             PlanSummaryDto dto1 = new PlanSummaryDto("1", "요금제1", 10000, 2000, 300, 200, 29000, 5,
-                    List.of());
+                    List.of(), List.of());
             PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000, 200, 100, 19000, 3,
-                    List.of());
+                    List.of(), List.of());
             SortedPlanResponse response =
                     new SortedPlanResponse(new SliceImpl<>(List.of(dto1, dto2)), "2", 3);
 
@@ -165,7 +172,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.plans.content[1].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
-                    .andDo(document("plans-get-sort"))
+                    .andDo(document("get-plans-sort-success"))
                     .andDo(print());
         }
 
@@ -175,7 +182,7 @@ class PlanControllerTest {
 
             // given
             PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000, 200, 100, 19000, 3,
-                    List.of());
+                    List.of(), List.of());
             SortedPlanResponse response =
                     new SortedPlanResponse(new SliceImpl<>(List.of(dto2)), "2", 3);
 
@@ -194,7 +201,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.plans.content[0].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
-                    .andDo(document("plans-get-search"))
+                    .andDo(document("get-plans-search-success"))
                     .andDo(print());
         }
 
@@ -214,7 +221,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORIT")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-sort"));
+                    .andDo(document("get-plans-error-invalid-sort"));
         }
 
         @Test
@@ -233,7 +240,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-plan-type"));
+                    .andDo(document("get-plans-error-invalid-plan-type"));
         }
 
         @ParameterizedTest
@@ -248,7 +255,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-size-parameter"));
+                    .andDo(document("get-plans-error-invalid-size-parameter"));
         }
     }
 
@@ -316,7 +323,7 @@ class PlanControllerTest {
                             .value(singleBenefit.description()))
                     .andExpect(jsonPath("$.singleBenefits[0].benefitType")
                             .value(singleBenefit.benefitType()))
-                    .andDo(document("plans-get-details"));
+                    .andDo(document("get-plans-details-success"));
         }
     }
 }
