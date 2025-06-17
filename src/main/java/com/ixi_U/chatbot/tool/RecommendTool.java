@@ -1,110 +1,68 @@
 package com.ixi_U.chatbot.tool;
 
-import com.ixi_U.chatbot.extractor.FilterConditions;
-import com.ixi_U.chatbot.extractor.MetadataExtractorImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RecommendTool {
 
-    private final Neo4jChatMemoryRepository chatMemoryRepository;
-    private final Neo4jVectorStore neo4jVectorStore;
-    private final MetadataExtractorImpl metadataExtractorImpl;
+    @Qualifier("planVectorStore")
+    private final VectorStore planVectorStore;
 
-    @Tool(description = "요금제에 대한 추천 요청이 아닌 경우 '요금제를 물어봐주세요@@!!@@' 라고 응답하기")
-    String defaultResponse() {
-
-        log.info("defaultResponse Tool 동작");
-
-
-        return "요금제를 물어봐주세요@@!!@@";
-    }
-
-    @Tool(description = "STK, KT 같은 U+ 통신사 이외에 대한 요금제 추천 요청이 들어올 경우 거부하기", returnDirect = true)
-    String denyResponse() {
-
-        log.info("denyResponse Tool 동작");
-
-
-        return "타 통신사 요금제는 추천드릴 수 없습니다!";
-    }
-
-    @Tool(description = "욕설이나 부적절한 요청이 들어올 경우 거부하기", returnDirect = true)
-    String badRequestResponse() {
-
-        log.info("badRequestResponse Tool 동작");
-
-
-        return "타 통신사 요금제는 추천드릴 수 없습니다!";
-    }
-
-    @Tool(description = "요금제에 대한 추천 요청이 들어올 경우 유사도 검색을 통해 요금제 추천하기")
+    @Tool(description = """
+            사용자가 특정 조건(가격, 데이터량, 혜택 등)에 맞는 요금제를 찾거나 추천받고 싶을 때 사용한다.
+            예: '3만원대 요금제 추천해줘', '무제한 데이터 요금제 찾아줘', '넷플릭스 혜택 있는 요금제는?
+            '학생용 저렴한 요금제 추천' 등의 조건부 검색이나 추천 요청에서만 동작한다.
+            """)
     List<Document> recommendPlan(
-            @ToolParam(description = "사용자의 자연어 요금제 추천 요청 쿼리") String userRequest,
-            ToolContext toolContext) {
+            @ToolParam(description = "사용자의 특정 조건이 포함된 요금제 추천/검색 쿼리") String userQuery,
+            final ToolContext toolContext) {
 
         log.info("recommendPlan Tool 동작");
-        log.info("userRequest = {}", userRequest);
-        log.info("userId = {}", toolContext.getContext().get("userId"));
 
-        List<Message> byConversationId = chatMemoryRepository.findByConversationId((String) toolContext.getContext().get("userId"));
+        String filterExpression = (String) toolContext.getContext().get("filterExpression");
+        String userId = (String) toolContext.getContext().get("userId");
 
+        log.info("userRequest = {}", userQuery);
+        log.info("filterExpression = {}", filterExpression);
+        log.info("userId = {}", userId);
 
-        return similaritySearchPlan(userRequest);
-    }
-
-    @Tool(description = "사용자 요청에서 혜택 관련된 정보가 있으면 정확히 어떤 혜택이 있는지 유사도 검색 기능 제공")
-    void test(){
-        log.info("동작 확인");
+        return similaritySearchPlan(userQuery, filterExpression);
     }
 
     /**
      * 벡터 유사도 검색
      */
-    private List<Document> similaritySearchPlan(String request){
+    private List<Document> similaritySearchPlan(String userQuery, String filterExpression) {
 
-        //--start 키워드 추출을 위한 필터식 생성 로직 (미완)
-//        FilterConditions filterConditions = metadataExtractorImpl.extractFilters(request);
-//        FilterExpressionBuilder b = new FilterExpressionBuilder();
-//        Filter.Expression build = b.eq("test", "BG").build();
+        List<Document> documents = null;
 
-        List<Document> documents = neo4jVectorStore.similaritySearch(
-                SearchRequest.builder()
-                        .query(request)
-                        .similarityThreshold(0.1)
-                        .topK(10)
-                        .build());
+        log.info("유사도 검사 메서드 동작 시작");
 
-        System.out.println("documents.size() = " + documents.size());
-        
-        for (Document document : documents) {
-            System.out.println("document = " + document);
-            System.out.println("document.getScore() = " + document.getScore());
-            System.out.println("document.getText() = " + document.getText());
+        try {
+            documents = planVectorStore.similaritySearch(
+                    SearchRequest.builder()
+                            .query(userQuery)
+                            .similarityThreshold(0.1)
+                            .topK(50)
+                            .filterExpression(filterExpression)
+                            .build());
 
-            Map<String, Object> metadata = document.getMetadata();
+        } catch (Exception e) {
 
-            System.out.println("document.getMetadata() = " + metadata);
-            System.out.println("metadata.keySet() = " + metadata.keySet());
-            System.out.println("metadata.values() = " + metadata.values());
-            System.out.println("===========================================================================");
+            log.error("예외 발생 ", e);
         }
 
         return documents;
