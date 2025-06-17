@@ -44,8 +44,7 @@ class ChatBotControllerTest {
     class WhenAPIHasRequested {
 
         @Test
-        @DisplayName("인증/인가된 사용자에게 웰컴 메세지를 응답한다")
-        @WithMockUser(username = "user", roles = "USER")
+        @DisplayName("사용자에게 웰컴 메세지를 응답한다")
         void getWelcomeMessageTest() {
 
             //given
