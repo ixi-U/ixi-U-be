@@ -3,6 +3,7 @@ package com.ixi_U.plan.entity;
 import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -62,13 +63,15 @@ public class Plan {
 
     private final Integer priority;
 
-    @CreatedDate
+//    @CreatedDate
     @Property("created_at")
-    private LocalDateTime createdAt;
+//    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
-    @LastModifiedDate
+//    @LastModifiedDate
     @Property("updated_at")
-    private LocalDateTime updatedAt;
+//    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @Builder.Default
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
@@ -81,20 +84,20 @@ public class Plan {
     public static Plan of(
 
             final String name,
-            final int mobileDataLimitMb,
-            final int sharedMobileDataLimitMb,
-            final int callLimitMinutes,
-            final int messageLimit,
-            final int monthlyPrice,
+            final Integer mobileDataLimitMb,
+            final Integer sharedMobileDataLimitMb,
+            final Integer callLimitMinutes,
+            final Integer messageLimit,
+            final Integer monthlyPrice,
             final PlanType planType,
             final String usageCautions,
-            final int mobileDataThrottleSpeedKbps,
-            final int minAge,
-            final int maxAge,
-            final boolean isActiveDuty,
-            final int pricePerKb,
+            final Integer mobileDataThrottleSpeedKbps,
+            final Integer minAge,
+            final Integer maxAge,
+            final Boolean isActiveDuty,
+            final Integer pricePerKb,
             final String etcInfo,
-            final int priority,
+            final Integer priority,
             List<BundledBenefit> bundledBenefits,
             List<SingleBenefit> singleBenefits
     ) {

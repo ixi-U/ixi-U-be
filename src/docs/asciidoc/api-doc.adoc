@@ -162,3 +162,10 @@ operation::get-subscribed-history-error-user-not-found[]
 === 웰컴 메시지 조회
 ==== 성공
 operation::get-welcome-message-success[]
+
+=== 요금제 추천 응답
+==== 성공
+operation::recommend-plan-success[]
+
+==== 실패
+operation::recommend-plan-fail[]

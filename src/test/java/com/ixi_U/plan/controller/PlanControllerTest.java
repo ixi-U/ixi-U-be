@@ -138,7 +138,7 @@ class PlanControllerTest {
                     .willReturn(PlanEmbeddedResponse.create(description, metaData));
 
             //when & then
-            mockMvc.perform(post("/plans/save")
+            mockMvc.perform(post("/admin/plans/save")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     )

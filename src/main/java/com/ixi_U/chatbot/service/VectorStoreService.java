@@ -20,10 +20,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class VectorStoreService {
 
-    private static final String SINGLE_BENEFIT_NAMES = "singleBenefitNames";
-    private static final String BUNDLED_BENEFIT_NAMES = "bundledBenefitNames";
-    private static final String SINGLE_BENEFIT_TYPES = "singleBenefitTypes";
-
     private final ChatBotService chatBotService;
     @Qualifier("planVectorStore")
     private final VectorStore planVectorStore;
@@ -115,33 +111,18 @@ public class VectorStoreService {
 
     private void processBundledBenefitList(Map<String, Object> result, List<BundledBenefitDTO> bundledBenefits) {
 
-        // List를 JSON 문자열로 변환하여 저장
         try {
-
-            Set<String> names = new HashSet<>();
-            Set<String> allSingleBenefitNames = new HashSet<>();
-            Set<String> allSingleBenefitTypes = new HashSet<>();
-
 
             for (BundledBenefitDTO bundledBenefit : bundledBenefits) {
 
-                names.add(bundledBenefit.name());
+                result.put(bundledBenefit.name(), true);
 
-                // 각 BundledBenefit 안의 SingleBenefit들의 이름 수집
                 for (SingleBenefitDTO singleBenefit : bundledBenefit.singleBenefits()) {
 
-                    allSingleBenefitNames.add(singleBenefit.name());
-                    allSingleBenefitTypes.add(singleBenefit.benefitType().getType());
+                    result.put(singleBenefit.name(), true);
+                    result.put(singleBenefit.benefitType().getType(), true);
                 }
             }
-
-            // 검색을 위한 단일 문자열 필드
-            result.put(BUNDLED_BENEFIT_NAMES, names);
-            result.put(SINGLE_BENEFIT_NAMES, allSingleBenefitNames);
-
-            HashSet<String> previousValue = (HashSet<String>) result.getOrDefault(SINGLE_BENEFIT_TYPES, new HashSet<>());
-            previousValue.addAll(allSingleBenefitTypes);
-            result.put(SINGLE_BENEFIT_TYPES, previousValue);
 
         } catch (Exception e) {
 
@@ -153,24 +134,11 @@ public class VectorStoreService {
 
         try {
 
-            Set<String> names = new HashSet<>();
-            Set<String> benefitTypes = new HashSet<>();
-
             for (SingleBenefitDTO singleBenefit : singleBenefits) {
-                names.add(singleBenefit.name());
-                benefitTypes.add(singleBenefit.benefitType().getType());
+
+                result.put(singleBenefit.name(), true);
+                result.put(singleBenefit.benefitType().getType(), true);
             }
-
-            // 검색을 위한 단일 문자열
-            HashSet<String> previousSingleBenefit = (HashSet<String>) result.getOrDefault(SINGLE_BENEFIT_NAMES, new HashSet<>());
-            previousSingleBenefit.addAll(names);
-
-            result.put(SINGLE_BENEFIT_NAMES, previousSingleBenefit);
-
-            HashSet<String> previousValue = (HashSet<String>) result.getOrDefault(SINGLE_BENEFIT_TYPES, new HashSet<>());
-            previousValue.addAll(benefitTypes);
-            result.put(SINGLE_BENEFIT_TYPES, previousValue);
-
         } catch (Exception e) {
 
             log.error("SingleBenefit 평탄화 오류 = {}", e.getMessage());
@@ -189,6 +157,6 @@ public class VectorStoreService {
                 type == Long.class ||
                 type == Float.class ||
                 type == String.class ||
-                type.isEnum(); // Enum 타입 추가
+                type.isEnum();
     }
 }

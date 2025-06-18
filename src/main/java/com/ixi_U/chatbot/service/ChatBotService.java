@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
+import com.ixi_U.chatbot.tool.ToolContextKey;
 import com.ixi_U.common.exception.GeneralException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -31,6 +33,12 @@ public class ChatBotService {
             관심있는 혜택 또는 원하는 조건을 말씀해주시면 최적의 요금제를 안내해드리겠습니다!
             예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
             """;
+    private static final String GENERAL_ERROR_MESSAGE = """
+            죄송합니다. 요금제 추천 서비스에 일시적인 문제가 발생했습니다.
+            """;
+    private static final String UNEXPECT_ERROR_MESSAGE = """
+            죄송합니다. 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+            """;
 
     @Qualifier("descriptionClient")
     private final ChatClient descriptionClient;
@@ -46,34 +54,56 @@ public class ChatBotService {
     public Flux<String> getWelcomeMessage() {
 
         return Flux.fromStream(CHATBOT_WELCOME_MESSAGE.chars()
-                        .mapToObj(c -> String.valueOf((char) c)))
+                        .mapToObj(c -> String.valueOf((char) c))
+                )
                 .delayElements(Duration.ofMillis(50));
     }
 
     public Flux<String> recommendPlan(String userId, RecommendPlanRequest request) {
 
-        try {
-            String llmResult = filterExpressionClient.prompt()
-                    .user(request.userQuery())
-                    .call()
-                    .content();
+        return Mono.fromCallable(() -> {
 
-            log.info("llmResult = {}", llmResult);
+                    String llmResult = filterExpressionClient.prompt()
+                            .user(request.userQuery())
+                            .call()
+                            .content();
 
-            if (llmResult == null) throw new GeneralException(ChatBotException.CHAT_BOT_FILTER_EXPRESSION_ERROR);
+                    log.info("llmResult = {}", llmResult);
 
-            return recommendClient.prompt()
-                    .user(request.userQuery())
-                    .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
-                    .toolContext(Map.of("userId", userId, "filterExpression", llmResult))
-                    .stream()
-                    .content();
-        } catch (Exception e) {
+                    if (llmResult == null || llmResult.isBlank()) {
 
-            log.error("서비스 에러 발생 : ", e);
+                        throw new GeneralException(ChatBotException.CHAT_BOT_RECOMMENDING_ERROR);
+                    }
 
-            return null;
-        }
+                    return llmResult;
+                })
+                .flatMapMany(llmResult ->
+
+                        recommendClient.prompt()
+                                .user(request.userQuery())
+                                .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
+                                .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
+                                .stream()
+                                .content()
+                )
+                .onErrorResume(GeneralException.class, e -> {
+
+                    log.error("추천 로직 에러 발생", e);
+
+                    return Flux.fromStream(GENERAL_ERROR_MESSAGE.chars()
+                                    .mapToObj(c -> String.valueOf((char) c))
+                            )
+                            .delayElements(Duration.ofMillis(50));
+                })
+                .onErrorResume(Exception.class, e -> {
+
+                    log.error("추천 로직에서 예상치 못한 에러 발생", e);
+
+                    return Flux.fromStream(UNEXPECT_ERROR_MESSAGE.chars()
+                                    .mapToObj(c -> String.valueOf((char) c))
+                            )
+                            .delayElements(Duration.ofMillis(50));
+                });
     }
 
     public String getPlanDescription(@Valid GeneratePlanDescriptionRequest request) {
