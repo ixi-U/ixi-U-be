@@ -33,12 +33,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
+    public WebSecurityCustomizer webSecurityCustomizer() { // security 를 적용하지 않을 리소스
         return web -> web.ignoring()
                 .requestMatchers("/error", "/favicon.ico");
     }
 
-    // 필터 체인 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -54,8 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(c ->
                         c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         ;
-
-        // JWT 필터 추가 : JWT 인증 필터를 OAuth2 인증 필터 이후에 등록 -> 쿠키로 받은 access token 을 읽고, 검증 후 Security Context에 사용자 정보 설정
+        // JWT 필터
         http
                 .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider),
                         OAuth2LoginAuthenticationFilter.class);
@@ -67,12 +65,19 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
                 );
-        // 인가 필터
+
+        // 기능 확인용 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // TODO 기능 테스트 후 해당 부분만 주석, 이후 주석 해제
+                        .anyRequest().permitAll()
+                );
 
-                        // CORS preflight 요청은 인증 없이 통과
+        return http.build();
+
+        // 인가 필터
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        // CORS preflight 요청은 인증 없이 통과
 //                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 //                        // 해당 요청에 대해서는 권한 확인
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -81,9 +86,8 @@ public class SecurityConfig {
 //                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/**", "/plans/names/**", "/api/user/onboarding/**", "/**").permitAll()
 //                        // 그 외 모든 요청은 인증 인가 필요
 //                        .anyRequest().authenticated()
-                );
-
-        return http.build();
+//                );
+//        return http.build();
     }
 
     @Bean
