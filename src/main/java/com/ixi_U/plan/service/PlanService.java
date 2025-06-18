@@ -18,6 +18,7 @@ import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
+import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -184,6 +185,31 @@ public class PlanService {
         return PlanDetailResponse.from(plan);
     }
 
+    public List<PlanAdminResponse> getPlansForAdmin() {
+        return planRepository.findAllForAdmin().stream()
+                .map(PlanAdminResponse::from)
+                .toList();
+    }
+
+    public void togglePlanState(String planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 요금제를 찾을 수 없습니다."));
+
+        Plan updated = plan.withPlanState(
+                plan.getPlanState() == PlanState.ABLE ? PlanState.DISABLE : PlanState.ABLE
+        );
+
+        planRepository.save(updated);
+    }
+
+    @Transactional
+    public void disablePlan(String planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
+        Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
+        planRepository.save(updatePlan);
+    }
+  
     public List<PlanNameDto> getPlanNameList() {
         return planRepository.findAllPlanNames();
     }
