@@ -1,26 +1,15 @@
-package com.ixi_U.common.forbiddenWord;
+package com.ixi_U.forbiddenWord.filters;
 
-import org.ahocorasick.trie.Trie;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ixi_U.forbiddenWord.ForbiddenWordLoader;
+import com.ixi_U.forbiddenWord.WordPreprocessingPolicy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ForbiddenWordFilter {
+@Component("levenshteinThresholdFilter")
+@RequiredArgsConstructor
+public class LevenshteinThresholdFilter implements ForbiddenWordFilter {
 
     private final ForbiddenWordLoader forbiddenWordLoader;
-    private final Trie trie;
-
-    @Autowired
-    public ForbiddenWordFilter(ForbiddenWordLoader forbiddenWordLoader) {
-        // TrieBuilder를 통해 단어 등록
-
-        this.forbiddenWordLoader = forbiddenWordLoader;
-
-        this.trie = Trie.builder()
-                .addKeywords(forbiddenWordLoader.getForbiddenWords())
-                .build();
-
-    }
 
     private static int levenshtein(String a, String b) {
 
@@ -48,16 +37,17 @@ public class ForbiddenWordFilter {
         return dp[a.length()][b.length()];
     }
 
-    public boolean isForbidden(String input) {
+    @Override
+    public boolean matches(String text) {
 
-        String cleanedInput = input;
+        String cleanedInput = text;
 
         for (WordPreprocessingPolicy policy : WordPreprocessingPolicy.values()) {
             cleanedInput = policy.apply(cleanedInput);
         }
 
         for (String forbidden : forbiddenWordLoader.getForbiddenWords()) {
-            if (input.contains(forbidden) || cleanedInput.contains(forbidden)) {
+            if (text.contains(forbidden) || cleanedInput.contains(forbidden)) {
 
                 return true;
             }
@@ -76,16 +66,4 @@ public class ForbiddenWordFilter {
 
         return (int) Math.floor(length * 0.25);
     }
-
-    public boolean containsForbiddenWords(String input) {
-
-        String cleanedInput = input;
-
-        for (WordPreprocessingPolicy policy : WordPreprocessingPolicy.values()) {
-            cleanedInput = policy.apply(cleanedInput);
-        }
-
-        return trie.containsMatch(cleanedInput);
-    }
-
 }

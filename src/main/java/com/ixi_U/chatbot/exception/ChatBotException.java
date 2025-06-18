@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ChatBotException implements BaseException {
 
-    CHAT_BOT_BAD_RESPONSE(HttpStatus.SERVICE_UNAVAILABLE, "LLM 응답이 유효하지 않습니다.");
+    CHAT_BOT_EMBEDDING_DESCRIPTION_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "임베딩을 위한 Description 생성에서 오류가 발생했습니다.")
+    ,CHAT_BOT_FILTER_EXPRESSION_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "필터 표현식 추출에서 오류가 발생했습니다.")
+    ,CHAT_BOT_RECOMMENDING_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "추천 응답에서 오류가 발생했습니다.")
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;
