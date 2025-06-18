@@ -1,7 +1,6 @@
 package com.ixi_U.chatbot.config;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import com.ixi_U.chatbot.tool.RecommendTool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -13,11 +12,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @RequiredArgsConstructor
 public class ChatBotConfig {
 
-    private static final String PROMPT_PATH = "classpath:/prompts/description.txt";
+    private static final String EMBEDDING_PROMPT = "classpath:/prompts/embedding-prompt.txt";
+    private static final String RECOMMEND_PROMPT = "classpath:/prompts/recommending-prompt.txt";
+    private static final String FILTER_EXPRESSION_PROMPT = "classpath:/prompts/filter-expression-prompt.txt";
+
     private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
     private final ResourceLoader resourceLoader;
 
@@ -26,6 +31,7 @@ public class ChatBotConfig {
             """;
 
     private String loadPrompt(String path) {
+
         try {
             Resource resource = resourceLoader.getResource(path);
             byte[] bytes = resource.getInputStream().readAllBytes();
@@ -35,11 +41,10 @@ public class ChatBotConfig {
         }
     }
 
-
     @Bean
     public ChatClient descriptionClient(ChatClient.Builder chatClientBuilder) {
 
-        String prompt = loadPrompt(PROMPT_PATH);
+        String prompt = loadPrompt(EMBEDDING_PROMPT);
 
         return chatClientBuilder
                 .defaultSystem(prompt)
@@ -47,7 +52,7 @@ public class ChatBotConfig {
     }
 
     @Bean
-    public ChatClient decisionForbiddenWordsClient(ChatClient.Builder chatClientBuilder){
+    public ChatClient decisionForbiddenWordsClient(ChatClient.Builder chatClientBuilder) {
 
         return chatClientBuilder
                 .defaultSystem(decisionForbiddenWordPrompt)
@@ -55,15 +60,32 @@ public class ChatBotConfig {
     }
 
     /**
-     * ChatClient Build
+     * Recommend Build
      */
     @Bean
-    public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
+    public ChatClient recommendClient(ChatClient.Builder chatClientBuilder, RecommendTool recommendTool) {
+
+        String prompt = loadPrompt(RECOMMEND_PROMPT);
 
         return chatClientBuilder
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(chatMemory()).build()
                 )
+                .defaultSystem(prompt)
+                .defaultTools(recommendTool)
+                .build();
+    }
+
+    /**
+     * Filter Expression Build
+     */
+    @Bean
+    public ChatClient filterExpressionClient(ChatClient.Builder chatClientBuilder) {
+
+        String prompt = loadPrompt(FILTER_EXPRESSION_PROMPT);
+
+        return chatClientBuilder
+                .defaultSystem(prompt)
                 .build();
     }
 

@@ -7,7 +7,7 @@ import com.ixi_U.benefit.repository.SingleBenefitRepository;
 import com.ixi_U.chatbot.dto.BundledBenefitDTO;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
-import com.ixi_U.chatbot.service.VectorService;
+import com.ixi_U.chatbot.service.VectorStoreService;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
@@ -26,6 +26,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,20 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final BundledBenefitRepository bundledBenefitRepository;
     private final SingleBenefitRepository singleBenefitRepository;
-    private final VectorService vectorService;
+    private final VectorStoreService vectorStoreService;
+
+    public void embedAllPlan(){
+
+        List<Plan> all = planRepository.findAll();
+
+        List<GeneratePlanDescriptionRequest> requests = new ArrayList<>();
+
+        for (Plan plan : all) {
+            requests.add(planEntityToDto(plan));
+        }
+
+        vectorStoreService.embedAllPlan(requests);
+    }
 
     /**
      * 요금제 저장 & 벡터 저장소에 저장
@@ -66,7 +80,7 @@ public class PlanService {
 
         GeneratePlanDescriptionRequest generatePlanDescriptionRequest = planEntityToDto(save);
 
-        return vectorService.saveEmbeddedPlan(generatePlanDescriptionRequest);
+        return vectorStoreService.saveEmbeddedPlan(generatePlanDescriptionRequest);
     }
 
     private void validateSamePlanName(final SavePlanRequest request) {
@@ -89,7 +103,6 @@ public class PlanService {
     }
 
     private List<BundledBenefitDTO> bundledBenefitEntityToDto(List<BundledBenefit> bundledBenefits) {
-
         return bundledBenefits.stream()
                 .map(entity ->
                         BundledBenefitDTO.create(
@@ -102,7 +115,6 @@ public class PlanService {
     }
 
     private List<SingleBenefitDTO> singleBenefitEntityToDto(List<SingleBenefit> singleBenefits) {
-
         return singleBenefits.stream()
                 .map(entity ->
                         SingleBenefitDTO.create(

@@ -59,10 +59,18 @@ public class PlanController {
 
         return ResponseEntity.ok(planEmbeddedResponse);
     }
-
+    
     // 요금제 목록 조회
     @GetMapping("/summaries")
     public ResponseEntity<List<PlanNameDto>> getPlanNames() {
         return ResponseEntity.ok(planService.getPlanNameList());
+    }
+        
+    @GetMapping("/embed")
+    public ResponseEntity<Void> embedPlan() {
+
+        planService.embedAllPlan();
+
+        return ResponseEntity.status(200).build();
     }
 }
