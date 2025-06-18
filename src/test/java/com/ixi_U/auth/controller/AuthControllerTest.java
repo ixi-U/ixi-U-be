@@ -3,7 +3,7 @@ package com.ixi_U.auth.controller;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtAuthenticationFilter;
-import com.ixi_U.jwt.JwtTokenProvider
+import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
