@@ -1,6 +1,5 @@
 package com.ixi_U.auth.dto;
 
-
 import com.ixi_U.user.entity.UserRole;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +18,7 @@ public class CustomOAuth2User implements OAuth2User {
     private final String username;
     private final String userId;
     private final UserRole userRole;
+    private final boolean isNewUser; // 신규/기존 회원 확인
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -32,15 +32,11 @@ public class CustomOAuth2User implements OAuth2User {
     }
 
     @Override
-    public String getName() {
-        return username;
-    }
+    public String getName() { return username; }
 
-    public String getUserId() {
-        return userId;
-    }
+    public String getUserId() { return userId; }
 
-    public UserRole getUserRole() {
-        return userRole;
-    }
+    public UserRole getUserRole() { return userRole; }
+
+    public boolean isNewUser() { return isNewUser;}
 }
