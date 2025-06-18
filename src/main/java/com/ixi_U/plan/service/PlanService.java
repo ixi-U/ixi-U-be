@@ -13,6 +13,7 @@ import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
+import com.ixi_U.plan.dto.response.PlanAdminResponse;
 import com.ixi_U.plan.dto.response.PlanDetailResponse;
 import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
