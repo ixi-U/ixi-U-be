@@ -1,12 +1,12 @@
 package com.ixi_U.plan.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.PlanAdminResponse;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.service.PlanService;
+import com.ixi_U.user.dto.request.OnboardingRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -83,7 +83,14 @@ public class PlanController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/embed")
+    
+    // 요금제 목록 조회
+    @GetMapping("/plans/summaries")
+    public ResponseEntity<List<PlanNameDto>> getPlanNames() {
+        return ResponseEntity.ok(planService.getPlanNameList());
+    }
+        
+    @GetMapping("/plans/embed")
     public ResponseEntity<Void> embedPlan() {
 
         planService.embedAllPlan();

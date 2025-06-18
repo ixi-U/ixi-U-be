@@ -66,7 +66,7 @@ public class SecurityConfig {
                         .successHandler(oAuth2SuccessHandler())
                 );
 
-        // 기능 확인용 인가 필터
+        // TODO 기능 확인용 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
@@ -96,7 +96,6 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-//                        .allowedOrigins("http://localhost:3000")
                         .allowedOrigins("http://localhost:3000", "https://ixi-u.site")
                         .allowedMethods("*")
                         .allowCredentials(true);

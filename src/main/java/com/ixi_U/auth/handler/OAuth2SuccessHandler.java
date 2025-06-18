@@ -13,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+/**
+ *  로그인 성공 후 사용자 정보를 가져와서 토큰 생성 + 리다이랙트 경로 설정
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
@@ -21,12 +24,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication) throws IOException, ServletException {
 
         CustomOAuth2User CustomOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
         String userId = CustomOAuth2User.getUserId();
         UserRole userRole = CustomOAuth2User.getUserRole();
+        Boolean isNewUser = CustomOAuth2User.isNewUser();
 
         log.info("userId = {}", userId);
         log.info("userRole = {}", userRole);
@@ -52,6 +56,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
 
-        response.sendRedirect("http://localhost:3000/login/status");
+        String redirectUrl = CustomOAuth2User.isNewUser()
+                ? "http://localhost:3000/onboarding"
+                : "http://localhost:3000/plans";
+
+        response.sendRedirect(redirectUrl);
     }
 }

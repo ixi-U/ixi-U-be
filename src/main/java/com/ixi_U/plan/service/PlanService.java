@@ -9,13 +9,11 @@ import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
 import com.ixi_U.chatbot.service.VectorStoreService;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.PlanAdminResponse;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanState;
@@ -31,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -195,5 +194,9 @@ public class PlanService {
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
         Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
         planRepository.save(updatePlan);
+    }
+  
+    public List<PlanNameDto> getPlanNameList() {
+        return planRepository.findAllPlanNames();
     }
 }
