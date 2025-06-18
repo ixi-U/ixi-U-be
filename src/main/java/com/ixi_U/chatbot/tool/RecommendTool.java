@@ -39,6 +39,11 @@ public class RecommendTool {
         log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
         log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
+        if (filterExpression.equals("ALL_DATA")){
+
+//            return similaritySearchPlan(userQuery);
+        }
+
         return similaritySearchPlan(userQuery, filterExpression);
     }
 
@@ -62,6 +67,7 @@ public class RecommendTool {
 
             log.info("조회된 건 수 = {}", documents.size());
             log.info("조회 디테일 = {}", documents);
+            log.info("=======================================");
 
         } catch (Exception e) {
 

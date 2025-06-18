@@ -4,7 +4,6 @@ import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.util.List;
@@ -17,7 +16,6 @@ public record GeneratePlanDescriptionRequest(
         @NotBlank
         String name,
 
-        @NotNull
         PlanState state,
 
         Integer mobileDataLimitMb,
