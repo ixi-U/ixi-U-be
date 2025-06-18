@@ -39,7 +39,36 @@ public class RecommendTool {
         log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
         log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
+        if (filterExpression.equals("ALL_DATA")){
+
+            return similaritySearchPlanWithoutFilterExpression(userQuery);
+        }
+
         return similaritySearchPlan(userQuery, filterExpression);
+    }
+
+    private List<Document> similaritySearchPlanWithoutFilterExpression(String userQuery){
+
+        List<Document> documents = null;
+
+        log.info("필터 표현식 사용하지 않는 유사도 검사 메서드 동작 시작");
+
+        try {
+            documents = planVectorStore.similaritySearch(
+                    SearchRequest.builder()
+                            .query(userQuery)
+                            .similarityThreshold(0.6)
+                            .topK(5)
+                            .build());
+
+            log.info("조회된 건 수 = {}", documents.size());
+
+        } catch (Exception e) {
+
+            log.error("예외 발생 ", e);
+        }
+
+        return documents;
     }
 
     /**
@@ -61,7 +90,8 @@ public class RecommendTool {
                             .build());
 
             log.info("조회된 건 수 = {}", documents.size());
-            log.info("조회 디테일 = {}", documents);
+//            log.info("조회 디테일 = {}", documents);
+            log.info("=======================================");
 
         } catch (Exception e) {
 
