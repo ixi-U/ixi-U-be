@@ -25,7 +25,6 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
-
 public class ChatBotService {
 
     private static final String CHATBOT_WELCOME_MESSAGE = """
@@ -48,7 +47,7 @@ public class ChatBotService {
     public Flux<String> getWelcomeMessage() {
 
         return Flux.fromStream(CHATBOT_WELCOME_MESSAGE.chars()
-                        .mapToObj(c -> String.valueOf((char) c)))
+                .mapToObj(c -> String.valueOf((char) c)))
                 .delayElements(Duration.ofMillis(50));
     }
 

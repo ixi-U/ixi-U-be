@@ -25,6 +25,7 @@ public class VectorStoreConfig {
 
     @Bean
     public VectorStore planVectorStore(Driver driver, EmbeddingModel embeddingModel) {
+
         return Neo4jVectorStore.builder(driver, embeddingModel)
                 .databaseName("neo4j")
                 .indexName("embedded-plan-index")
