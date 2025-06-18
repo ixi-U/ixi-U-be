@@ -36,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class AuthControllerTest {
 
+    private static final String LOGOUT_URL = "/api/auth/logout";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -65,7 +67,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("✅ 유효한 access_token이 있을 때 로그아웃 성공")
+    @DisplayName("유효한 access_token이 있을 때 로그아웃 성공")
     void logoutSuccessWithValidToken() throws Exception {
         // given
         String fakeAccessToken = "valid-token";
@@ -79,7 +81,7 @@ class AuthControllerTest {
         when(jwtTokenProvider.getUserIdFromToken(fakeAccessToken)).thenReturn(userId);
 
         // when & then
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post(LOGOUT_URL)
                         .cookie(accessCookie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -89,9 +91,9 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("❌ access_token이 없을 때 로그아웃 실패")
+    @DisplayName("access_token이 없을 때 로그아웃 실패")
     void logoutFailWhenNoAccessToken() throws Exception {
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post(LOGOUT_URL)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("유효하지 않은 토큰입니다."));
@@ -100,7 +102,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("❌ 유효하지 않은 access_token일 때 로그아웃 실패")
+    @DisplayName("유효하지 않은 access_token일 때 로그아웃 실패")
     void logoutFailWithInvalidToken() throws Exception {
         String invalidToken = "invalid-token";
         MockCookie cookie = new MockCookie("access_token", invalidToken);
@@ -109,7 +111,7 @@ class AuthControllerTest {
 
         when(jwtTokenProvider.validateToken(invalidToken)).thenReturn(false);
 
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post(LOGOUT_URL)
                         .cookie(cookie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
