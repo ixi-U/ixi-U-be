@@ -5,6 +5,7 @@ import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.service.ChatBotService;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.util.constants.TestConstants;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +19,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -77,8 +81,16 @@ class ChatBotControllerTest {
         @Nested
         class WhenRecommendAPIRequested {
 
+            @BeforeEach
+            public void initSecurity() {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken("testUser", null,
+                                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
             @Test
-            @WithMockUser(username = "user", roles = "USER")
+         //   @WithMockUser(username = "user", roles = "USER")
             @DisplayName("사용자에게 요금제를 추천해준다")
             public void recommendPlanSuccessTest() {
 
