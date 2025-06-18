@@ -61,6 +61,7 @@ class AuthControllerTest {
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
 
