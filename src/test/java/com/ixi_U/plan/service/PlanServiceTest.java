@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
@@ -46,21 +47,18 @@ class PlanServiceTest {
                 "5G/LTE, PRIORITY",
                 "ONLINE, PRICE_ASC",
                 "TABLET/SMARTWATCH, PRICE_DESC",
-                "DUAL_NUMBER, DATA_DESC"})
+                "DUAL_NUMBER, DATA_DESC"
+        })
         @DisplayName("정렬 조건으로 요금제를 조회할 수 있다")
         void searchBySort(String planTypeStr, String planSortOptionStr) {
-
             // given
-            PlanSummaryDto dto1 = new PlanSummaryDto("1", "요금제1", 10000, 2000,
-                    300, 200, 29000, 5, List.of(), List.of());
-            PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000,
-                    200, 100, 19000, 3, List.of(), List.of());
-            PlanSummaryDto dto3 = new PlanSummaryDto("3", "요금제3", 20000, 3000,
-                    500, 300, 49000, 1, List.of(), List.of());
-
             PageRequest pageable = PageRequest.ofSize(3);
-            Slice<PlanSummaryDto> slice =
-                    new SliceImpl<>(List.of(dto1, dto2, dto3), pageable, true);
+
+            PlanSummaryDto dto1 = new PlanSummaryDto("plan-A", "A 요금제", 5000, 1000, 200, 300, 29000, 1, List.of(), List.of());
+            PlanSummaryDto dto2 = new PlanSummaryDto("plan-B", "B 요금제", 3000, 500, 100, 200, 19000, 2, List.of(), List.of());
+            PlanSummaryDto dto3 = new PlanSummaryDto("plan-C", "C 요금제", 1000, 300, 50, 100, 9900, 3, List.of(), List.of());
+
+            Slice<PlanSummaryDto> slice = new SliceImpl<>(List.of(dto1, dto2, dto3), pageable, true);
 
             given(planRepository.findPlans(pageable, PlanType.from(planTypeStr),
                     PlanSortOption.from(planSortOptionStr), null, null, null))
@@ -68,7 +66,8 @@ class PlanServiceTest {
 
             // when
             SortedPlanResponse result = planService.findPlans(
-                    pageable, GetPlansRequest.of(planTypeStr, planSortOptionStr, null, null, null));
+                    pageable, GetPlansRequest.of(planTypeStr, planSortOptionStr, null, null, null)
+            );
 
             // then
             assertThat(result.plans().getContent()).containsExactly(dto1, dto2, dto3);

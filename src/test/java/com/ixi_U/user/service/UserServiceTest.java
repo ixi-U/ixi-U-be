@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -58,7 +60,8 @@ class UserServiceTest {
         CustomOAuth2User customUser = new CustomOAuth2User(
                 dummyUser.getName(),
                 dummyUser.getId(),
-                dummyUser.getUserRole()
+                dummyUser.getUserRole(),
+                false
         );
 
         UsernamePasswordAuthenticationToken auth =

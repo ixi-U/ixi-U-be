@@ -14,42 +14,52 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
+// jwt access token 에 대한 인가 확인 필터
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    // 필터 동작 안하도록
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+//
+//        return true;
+//    }
 
-        return true;
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // 예외 URI 정의 (예: 로그인 관련 URI 등은 필터 패스)
+        String uri = request.getRequestURI();
+        return uri.startsWith("/oauth2") || uri.startsWith("/login") || uri.equals("/favicon.ico");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         // 1. 쿠키에서 토큰 추출
         String token = extractTokenFromCookie(request);
+//        String token = jwtTokenProvider.resolveToken(request); // 쿠키에서 access_token 추출
 
+        // 2. 쿠키 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 2. 토큰에서 사용자 정보 파싱
+
+            // 3. 토큰에서 사용자 정보 파싱
             String userId = jwtTokenProvider.getUserIdFromToken(token).toString(); // subject는 문자열
             String role = jwtTokenProvider.getRoleFromToken(token);
 
-            // 3. 인증 객체 생성
+            // 4. 인증 객체 생성
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userId, null, List.of(new SimpleGrantedAuthority(role)));
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // 4. SecurityContext에 저장
+            // 5. SecurityContext에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            filterChain.doFilter(request, response);
-
         }
-        throw new IllegalArgumentException("인증되지 않은 사용자 입니다");
+        filterChain.doFilter(request, response);
     }
 
     private String extractTokenFromCookie(HttpServletRequest request) {
