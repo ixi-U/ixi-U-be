@@ -66,7 +66,7 @@ public class SecurityConfig {
                         .successHandler(oAuth2SuccessHandler())
                 );
 
-        // 기능 확인용 인가 필터
+        // TODO 기능 확인용 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
