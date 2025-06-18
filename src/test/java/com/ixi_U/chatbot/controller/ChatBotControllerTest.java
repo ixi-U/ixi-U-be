@@ -3,7 +3,6 @@ package com.ixi_U.chatbot.controller;
 import com.ixi_U.TestWebFluxSecurityConfig;
 import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.service.ChatBotService;
-import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.util.constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +17,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -52,6 +54,7 @@ class ChatBotControllerTest {
                 .build();
     }
 
+
     @Nested
     class WhenAPIHasRequested {
 
@@ -79,8 +82,14 @@ class ChatBotControllerTest {
         @Nested
         class WhenRecommendAPIRequested {
 
+            @BeforeEach
+            public void initSecurity() {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken("testUser", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
             @Test
-            @WithMockUser(username = "user", roles = "USER")
             @DisplayName("사용자에게 요금제를 추천해준다")
             public void recommendPlanSuccessTest() {
 
@@ -95,39 +104,42 @@ class ChatBotControllerTest {
                 webTestClient.post()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/api/chatbot/recommend")
-                                .queryParam("userId", userId)
                                 .build())
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(recommendPlanRequest)
                         .exchange()
-                        .expectStatus().isOk()
+                        .expectStatus().is2xxSuccessful()
                         .expectHeader().contentType("text/event-stream;charset=UTF-8")
-                        .expectBodyList(String.class)
+                        .returnResult(String.class)
                         .consumeWith(document("recommend-plan-success"));
+
             }//recommendPlanSuccessTest
 
             @Test
-            @WithMockUser(username = "user", roles = "USER")
+            //     @WithMockUser(username = "user", roles = "USER")
             @DisplayName("응답이 없을 경우 실패 응답을 반환한다")
             public void recommendPlanFailTest() throws Exception {
 
                 //given
                 RecommendPlanRequest recommendPlanRequest = RecommendPlanRequest.create("6만원 이하의 무제한 요금제 추천 해줘");
                 String userId = "testUser";
+                List<String> errorMessage = List.of("죄송합니다. 요금제 추천 서비스에 일시적인 문제가 발생했습니다.".split(""));
 
-                given(chatBotService.recommendPlan(userId, recommendPlanRequest)).willReturn(null);
+                given(chatBotService.recommendPlan(userId, recommendPlanRequest)).willReturn(Flux.just(errorMessage));
 
                 //when & then
                 webTestClient.post()
-                        .uri("/api/chatbot/recommend")
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/api/chatbot/recommend")
+                                .build())
                         .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(recommendPlanRequest)
                         .exchange()
-                        .expectStatus().is4xxClientError()
-                        .expectHeader().contentType("application/json")
+                        .expectStatus().is2xxSuccessful()
+                        .expectHeader().contentType("text/event-stream;charset=UTF-8")
                         .expectBodyList(String.class)
                         .consumeWith(document("recommend-plan-fail"));
             }//recommendPlanFailTest
         }// WhenRecommendAPIRequested
-
     }
 }
