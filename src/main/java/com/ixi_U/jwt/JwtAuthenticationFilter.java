@@ -43,28 +43,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractTokenFromCookie(request);
 //        String token = jwtTokenProvider.resolveToken(request); // 쿠키에서 access_token 추출
 
-        // 2. 쿠키 유효성 검사 하고
+        // 2. 쿠키 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
+
             // 3. 토큰에서 사용자 정보 파싱
             String userId = jwtTokenProvider.getUserIdFromToken(token).toString(); // subject는 문자열
             String role = jwtTokenProvider.getRoleFromToken(token);
 
-            // 3. 인증 객체 생성
+            // 4. 인증 객체 생성
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userId, null, List.of(new SimpleGrantedAuthority(role)));
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // 4. SecurityContext에 저장
+            // 5. SecurityContext에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-//            Authentication auth = jwtTokenProvider.getAuthentication(userId, role);
-//            SecurityContextHolder.getContext().setAuthentication(auth);
-
-
-
         }
-//        throw new IllegalArgumentException("인증되지 않은 사용자 입니다"); // Todo 로그아웃된 사용자에 대해서도 예외처리를 해버림
         filterChain.doFilter(request, response);
     }
 
