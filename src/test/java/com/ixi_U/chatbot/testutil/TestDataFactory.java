@@ -4,6 +4,9 @@ import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.chatbot.dto.BundledBenefitDTO;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
+import com.ixi_U.plan.entity.PlanState;
+import com.ixi_U.plan.entity.PlanType;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -20,8 +23,26 @@ public class TestDataFactory {
         BundledBenefitDTO bbr = BundledBenefitDTO.create(
                 UUID.randomUUID().toString(), "테스트 번들 혜택", 1, List.of(sbr));
 
-        return GeneratePlanDescriptionRequest.create(UUID.randomUUID().toString(), "테스트 요금제", 100,
-                59000, List.of(bbr), List.of(sbr));
+        return GeneratePlanDescriptionRequest.create(
+                UUID.randomUUID().toString(),
+                "테스트 요금제",
+                PlanState.ABLE,
+                100,
+                150,
+                100,
+                500,
+                69000,
+                PlanType.FIVE_G_LTE,
+                "주의사항",
+                500,
+                7,
+                30,
+                false,
+                null,
+                null,
+                null,
+                List.of(sbr),
+                List.of(bbr));
     }
 
     /**
@@ -32,12 +53,30 @@ public class TestDataFactory {
         SingleBenefitDTO sbr1 = SingleBenefitDTO.create(
                 UUID.randomUUID().toString(), null, BenefitType.DEVICE);
         SingleBenefitDTO sbr2 = SingleBenefitDTO.create(
-                UUID.randomUUID().toString(), null,  BenefitType.DEVICE);
+                UUID.randomUUID().toString(), null, BenefitType.DEVICE);
 
         BundledBenefitDTO bbr = BundledBenefitDTO.create(
                 UUID.randomUUID().toString(), "테스트 번들 혜택", 1, List.of(sbr1));
 
-        return GeneratePlanDescriptionRequest.create(UUID.randomUUID().toString(), "테스트 요금제", 100,
-                59000, List.of(bbr), List.of(sbr2));
+        return GeneratePlanDescriptionRequest.create(
+                null,
+                "테스트 요금제",
+                PlanState.ABLE,
+                100,
+                150,
+                100,
+                500,
+                69000,
+                PlanType.FIVE_G_LTE,
+                "주의사항",
+                500,
+                7,
+                30,
+                false,
+                null,
+                null,
+                null,
+                List.of(sbr2),
+                List.of(bbr));
     }
 }

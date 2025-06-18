@@ -2,8 +2,6 @@ package com.ixi_U.chatbot.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.util.List;
@@ -17,11 +15,9 @@ public record BundledBenefitDTO(
         String name,
 
         @Positive
-        @NotNull
         int choice,
 
         @Valid
-        @NotEmpty
         List<SingleBenefitDTO> singleBenefits) {
 
     public static BundledBenefitDTO create(
