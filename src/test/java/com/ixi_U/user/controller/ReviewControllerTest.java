@@ -1,27 +1,6 @@
 package com.ixi_U.user.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ixi_U.auth.handler.OAuth2SuccessHandler;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.common.exception.GeneralException;
@@ -35,9 +14,6 @@ import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.service.ReviewService;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -55,7 +31,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,6 +38,22 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(value = {ReviewController.class})
 @Import(SecurityConfig.class)
@@ -78,7 +69,6 @@ class ReviewControllerTest {
     @Autowired
     private WebApplicationContext context;
 
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -87,9 +77,6 @@ class ReviewControllerTest {
 
     @MockBean
     CustomOAuth2UserService customOAuth2UserService;
-
-
-
 
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
@@ -105,7 +92,7 @@ class ReviewControllerTest {
     class Describe_createReview {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -355,7 +342,7 @@ class ReviewControllerTest {
     class Describe_showReviewList {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -366,9 +353,9 @@ class ReviewControllerTest {
         void it_returns_review_list_and_hasNext() throws Exception {
             // given
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse(123L,"유저1", 5, "좋았어요",
+                    new ShowReviewResponse(123L, "유저1", 5, "좋았어요",
                             LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
-                    new ShowReviewResponse(456L,"유저2", 3, "괜찮아요",
+                    new ShowReviewResponse(456L, "유저2", 3, "괜찮아요",
                             LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 
@@ -408,11 +395,12 @@ class ReviewControllerTest {
     class Describe_showReviewStats {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         @Test
         @DisplayName("리뷰 개수와 리뷰 평균 별점 및 나의 리뷰를 반환한다")
         void it_returns_review_count_and_average_and_my_review() throws Exception {
@@ -420,10 +408,10 @@ class ReviewControllerTest {
             //given
             double averageRating = 3.5;
             int reviewCount = 3;
-            ShowReviewResponse showReviewResponse = ShowReviewResponse.of(1L,"jinu",5,"comment",
+            ShowReviewResponse showReviewResponse = ShowReviewResponse.of(1L, "jinu", 5, "comment",
                     LocalDateTime.now());
-            given(reviewService.showReviewSummary(anyString(),anyString())).willReturn(
-                    ShowReviewSummaryResponse.of(ShowReviewStatsResponse.of(averageRating,reviewCount),
+            given(reviewService.showReviewSummary(anyString(), anyString())).willReturn(
+                    ShowReviewSummaryResponse.of(ShowReviewStatsResponse.of(averageRating, reviewCount),
                             showReviewResponse));
 
             //when
@@ -449,7 +437,7 @@ class ReviewControllerTest {
     class Describe_updateReview {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);

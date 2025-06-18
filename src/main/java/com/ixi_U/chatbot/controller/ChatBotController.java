@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ChatBotController {
@@ -29,8 +31,8 @@ public class ChatBotController {
 
     @SSEEndpoint
     @PostMapping(value = "/api/chatbot/recommend", produces = TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<Flux<String>> recommendPlan(
-             @AuthenticationPrincipal String userId,
+    public ResponseEntity<Flux<List<String>>> recommendPlan(
+            @AuthenticationPrincipal String userId,
             @RequestBody RecommendPlanRequest request) {
 
         return ResponseEntity.ok().body(chatBotService.recommendPlan(userId, request));
