@@ -127,7 +127,7 @@ class ReviewControllerTest {
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
-                        .andDo(document("createReview-success"))
+                        .andDo(document("create-review-success"))
                         .andDo(print());
 
                 // then
@@ -175,7 +175,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-review-content-null"))
+                                "create-review-error-review-content-null"))
                         .andDo(print());
 
                 // then
@@ -199,7 +199,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-review-letter-too-short"))
+                                "create-review-error-review-letter-too-short"))
                         .andDo(print());
 
                 // then
@@ -222,7 +222,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-review-letter-too-long"))
+                                "create-review-error-review-letter-too-long"))
                         .andDo(print());
 
                 // then
@@ -246,7 +246,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-review-point-under-zero"))
+                                "create-review-error-review-point-under-zero"))
                         .andDo(print());
 
                 // then
@@ -269,7 +269,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-review-point-over-6"))
+                                "create-review-error-review-point-over-6"))
                         .andDo(print());
 
                 // then
@@ -290,7 +290,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-plan-id-null"))
+                                "create-review-error-plan-id-null"))
                         .andDo(print());
                 // then
                 result.andExpect(status().isBadRequest())
@@ -314,7 +314,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-when-not-subscribe"))
+                                "create-review-error-when-not-subscribe"))
                         .andDo(print());
 
                 // then
@@ -339,7 +339,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "createReview-error-when-already-reviewed"))
+                                "create-review-error-when-already-reviewed"))
                         .andDo(print());
 
                 // then
@@ -385,7 +385,7 @@ class ReviewControllerTest {
                                     .param("size", "5")
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(document(
-                            "showReview-success"))
+                            "get-review-success"))
                     .andDo(print());
 
             // then
@@ -432,7 +432,7 @@ class ReviewControllerTest {
                                     .param("planId", "plan-001")
                                     .contentType(MediaType.APPLICATION_JSON))
                     .andDo(document(
-                            "showReviewSummary-success"))
+                            "get-review-summary-success"))
                     .andDo(print());
 
             //then
@@ -471,7 +471,7 @@ class ReviewControllerTest {
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
-                        .andDo(document("updateReview-success"))
+                        .andDo(document("update-review-success"))
                         .andDo(print());
 
                 // then
@@ -500,7 +500,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "updateReview-error-review-content-null"))
+                                "update-review-error-review-content-null"))
                         .andDo(print());
 
                 // then
@@ -525,7 +525,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "updateReview-error-review-letter-too-short"))
+                                "update-review-error-review-letter-too-short"))
                         .andDo(print());
 
                 // then
@@ -549,7 +549,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "updateReview-error-review-letter-too-long"))
+                                "update-review-error-review-letter-too-long"))
                         .andDo(print());
 
                 // then
@@ -571,7 +571,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "updateReview-error-review-id-null"))
+                                "update-review-error-review-id-null"))
                         .andDo(print());
                 // then
                 result.andExpect(status().isBadRequest())
@@ -595,7 +595,7 @@ class ReviewControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                         .andDo(document(
-                                "updateReview-error-when-not-myReview"))
+                                "update-review-error-when-not-my-review"))
                         .andDo(print());
 
                 // then
@@ -633,7 +633,7 @@ class ReviewControllerTest {
                 ResultActions result = mockMvc.perform(delete(REVIEW_URL + "/{reviewId}", reviewId)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON))
-                        .andDo(document("deleteReview-success"))
+                        .andDo(document("delete-review-success"))
                         .andDo(print());
 
                 // then

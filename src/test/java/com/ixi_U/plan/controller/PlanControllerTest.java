@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
@@ -86,6 +87,30 @@ class PlanControllerTest {
     }
 
     @Nested
+    @DisplayName("요금제 이름 목록 조회")
+    class GetPlanNamesTest {
+
+        @Test
+        @DisplayName("요금제 이름 목록을 조회할 수 있다")
+        void getPlanNames() throws Exception {
+            // given
+            PlanNameDto planA = new PlanNameDto("plan-A", "A 요금제");
+            PlanNameDto planB = new PlanNameDto("plan-B", "B 요금제");
+            given(planService.getPlanNameList()).willReturn(List.of(planA, planB));
+
+            // when, then
+            mockMvc.perform(get("/plans/summaries")
+                            .with(user("tester").roles("USER")))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].id").value("plan-A"))
+                    .andExpect(jsonPath("$[0].name").value("A 요금제"))
+                    .andExpect(jsonPath("$[1].id").value("plan-B"))
+                    .andExpect(jsonPath("$[1].name").value("B 요금제"))
+                    .andDo(document("plans-get-names"));
+        }
+    }
+
+    @Nested
     class SavePlanTest {
 
         @Test
@@ -98,10 +123,6 @@ class PlanControllerTest {
             List<String> bundledBenefitNames = TestConstants.createBundledBenefitNames();
             List<String> singleBenefitNames = TestConstants.createSingleBenefitNames();
             List<String> singleBenefitTypes = TestConstants.createSingleBenefitTypes();
-
-            System.out.println("bundledBenefitNames = " + bundledBenefitNames);
-            System.out.println("singleBenefitTypes = " + singleBenefitTypes);
-            System.out.println("singleBenefitNames = " + singleBenefitNames);
 
             Map<String, Object> metaData = Map.of(
                     "id", TestConstants.createPlanId(),
@@ -117,7 +138,7 @@ class PlanControllerTest {
                     .willReturn(PlanEmbeddedResponse.create(description, metaData));
 
             //when & then
-            mockMvc.perform(post("/plans/save")
+            mockMvc.perform(post("/admin/plans/save")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                     )
@@ -137,7 +158,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes").isArray())
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes",
                             hasSize(singleBenefitTypes.size())))
-                    .andDo(document("plans-save"));
+                    .andDo(document("save-plans-success"));
         }
     }
 
@@ -172,7 +193,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.plans.content[1].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
-                    .andDo(document("plans-get-sort"))
+                    .andDo(document("get-plans-sort-success"))
                     .andDo(print());
         }
 
@@ -201,7 +222,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.plans.content[0].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
-                    .andDo(document("plans-get-search"))
+                    .andDo(document("get-plans-search-success"))
                     .andDo(print());
         }
 
@@ -221,7 +242,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORIT")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-sort"));
+                    .andDo(document("get-plans-error-invalid-sort"));
         }
 
         @Test
@@ -240,7 +261,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-plan-type"));
+                    .andDo(document("get-plans-error-invalid-plan-type"));
         }
 
         @ParameterizedTest
@@ -255,7 +276,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-size-parameter"));
+                    .andDo(document("get-plans-error-invalid-size-parameter"));
         }
     }
 
@@ -323,7 +344,7 @@ class PlanControllerTest {
                             .value(singleBenefit.description()))
                     .andExpect(jsonPath("$.singleBenefits[0].benefitType")
                             .value(singleBenefit.benefitType()))
-                    .andDo(document("plans-get-details"));
+                    .andDo(document("get-plans-details-success"));
         }
     }
 }

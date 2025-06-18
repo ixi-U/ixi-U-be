@@ -1,17 +1,19 @@
 package com.ixi_U.user.controller;
 
+import com.ixi_U.user.dto.request.OnboardingRequest;
 import com.ixi_U.user.dto.response.PlanResponse;
-import com.ixi_U.user.dto.response.SubscribedResponse;
+//import com.ixi_U.user.dto.response.SubscribedResponse;
+import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
+import com.ixi_U.user.dto.response.ShowMyInfoResponse;
 import com.ixi_U.user.service.UserService;
-import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -19,18 +21,11 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
-    public ResponseEntity<?> getMyPlan() {
-        List<SubscribedResponse> subscribedList = userService.getMySubscribedPlans();
+    @GetMapping("/plan")
+    public ResponseEntity<?> getMyPlan(@AuthenticationPrincipal String userId) {
+        ShowCurrentSubscribedResponse subscribed = userService.findCurrentSubscribedPlan(userId);
 
-        if (subscribedList.isEmpty()) {
-            return ResponseEntity.ok("아직 등록된 요금제가 없습니다.");
-
-        }
-
-        // 하나만 있다고 가정
-        PlanResponse plan = subscribedList.get(0).plan();
-        return ResponseEntity.ok(plan);
+        return ResponseEntity.ok(Objects.requireNonNullElse(subscribed, "아직 등록된 요금제가 없습니다."));
     }
 
     @DeleteMapping
@@ -40,4 +35,18 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/onboarding")
+    public ResponseEntity<Void> onboarding(@RequestBody OnboardingRequest request,
+                                           @AuthenticationPrincipal String userId) {
+        log.info("[Onboarding] userId: {}", userId);
+        userService.updateOnboardingInfo(userId, request.email(), request.planId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
+        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
+
+        return ResponseEntity.ok(response);
+    }
 }

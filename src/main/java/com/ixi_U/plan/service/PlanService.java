@@ -7,16 +7,16 @@ import com.ixi_U.benefit.repository.SingleBenefitRepository;
 import com.ixi_U.chatbot.dto.BundledBenefitDTO;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
-import com.ixi_U.chatbot.service.VectorService;
+import com.ixi_U.chatbot.service.VectorStoreService;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
+import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -27,7 +27,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,7 +39,20 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final BundledBenefitRepository bundledBenefitRepository;
     private final SingleBenefitRepository singleBenefitRepository;
-    private final VectorService vectorService;
+    private final VectorStoreService vectorStoreService;
+
+    public void embedAllPlan(){
+
+        List<Plan> all = planRepository.findAll();
+
+        List<GeneratePlanDescriptionRequest> requests = new ArrayList<>();
+
+        for (Plan plan : all) {
+            requests.add(planEntityToDto(plan));
+        }
+
+        vectorStoreService.embedAllPlan(requests);
+    }
 
     /**
      * 요금제 저장 & 벡터 저장소에 저장
@@ -66,7 +81,7 @@ public class PlanService {
 
         GeneratePlanDescriptionRequest generatePlanDescriptionRequest = planEntityToDto(save);
 
-        return vectorService.saveEmbeddedPlan(generatePlanDescriptionRequest);
+        return vectorStoreService.saveEmbeddedPlan(generatePlanDescriptionRequest);
     }
 
     private void validateSamePlanName(final SavePlanRequest request) {
@@ -89,7 +104,6 @@ public class PlanService {
     }
 
     private List<BundledBenefitDTO> bundledBenefitEntityToDto(List<BundledBenefit> bundledBenefits) {
-
         return bundledBenefits.stream()
                 .map(entity ->
                         BundledBenefitDTO.create(
@@ -102,7 +116,6 @@ public class PlanService {
     }
 
     private List<SingleBenefitDTO> singleBenefitEntityToDto(List<SingleBenefit> singleBenefits) {
-
         return singleBenefits.stream()
                 .map(entity ->
                         SingleBenefitDTO.create(
@@ -156,5 +169,34 @@ public class PlanService {
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
         return PlanDetailResponse.from(plan);
+    }
+
+    public List<PlanAdminResponse> getPlansForAdmin() {
+        return planRepository.findAllForAdmin().stream()
+                .map(PlanAdminResponse::from)
+                .toList();
+    }
+
+    public void togglePlanState(String planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 요금제를 찾을 수 없습니다."));
+
+        Plan updated = plan.withPlanState(
+                plan.getPlanState() == PlanState.ABLE ? PlanState.DISABLE : PlanState.ABLE
+        );
+
+        planRepository.save(updated);
+    }
+
+    @Transactional
+    public void disablePlan(String planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
+        Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
+        planRepository.save(updatePlan);
+    }
+  
+    public List<PlanNameDto> getPlanNameList() {
+        return planRepository.findAllPlanNames();
     }
 }

@@ -8,7 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -17,14 +18,15 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VectorService {
+public class VectorStoreService {
 
     private static final String SINGLE_BENEFIT_NAMES = "singleBenefitNames";
     private static final String BUNDLED_BENEFIT_NAMES = "bundledBenefitNames";
     private static final String SINGLE_BENEFIT_TYPES = "singleBenefitTypes";
 
     private final ChatBotService chatBotService;
-    private final Neo4jVectorStore vectorStore;
+    @Qualifier("planVectorStore")
+    private final VectorStore planVectorStore;
 
     public PlanEmbeddedResponse saveEmbeddedPlan(@Valid GeneratePlanDescriptionRequest request) {
 
@@ -36,9 +38,30 @@ public class VectorService {
 
         log.info("metadata = {}", metadata);
 
-        vectorStore.add(List.of(new Document(planDescription, metadata)));
+        planVectorStore.add(List.of(new Document(planDescription, metadata)));
 
         return PlanEmbeddedResponse.create(planDescription, metadata);
+    }
+
+    /**
+     * 저장된 요금제 일괄 벡터 저장소에 저장
+     */
+    public void embedAllPlan(List<GeneratePlanDescriptionRequest> requests) {
+
+        List<Document> documents = new ArrayList<>();
+
+        for (GeneratePlanDescriptionRequest request : requests) {
+
+            String planDescription = chatBotService.getPlanDescription(request);
+
+            Map<String, Object> metadata = flattenMetadata(request);
+
+            Document document = new Document(planDescription, metadata);
+
+            documents.add(document);
+        }
+
+        planVectorStore.add(documents);
     }
 
     /**

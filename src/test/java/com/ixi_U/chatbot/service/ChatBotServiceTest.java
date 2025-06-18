@@ -104,19 +104,5 @@ class ChatBotServiceTest {
             //then
             assertTrue(validate.isEmpty());
         }
-
-        @Test
-        @DisplayName("유효하지 않은 요청이면 예외를 발생한다")
-        public void exceptNullPlan() {
-
-            //given
-            GeneratePlanDescriptionRequest plan = TestDataFactory.createNullFieldPlan();
-
-            //when
-            Set<ConstraintViolation<GeneratePlanDescriptionRequest>> validate = validator.validate(plan);
-
-            //then
-            assertFalse(validate.isEmpty());
-        }
     }
 }

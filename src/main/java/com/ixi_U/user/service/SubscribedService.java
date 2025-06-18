@@ -12,7 +12,6 @@ import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.UserRepository;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,18 +35,18 @@ public class SubscribedService {
         Plan plan = planRepository.findById(request.planId())
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
-        // 유저의 가장 최신 구독 가져오기
-        Subscribed latestSubscribed = user.getSubscribedHistory().stream()
-                .reduce((first, second) -> second)
+        List<Subscribed> list = user.getSubscribedHistory();
+
+        Subscribed latestSubscribed = list.stream()
+                .max(Comparator.comparing(Subscribed::getCreatedAt))
                 .orElse(null);
 
         // 현재 요금제와 같은지 체크
-        if (Objects.nonNull(latestSubscribed) && latestSubscribed.getPlan().equals(plan)) {
+        if (latestSubscribed != null && latestSubscribed.getPlan().equals(plan)) {
             throw new GeneralException(PlanException.ALREADY_SUBSCRIBED_PLAN);
         }
 
         user.addSubscribed(Subscribed.of(plan));
-
         userRepository.save(user);
     }
 
@@ -56,6 +55,7 @@ public class SubscribedService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         List<Subscribed> subscribeds = user.getSubscribedHistory();
+
         return subscribeds.stream()
                 .sorted(Comparator.comparing(Subscribed::getCreatedAt).reversed())
                 .map(ShowSubscribedHistoryResponse::from)

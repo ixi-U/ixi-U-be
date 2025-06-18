@@ -3,6 +3,7 @@ package com.ixi_U.plan.entity;
 import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -34,41 +35,43 @@ public class Plan {
 
     private final PlanState planState;
 
-    private final int mobileDataLimitMb;
+    private final Integer mobileDataLimitMb;
 
-    private final int sharedMobileDataLimitMb;
+    private final Integer sharedMobileDataLimitMb;
 
-    private final int callLimitMinutes;
+    private final Integer callLimitMinutes;
 
-    private final int messageLimit;
+    private final Integer messageLimit;
 
-    private final int monthlyPrice;
+    private final Integer monthlyPrice;
 
     private final PlanType planType;
 
     private final String usageCautions;
 
-    private final int mobileDataThrottleSpeedKbps;
+    private final Integer mobileDataThrottleSpeedKbps;
 
-    private final int minAge;
+    private final Integer minAge;
 
-    private final int maxAge;
+    private final Integer maxAge;
 
-    private final boolean isActiveDuty;
+    private final Boolean isActiveDuty;
 
-    private final int pricePerKb;
+    private final Integer pricePerKb;
 
     private final String etcInfo;
 
-    private final int priority;
+    private final Integer priority;
 
-    @CreatedDate
+//    @CreatedDate
     @Property("created_at")
-    private LocalDateTime createdAt;
+//    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
-    @LastModifiedDate
+//    @LastModifiedDate
     @Property("updated_at")
-    private LocalDateTime updatedAt;
+//    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @Builder.Default
     @Relationship(type = "HAS_BENEFIT", direction = Relationship.Direction.OUTGOING)
