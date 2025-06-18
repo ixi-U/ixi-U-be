@@ -18,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
@@ -59,7 +61,7 @@ public class ChatBotService {
                 .delayElements(Duration.ofMillis(50));
     }
 
-    public Flux<String> recommendPlan(String userId, RecommendPlanRequest request) {
+    public Flux<List<String>> recommendPlan(String userId, RecommendPlanRequest request) {
 
         return Mono.fromCallable(() -> {
 
@@ -85,13 +87,14 @@ public class ChatBotService {
                                 .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
                                 .stream()
                                 .content()
+                                .bufferTimeout(5, Duration.ofMillis(1))
                 )
                 .onErrorResume(GeneralException.class, e -> {
 
                     log.error("추천 로직 에러 발생", e);
 
                     return Flux.fromStream(GENERAL_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> String.valueOf((char) c))
+                                    .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
                             )
                             .delayElements(Duration.ofMillis(50));
                 })
@@ -100,7 +103,7 @@ public class ChatBotService {
                     log.error("추천 로직에서 예상치 못한 에러 발생", e);
 
                     return Flux.fromStream(UNEXPECT_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> String.valueOf((char) c))
+                                    .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
                             )
                             .delayElements(Duration.ofMillis(50));
                 });
