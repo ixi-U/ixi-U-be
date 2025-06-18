@@ -54,7 +54,8 @@ public class ChatBotService {
     public Flux<String> getWelcomeMessage() {
 
         return Flux.fromStream(CHATBOT_WELCOME_MESSAGE.chars()
-                        .mapToObj(c -> String.valueOf((char) c)))
+                        .mapToObj(c -> String.valueOf((char) c))
+                )
                 .delayElements(Duration.ofMillis(50));
     }
 
@@ -69,11 +70,12 @@ public class ChatBotService {
 
                     log.info("llmResult = {}", llmResult);
 
-                    if (llmResult == null) {
+                    if (llmResult == null || llmResult.isBlank()) {
+
                         throw new GeneralException(ChatBotException.CHAT_BOT_RECOMMENDING_ERROR);
                     }
-                    return llmResult;
 
+                    return llmResult;
                 })
                 .flatMapMany(llmResult ->
 
@@ -85,15 +87,21 @@ public class ChatBotService {
                                 .content()
                 )
                 .onErrorResume(GeneralException.class, e -> {
+
                     log.error("추천 로직 에러 발생", e);
+
                     return Flux.fromStream(GENERAL_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> String.valueOf((char) c)))
+                                    .mapToObj(c -> String.valueOf((char) c))
+                            )
                             .delayElements(Duration.ofMillis(50));
                 })
                 .onErrorResume(Exception.class, e -> {
+
                     log.error("추천 로직에서 예상치 못한 에러 발생", e);
+
                     return Flux.fromStream(UNEXPECT_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> String.valueOf((char) c)))
+                                    .mapToObj(c -> String.valueOf((char) c))
+                            )
                             .delayElements(Duration.ofMillis(50));
                 });
     }
