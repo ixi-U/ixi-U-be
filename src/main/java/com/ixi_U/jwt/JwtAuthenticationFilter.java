@@ -65,6 +65,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } else {
             log.info("❌ 인증 실패 - 유효하지 않은 토큰");
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or missing token");
+//            return; // 요청 차단
         }
         filterChain.doFilter(request, response);
     }
