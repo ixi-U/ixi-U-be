@@ -7,7 +7,8 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Component;
 public class EmbeddingSimilarityFilter implements ForbiddenWordFilter {
 
     private final ForbiddenWordLoader forbiddenWordLoader;
-    private final Neo4jVectorStore vectorStore;
-
+    @Qualifier("forbiddenVectorStore")
+    private final VectorStore vectorStore;
+    
 //    public void run(ApplicationArguments args) throws Exception {
 //
 //        // load all forbidden words, but filter out those already in the vector store by checking for an existing ID match

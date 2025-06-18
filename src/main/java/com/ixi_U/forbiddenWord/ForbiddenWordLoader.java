@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.vectorstore.neo4j.Neo4jVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Getter
@@ -17,7 +18,8 @@ import org.springframework.stereotype.Component;
 public class ForbiddenWordLoader {
 
     private final List<String> forbiddenWords = new ArrayList<>();
-    private final Neo4jVectorStore neo4jVectorStore;
+    @Qualifier("forbiddenVectorStore")
+    private final VectorStore vectorStore;
 
     @PostConstruct
     public void init() throws Exception {
