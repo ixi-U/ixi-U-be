@@ -32,12 +32,12 @@ public class RecommendTool {
 
         log.info("recommendPlan Tool 동작");
 
-        String filterExpression = (String) toolContext.getContext().get("filterExpression");
-        String userId = (String) toolContext.getContext().get("userId");
+        String filterExpression = (String) toolContext.getContext().get(ToolContextKey.FILTER_EXPRESSION.getKey());
+        String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
 
         log.info("userRequest = {}", userQuery);
-        log.info("filterExpression = {}", filterExpression);
-        log.info("userId = {}", userId);
+        log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
+        log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
         return similaritySearchPlan(userQuery, filterExpression);
     }
@@ -59,6 +59,9 @@ public class RecommendTool {
                             .topK(50)
                             .filterExpression(filterExpression)
                             .build());
+
+            log.info("조회된 건 수 = {}", documents.size());
+            log.info("조회 디테일 = {}", documents);
 
         } catch (Exception e) {
 

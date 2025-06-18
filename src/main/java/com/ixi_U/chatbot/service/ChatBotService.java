@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
+import com.ixi_U.chatbot.tool.ToolContextKey;
 import com.ixi_U.common.exception.GeneralException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -66,14 +67,12 @@ public class ChatBotService {
             return recommendClient.prompt()
                     .user(request.userQuery())
                     .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
-                    .toolContext(Map.of("userId", userId, "filterExpression", llmResult))
+                    .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
                     .stream()
                     .content();
         } catch (Exception e) {
 
-            log.error("서비스 에러 발생 : ", e);
-
-            return null;
+            throw new GeneralException(ChatBotException.CHAT_BOT_RECOMMENDING_ERROR);
         }
     }
 
