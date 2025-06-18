@@ -23,6 +23,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.documentationConfiguration;
@@ -85,9 +87,9 @@ class ChatBotControllerTest {
                 //given
                 String userQuery = "6만원 이하의 무제한 요금제 추천 해줘";
                 String userId = "testUser";
-                String[] assistanceResponse = "너겟 59 요금제를 추천합니다".split("");
+                List<String> assistanceResponse = List.of("너겟 59 요금제를 추천합니다".split(""));
                 RecommendPlanRequest recommendPlanRequest = RecommendPlanRequest.create(userQuery);
-                given(chatBotService.recommendPlan(userId, recommendPlanRequest)).willReturn(Flux.fromArray(assistanceResponse));
+                given(chatBotService.recommendPlan(userId, recommendPlanRequest)).willReturn(Flux.just(assistanceResponse));
 
                 //when & then
                 webTestClient.post()
