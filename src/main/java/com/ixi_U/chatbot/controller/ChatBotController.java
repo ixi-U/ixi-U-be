@@ -5,6 +5,7 @@ import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.service.ChatBotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public class ChatBotController {
     @SSEEndpoint
     @PostMapping(value = "/api/chatbot/recommend", produces = TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<Flux<String>> recommendPlan(
-            String userId,
+             @AuthenticationPrincipal String userId,
             @RequestBody RecommendPlanRequest request) {
 
         return ResponseEntity.ok().body(chatBotService.recommendPlan(userId, request));
