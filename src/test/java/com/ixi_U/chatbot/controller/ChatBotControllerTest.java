@@ -3,7 +3,6 @@ package com.ixi_U.chatbot.controller;
 import com.ixi_U.TestWebFluxSecurityConfig;
 import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.service.ChatBotService;
-import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.util.constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -98,10 +97,11 @@ class ChatBotControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(recommendPlanRequest)
                         .exchange()
-                        .expectStatus().isOk()
+                        .expectStatus().is2xxSuccessful()
                         .expectHeader().contentType("text/event-stream;charset=UTF-8")
-                        .expectBodyList(String.class)
+                        .returnResult(String.class)
                         .consumeWith(document("recommend-plan-success"));
+
             }//recommendPlanSuccessTest
 
             @Test
@@ -112,16 +112,21 @@ class ChatBotControllerTest {
                 //given
                 RecommendPlanRequest recommendPlanRequest = RecommendPlanRequest.create("6만원 이하의 무제한 요금제 추천 해줘");
                 String userId = "testUser";
+                String[] errorMessage = "죄송합니다. 요금제 추천 서비스에 일시적인 문제가 발생했습니다.".split("");
 
-                given(chatBotService.recommendPlan(userId, recommendPlanRequest)).willReturn(null);
+                given(chatBotService.recommendPlan(userId, recommendPlanRequest)).willReturn(Flux.fromArray(errorMessage));
 
                 //when & then
                 webTestClient.post()
-                        .uri("/api/chatbot/recommend")
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/api/chatbot/recommend")
+                                .queryParam("userId", userId)
+                                .build())
                         .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(recommendPlanRequest)
                         .exchange()
-                        .expectStatus().is4xxClientError()
-                        .expectHeader().contentType("application/json")
+                        .expectStatus().is2xxSuccessful()
+                        .expectHeader().contentType("text/event-stream;charset=UTF-8")
                         .expectBodyList(String.class)
                         .consumeWith(document("recommend-plan-fail"));
             }//recommendPlanFailTest
