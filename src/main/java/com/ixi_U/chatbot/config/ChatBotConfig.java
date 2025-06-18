@@ -1,5 +1,6 @@
 package com.ixi_U.chatbot.config;
 
+import com.ixi_U.chatbot.tool.RecommendTool;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
