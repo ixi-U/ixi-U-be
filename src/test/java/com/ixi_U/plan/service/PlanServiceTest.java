@@ -64,11 +64,14 @@ class PlanServiceTest {
             Slice<PlanSummaryDto> slice = new SliceImpl<>(List.of(dto1, dto2, dto3), pageable,
                     true);
 
-            PlanListDto dtoA = new PlanListDto("plan-A", "A 요금제", "5", "1", "2", "300", 29000, 1,
+            PlanListDto dtoA = new PlanListDto("plan-A", "A 요금제", "5 GB", "1 GB", "200 분", "300 건",
+                    29000, 1,
                     List.of(), List.of());
-            PlanListDto dtoB = new PlanListDto("plan-B", "B 요금제", "3", "5", "100", "200", 19000, 2,
+            PlanListDto dtoB = new PlanListDto("plan-B", "B 요금제", "3 GB", "0 GB", "100 분", "200 건",
+                    19000, 2,
                     List.of(), List.of());
-            PlanListDto dtoC = new PlanListDto("plan-C", "C 요금제", "1", "3", "50", "100", 9900, 3,
+            PlanListDto dtoC = new PlanListDto("plan-C", "C 요금제", "1 GB", "0 GB", "50 분", "100 건",
+                    9900, 3,
                     List.of(), List.of());
 
             Slice<PlanListDto> sliceList = new SliceImpl<>(List.of(dtoA, dtoB, dtoC), pageable,
