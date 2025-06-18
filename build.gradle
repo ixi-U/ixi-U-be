@@ -44,6 +44,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // Hot Swap
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
     // Spring AI Open AI
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
@@ -61,6 +64,9 @@ dependencies {
 
     // Spring Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Advisors
+    implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -82,4 +82,12 @@ public class PlanController {
         planService.disablePlan(planId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/embed")
+    public ResponseEntity<Void> embedPlan() {
+
+        planService.embedAllPlan();
+
+        return ResponseEntity.status(200).build();
+    }
 }

@@ -35,21 +35,10 @@ spring:
         options:
           model: ${OPEN_AI_CHAT_MODEL}
 
-    vector-store:
-      neo4j:
-        initialize-schema: true
-        index-name: forbidden-index
-        embedding-dimension: 1536
-        label: Forbidden
-        distance-type: cosine
-
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration-time: ${ACCESS_TOKEN_EXP}
   refresh-token-expiration-days: ${REFRESH_TOKEN_EXP}
-
-server:
-  forward-headers-strategy: native
 
 ---
 spring:

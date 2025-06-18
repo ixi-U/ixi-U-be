@@ -99,10 +99,6 @@ class PlanControllerTest {
             List<String> singleBenefitNames = TestConstants.createSingleBenefitNames();
             List<String> singleBenefitTypes = TestConstants.createSingleBenefitTypes();
 
-            System.out.println("bundledBenefitNames = " + bundledBenefitNames);
-            System.out.println("singleBenefitTypes = " + singleBenefitTypes);
-            System.out.println("singleBenefitNames = " + singleBenefitNames);
-
             Map<String, Object> metaData = Map.of(
                     "id", TestConstants.createPlanId(),
                     "name", request.name(),
@@ -137,7 +133,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes").isArray())
                     .andExpect(jsonPath("$.metaData.singleBenefitTypes",
                             hasSize(singleBenefitTypes.size())))
-                    .andDo(document("plans-save"));
+                    .andDo(document("save-plans-success"));
         }
     }
 
@@ -172,7 +168,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.plans.content[1].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
-                    .andDo(document("plans-get-sort"))
+                    .andDo(document("get-plans-sort-success"))
                     .andDo(print());
         }
 
@@ -201,7 +197,7 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.plans.content[0].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
-                    .andDo(document("plans-get-search"))
+                    .andDo(document("get-plans-search-success"))
                     .andDo(print());
         }
 
@@ -221,7 +217,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORIT")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-sort"));
+                    .andDo(document("get-plans-error-invalid-sort"));
         }
 
         @Test
@@ -240,7 +236,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-plan-type"));
+                    .andDo(document("get-plans-error-invalid-plan-type"));
         }
 
         @ParameterizedTest
@@ -255,7 +251,7 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isBadRequest())
-                    .andDo(document("plans-get-invalid-size-parameter"));
+                    .andDo(document("get-plans-error-invalid-size-parameter"));
         }
     }
 
@@ -323,7 +319,7 @@ class PlanControllerTest {
                             .value(singleBenefit.description()))
                     .andExpect(jsonPath("$.singleBenefits[0].benefitType")
                             .value(singleBenefit.benefitType()))
-                    .andDo(document("plans-get-details"));
+                    .andDo(document("get-plans-details-success"));
         }
     }
 }
