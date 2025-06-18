@@ -13,7 +13,9 @@ import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.*;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
@@ -28,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,7 +41,7 @@ public class PlanService {
     private final SingleBenefitRepository singleBenefitRepository;
     private final VectorStoreService vectorStoreService;
 
-    public void embedAllPlan(){
+    public void embedAllPlan() {
 
         List<Plan> all = planRepository.findAll();
 
@@ -95,10 +96,23 @@ public class PlanService {
         return GeneratePlanDescriptionRequest.create(
                 plan.getId(),
                 plan.getName(),
+                plan.getPlanState(),
                 plan.getMobileDataLimitMb(),
+                plan.getSharedMobileDataLimitMb(),
+                plan.getCallLimitMinutes(),
+                plan.getMessageLimit(),
                 plan.getMonthlyPrice(),
-                bundledBenefitEntityToDto(plan.getBundledBenefits()),
-                singleBenefitEntityToDto(plan.getSingleBenefits())
+                plan.getPlanType(),
+                plan.getUsageCautions(),
+                plan.getMobileDataThrottleSpeedKbps(),
+                plan.getMinAge(),
+                plan.getMaxAge(),
+                plan.getIsActiveDuty(),
+                plan.getPricePerKb(),
+                plan.getEtcInfo(),
+                plan.getPriority(),
+                singleBenefitEntityToDto(plan.getSingleBenefits()),
+                bundledBenefitEntityToDto(plan.getBundledBenefits())
         );
     }
 
