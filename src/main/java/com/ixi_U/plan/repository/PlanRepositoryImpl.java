@@ -106,6 +106,7 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
 
         Node p = Cypher.node("Plan").named("p");
         Condition condition = p.property("planType").eq(Cypher.parameter("planType"));
+        condition = condition.and(p.property("planState").ne(Cypher.literalOf("DISABLE")));
 
         if (planId != null && cursorSortValue != null) {
             Condition sortCondition;

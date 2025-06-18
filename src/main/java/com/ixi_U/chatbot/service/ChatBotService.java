@@ -24,7 +24,6 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
-
 public class ChatBotService {
 
     private static final String CHATBOT_WELCOME_MESSAGE = """

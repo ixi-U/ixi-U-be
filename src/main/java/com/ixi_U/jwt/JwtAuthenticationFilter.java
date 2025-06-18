@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 1. 쿠키에서 토큰 추출
         String token = extractTokenFromCookie(request);
+//        String token = jwtTokenProvider.resolveToken(request); // 쿠키에서 access_token 추출
 
         // 2. 쿠키 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {

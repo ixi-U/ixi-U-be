@@ -55,6 +55,15 @@ public class UserService {
         );
     }
 
+    @Transactional
+    public void removeRefreshToken(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+
+        User updated = user.withRefreshToken(null); // null로 초기화 (or 빈 문자열 ..)
+        userRepository.save(updated);
+    }
+
     @Transactional(readOnly = true)
     public ShowMyInfoResponse findMyInfoByUserId(String userId) {
         User user = userRepository.findById(userId)

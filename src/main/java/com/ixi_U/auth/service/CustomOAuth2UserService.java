@@ -47,3 +47,5 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(), isNewUser); // JWT 토큰 생성에 사용되는 사용자 정보의 출처가 된다.
     }
 }
+
+
