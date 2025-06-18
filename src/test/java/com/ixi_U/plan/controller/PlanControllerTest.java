@@ -99,10 +99,6 @@ class PlanControllerTest {
             List<String> singleBenefitNames = TestConstants.createSingleBenefitNames();
             List<String> singleBenefitTypes = TestConstants.createSingleBenefitTypes();
 
-            System.out.println("bundledBenefitNames = " + bundledBenefitNames);
-            System.out.println("singleBenefitTypes = " + singleBenefitTypes);
-            System.out.println("singleBenefitNames = " + singleBenefitNames);
-
             Map<String, Object> metaData = Map.of(
                     "id", TestConstants.createPlanId(),
                     "name", request.name(),

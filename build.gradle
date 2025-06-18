@@ -65,6 +65,9 @@ dependencies {
     // Spring Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // Advisors
+    implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

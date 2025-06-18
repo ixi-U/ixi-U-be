@@ -1,6 +1,5 @@
 package com.ixi_U.plan.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
 import com.ixi_U.plan.dto.response.PlanDetailResponse;
@@ -55,5 +54,13 @@ public class PlanController {
         PlanEmbeddedResponse planEmbeddedResponse = planService.savePlan(request);
 
         return ResponseEntity.ok(planEmbeddedResponse);
+    }
+
+    @GetMapping("/embed")
+    public ResponseEntity<Void> embedPlan() {
+
+        planService.embedAllPlan();
+
+        return ResponseEntity.status(200).build();
     }
 }

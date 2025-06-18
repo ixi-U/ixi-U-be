@@ -22,12 +22,8 @@ public record GeneratePlanDescriptionRequest(
         @Positive
         int monthlyPrice,
 
-        @Valid
-        @NotEmpty
         List<BundledBenefitDTO> bundledBenefits,
 
-        @Valid
-        @NotEmpty
         List<SingleBenefitDTO> singleBenefits) {
 
     public static GeneratePlanDescriptionRequest create(
