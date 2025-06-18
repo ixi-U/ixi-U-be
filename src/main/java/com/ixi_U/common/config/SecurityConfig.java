@@ -65,15 +65,24 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
                 );
+
         // 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/names/**", "/api/user/onboarding/**", "/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 );
 
         return http.build();
+
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/names/**", "/api/user/onboarding/**", "/**").permitAll()
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                        .anyRequest().authenticated()
+//                );
+//
+//        return http.build();
+//    }
     }
 
     @Bean
