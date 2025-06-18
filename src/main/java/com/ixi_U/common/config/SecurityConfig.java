@@ -65,21 +65,29 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
                 );
-        // 인가 필터
+
+        // 기능 확인용 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
-                        // CORS preflight 요청은 인증 없이 통과
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 해당 요청에 대해서는 권한 확인
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                        // 다음 요청에 대해서는 누구나 접근 허용
-                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/**", "/plans/names/**", "/api/user/onboarding/**", "/**").permitAll()
-                        // 그 외 모든 요청은 인증 인가 필요
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 );
 
         return http.build();
+
+        // 인가 필터
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        // CORS preflight 요청은 인증 없이 통과
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                        // 해당 요청에 대해서는 권한 확인
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+//                        // 다음 요청에 대해서는 누구나 접근 허용
+//                        .requestMatchers("/login/**", "/oauth2/**", "/public/**", "/plans/**", "/plans/names/**", "/api/user/onboarding/**", "/**").permitAll()
+//                        // 그 외 모든 요청은 인증 인가 필요
+//                        .anyRequest().authenticated()
+//                );
+//        return http.build();
     }
 
     @Bean
