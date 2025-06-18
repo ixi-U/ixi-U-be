@@ -20,10 +20,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class VectorStoreService {
 
-//    private static final String SINGLE_BENEFIT_NAMES = "singleBenefitNames";
-//    private static final String BUNDLED_BENEFIT_NAMES = "bundledBenefitNames";
-//    private static final String SINGLE_BENEFIT_TYPES = "singleBenefitTypes";
-
     private final ChatBotService chatBotService;
     @Qualifier("planVectorStore")
     private final VectorStore planVectorStore;
