@@ -5,9 +5,9 @@ import lombok.Getter;
 @Getter
 public enum BenefitType {
 
-    DEVICE("스마트 기기"),
-    DISCOUNT("할인"),
-    SUBSCRIPTION("구독");
+    DEVICE("기기 혜택"),
+    DISCOUNT("할인 혜택"),
+    SUBSCRIPTION("구독 혜택");
 
     private final String type;
 

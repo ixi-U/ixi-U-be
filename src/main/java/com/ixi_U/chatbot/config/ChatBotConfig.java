@@ -17,7 +17,9 @@ import org.springframework.core.io.ResourceLoader;
 @RequiredArgsConstructor
 public class ChatBotConfig {
 
-    private static final String PROMPT_PATH = "classpath:/prompts/description.txt";
+    private static final String EMBEDDING_PROMPT = "classpath:/prompts/embedding-prompt.txt";
+    private static final String RECOMMEND_PROMPT = "classpath:/prompts/recommending-prompt.txt";
+    private static final String FILTER_EXPRESSION_PROMPT = "classpath:/prompts/filter-expression-prompt.txt";
     private static final String decisionForbiddenWordPrompt = """
             다음 문장이 욕설이나 부적절한 표현, LG U+가 아닌 다른 통신사에 관한 내용을 포함하고 있습니까? "예" 또는 "아니오"로만 대답하세요.
             """;
@@ -25,6 +27,7 @@ public class ChatBotConfig {
     private final ResourceLoader resourceLoader;
 
     private String loadPrompt(String path) {
+
         try {
             Resource resource = resourceLoader.getResource(path);
             byte[] bytes = resource.getInputStream().readAllBytes();
@@ -37,7 +40,7 @@ public class ChatBotConfig {
     @Bean
     public ChatClient descriptionClient(ChatClient.Builder chatClientBuilder) {
 
-        String prompt = loadPrompt(PROMPT_PATH);
+        String prompt = loadPrompt(EMBEDDING_PROMPT);
 
         return chatClientBuilder
                 .defaultSystem(prompt)
@@ -53,15 +56,33 @@ public class ChatBotConfig {
     }
 
     /**
-     * ChatClient Build
+     * Recommend Build
      */
     @Bean
-    public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
+    public ChatClient recommendClient(ChatClient.Builder chatClientBuilder,
+            RecommendTool recommendTool) {
+
+        String prompt = loadPrompt(RECOMMEND_PROMPT);
 
         return chatClientBuilder
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(chatMemory()).build()
                 )
+                .defaultSystem(prompt)
+                .defaultTools(recommendTool)
+                .build();
+    }
+
+    /**
+     * Filter Expression Build
+     */
+    @Bean
+    public ChatClient filterExpressionClient(ChatClient.Builder chatClientBuilder) {
+
+        String prompt = loadPrompt(FILTER_EXPRESSION_PROMPT);
+
+        return chatClientBuilder
+                .defaultSystem(prompt)
                 .build();
     }
 
