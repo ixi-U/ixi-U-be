@@ -7,7 +7,6 @@ import com.ixi_U.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -66,7 +65,7 @@ public class SecurityConfig {
                         .successHandler(oAuth2SuccessHandler())
                 );
 
-        // 기능 확인용 인가 필터
+        // TODO 기능 확인용 인가 필터
         http
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
@@ -96,7 +95,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "https://ixi-u.site")
+                        .allowedOrigins("http://localhost:3000", "https://ixiu.site",
+                                "https://www.ixiu.site")
                         .allowedMethods("*")
                         .allowCredentials(true);
             }
