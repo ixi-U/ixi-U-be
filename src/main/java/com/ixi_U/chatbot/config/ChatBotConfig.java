@@ -3,7 +3,6 @@ package com.ixi_U.chatbot.config;
 import com.ixi_U.chatbot.tool.RecommendTool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
@@ -66,9 +65,6 @@ public class ChatBotConfig {
         String prompt = loadPrompt(RECOMMEND_PROMPT);
 
         return chatClientBuilder
-                .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory()).build()
-                )
                 .defaultSystem(prompt)
                 .defaultTools(recommendTool)
                 .build();
