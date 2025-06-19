@@ -1,6 +1,5 @@
 package com.ixi_U.user.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -9,10 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,9 +20,9 @@ import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtTokenProvider;
-import com.ixi_U.user.dto.response.PlanResponse;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
 import com.ixi_U.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,16 +57,13 @@ class UserControllerTest {
 
     @MockBean
     UserService userService;
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
     @MockBean
     JwtTokenProvider oAuth2SuccessHandler;
-
     @MockBean
     CustomOAuth2UserService customOAuth2UserService;
+    private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext context;
 
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
@@ -85,9 +79,10 @@ class UserControllerTest {
     class DescribeMyPlan {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                    new UsernamePasswordAuthenticationToken("userId", null,
+                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
@@ -114,11 +109,11 @@ class UserControllerTest {
             given(userService.findCurrentSubscribedPlan(any())).willReturn(response1);
 
             // when
-            ResultActions result = mockMvc.perform(get(USER_URL+"/plan")
+            ResultActions result = mockMvc.perform(get(USER_URL + "/plan")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON))
-                            .andDo(document("get-my-plan-success"))
-                            .andDo(print());
+                    .andDo(document("get-my-plan-success"))
+                    .andDo(print());
 
             // then
             result.andExpect(status().isOk())
@@ -132,33 +127,33 @@ class UserControllerTest {
     class DescribeDeleteUser {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                    new UsernamePasswordAuthenticationToken("userId", null,
+                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         @Test
         @DisplayName("성공적으로 삭제할 수 있다")
         void it_returns_delete_me() throws Exception {
+            // given
+            doNothing().when(userService)
+                    .deleteUserById(any(String.class), any(HttpServletResponse.class));
 
-            //given
-            doNothing().when(userService).deleteUserById(any());
-
-            //when
+            // when
             ResultActions result = mockMvc.perform(delete(USER_URL)
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(document("delete-my-user-success"))
                     .andDo(print());
 
-            //then
+            // then
             result.andExpect(status().isNoContent());
-            verify(userService, times(1)).deleteUserById(any(String.class));
-
+            verify(userService, times(1))
+                    .deleteUserById(any(String.class), any(HttpServletResponse.class));
         }
     }
-
 
 
 }

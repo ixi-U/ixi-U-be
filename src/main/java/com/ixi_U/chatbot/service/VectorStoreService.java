@@ -5,15 +5,17 @@ import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
 import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import jakarta.validation.Valid;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Field;
-import java.util.*;
 
 @Slf4j
 @Service
@@ -76,7 +78,9 @@ public class VectorStoreService {
 
                 Object value = field.get(request);
 
-                if (value == null) continue;
+                if (value == null) {
+                    continue;
+                }
 
                 String fieldName = field.getName(); // id, name ...
 
@@ -97,8 +101,12 @@ public class VectorStoreService {
                 }
                 // 기본 타입, 래퍼 클래스, String, Enum 처리
                 else if (isPrimitiveOrWrapperOrStringOrEnum(value.getClass())) {
-
-                    result.put(fieldName, value);
+                    if (value.getClass().isEnum()) {
+                        // Enum이면 name()으로 변환
+                        result.put(fieldName, ((Enum<?>) value).name());
+                    } else {
+                        result.put(fieldName, value);
+                    }
                 }
 
             } catch (Exception e) {
@@ -109,7 +117,8 @@ public class VectorStoreService {
         return result;
     }
 
-    private void processBundledBenefitList(Map<String, Object> result, List<BundledBenefitDTO> bundledBenefits) {
+    private void processBundledBenefitList(Map<String, Object> result,
+            List<BundledBenefitDTO> bundledBenefits) {
 
         try {
 
@@ -130,7 +139,8 @@ public class VectorStoreService {
         }
     }
 
-    private void processSingleBenefitList(Map<String, Object> result, List<SingleBenefitDTO> singleBenefits) {
+    private void processSingleBenefitList(Map<String, Object> result,
+            List<SingleBenefitDTO> singleBenefits) {
 
         try {
 
