@@ -93,6 +93,11 @@ class AuthControllerTest {
     @Test
     @DisplayName("access_token이 없을 때 로그아웃 실패")
     void logoutFailWhenNoAccessToken() throws Exception {
+
+        // given
+
+
+        // when & then
         mockMvc.perform(post(LOGOUT_URL)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
@@ -104,6 +109,8 @@ class AuthControllerTest {
     @Test
     @DisplayName("유효하지 않은 access_token일 때 로그아웃 실패")
     void logoutFailWithInvalidToken() throws Exception {
+
+        // given
         String invalidToken = "invalid-token";
         MockCookie cookie = new MockCookie("access_token", invalidToken);
         cookie.setHttpOnly(true);
@@ -111,6 +118,7 @@ class AuthControllerTest {
 
         when(jwtTokenProvider.validateToken(invalidToken)).thenReturn(false);
 
+        // when & then
         mockMvc.perform(post(LOGOUT_URL)
                         .cookie(cookie)
                         .contentType(MediaType.APPLICATION_JSON))
