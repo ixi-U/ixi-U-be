@@ -25,6 +25,7 @@ import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.dto.response.PlanResponse;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
+import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +71,9 @@ class UserControllerTest {
 
     @MockBean
     CustomOAuth2UserService customOAuth2UserService;
+
+    @MockBean
+    UserRepository userRepository;
 
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
