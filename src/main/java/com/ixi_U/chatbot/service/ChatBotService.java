@@ -1,6 +1,7 @@
 package com.ixi_U.chatbot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ixi_U.chatbot.advisor.ForbiddenWordAdvisor;
 import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
@@ -45,6 +46,7 @@ public class ChatBotService {
             죄송합니다. 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
             """;
 
+
     @Qualifier("descriptionClient")
     private final ChatClient descriptionClient;
 
@@ -56,6 +58,8 @@ public class ChatBotService {
 
     private final ObjectMapper objectMapper;
     private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
+
+    private final ForbiddenWordAdvisor forbiddenWordAdvisor;
 
     public Flux<String> getWelcomeMessage() {
 
@@ -71,6 +75,7 @@ public class ChatBotService {
 
                     String llmResult = filterExpressionClient.prompt()
                             .user(request.userQuery())
+                            .advisors(forbiddenWordAdvisor)
                             .call()
                             .content();
 
@@ -95,7 +100,7 @@ public class ChatBotService {
 
                     log.error("추천 로직 에러 발생", e);
 
-                    return Flux.fromStream(GENERAL_ERROR_MESSAGE.chars()
+                    return Flux.fromStream(e.getMessage().chars()
                                     .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
                             )
                             .delayElements(Duration.ofMillis(50));
