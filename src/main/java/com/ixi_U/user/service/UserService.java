@@ -122,9 +122,7 @@ public class UserService {
             Plan plan = planRepository.findById(planId)
                     .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
-            Subscribed subscribed = Subscribed.of(plan);
-            updatedUser.addSubscribed(subscribed);
-            subscribedRepository.save(subscribed);
+            updatedUser.addSubscribed(Subscribed.of(plan));
         }
         userRepository.save(updatedUser);
     }
