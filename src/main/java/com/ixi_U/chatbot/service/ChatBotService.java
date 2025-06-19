@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -52,6 +55,7 @@ public class ChatBotService {
     private final ChatClient filterExpressionClient;
 
     private final ObjectMapper objectMapper;
+    private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
 
     public Flux<String> getWelcomeMessage() {
 
@@ -80,14 +84,12 @@ public class ChatBotService {
                     return llmResult;
                 })
                 .flatMapMany(llmResult ->
-
-                        recommendClient.prompt()
-                                .user(request.userQuery())
-                                .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
-                                .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
-                                .stream()
-                                .content()
-                                .bufferTimeout(5, Duration.ofMillis(1))
+                    recommendClient.prompt()
+                            .user(request.userQuery())
+                            .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
+                            .stream()
+                            .content()
+                            .bufferTimeout(5, Duration.ofMillis(50))
                 )
                 .onErrorResume(GeneralException.class, e -> {
 
@@ -130,5 +132,21 @@ public class ChatBotService {
 
             throw new GeneralException(ChatBotException.CHAT_BOT_EMBEDDING_DESCRIPTION_ERROR);
         }
+    }
+
+    private void saveMessage(String userId, String userQuery, String assistantResponse){
+
+        saveUserMessage(userId, userQuery);
+//        saveAssistantMessage(userId, assistantResponse);
+
+    }
+
+    private void saveUserMessage(String userId, String userQuery){
+
+        List<Message> userChatHistory = neo4jChatMemoryRepository.findByConversationId(userId);
+
+        UserMessage.builder()
+                .text(userQuery).build();
+//                .metadata(Map.of("planIds",""))
     }
 }
