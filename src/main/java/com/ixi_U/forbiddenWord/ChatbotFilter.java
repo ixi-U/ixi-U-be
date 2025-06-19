@@ -32,6 +32,7 @@ public class ChatbotFilter implements ForbiddenWordFilter {
         }
 
         // 3) Embedding 검사
-        return embeddingSimilarityFilter.matches(text);
+    //    return embeddingSimilarityFilter.matches(text);
+        return false;
     }
 }
