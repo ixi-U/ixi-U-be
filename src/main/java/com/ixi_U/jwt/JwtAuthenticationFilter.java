@@ -1,5 +1,8 @@
 package com.ixi_U.jwt;
 
+import com.ixi_U.user.entity.User;
+import com.ixi_U.user.repository.UserRepository;
+import com.ixi_U.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,14 +24,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    @Value("${jwt.access-token-expiration-time}")
+    private long ACCESS_TOKEN_EXP;
+
     private final JwtTokenProvider jwtTokenProvider;
 
-    // 필터 동작 안하도록
-//    @Override
-//    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-//
-//        return true;
-//    }
+    private final UserRepository userRepository;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -43,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("🔍 JwtAuthenticationFilter 진입: {}", request.getRequestURI());
 
         // 1. 쿠키에서 토큰 추출
-        String token = extractTokenFromCookie(request);
+        String token = extractAccessTokenFromCookie(request);
         log.info("🔑 추출된 토큰: {}", token);
 
         // 2. 쿠키 유효성 검사
@@ -64,20 +66,66 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } else {
-            log.info("❌ 인증 실패 - 유효하지 않은 토큰");
+            log.info("❌ 인증 실패 - 유효하지 않은 access token");
+
+            // todo access token 이 없으면 -> 인증 실패 요청 차단 ?
 //            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or missing token");
 //            return; // 요청 차단
+
+            String refreshToken = extractRefreshTokenFromCookie(request);
+
+            if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
+                String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
+                String role = jwtTokenProvider.getRoleFromToken(refreshToken);
+
+                // refresh token이 DB에 저장된 값과 일치하는지 검증 필요
+                User user = userRepository.findById(userId).orElse(null);
+
+                if (user != null && refreshToken.equals(user.getRefreshToken())) {
+                    // access token 재발급
+                    String newAcceessToken = jwtTokenProvider.generateAccessToken(userId, role); // USER_ROLE
+
+                    // 쿠키에 다시 저장
+                    Cookie newAccessTokenCookie = new Cookie("access_token", newAcceessToken);
+                    newAccessTokenCookie.setHttpOnly(true);
+                    newAccessTokenCookie.setPath("/");
+                    newAccessTokenCookie.setMaxAge((int) ACCESS_TOKEN_EXP);
+                    response.addCookie(newAccessTokenCookie);
+
+                    // 인증 처리
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(role)));
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                    log.info("♻️ access token 재발급 완료 - userId: {}", userId);
+                }
+            }
         }
         filterChain.doFilter(request, response);
     }
 
-    private String extractTokenFromCookie(HttpServletRequest request) {
+    // access 토큰 추출
+    private String extractAccessTokenFromCookie(HttpServletRequest request) {
         if (request.getCookies() == null) {
             return null;
         }
 
         for (Cookie cookie : request.getCookies()) {
             if ("access_token".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    // refresh 토큰 추출
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+        for (Cookie cookie : request.getCookies()) {
+            if ("refresh_token".equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }
