@@ -7,9 +7,9 @@ import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -56,7 +56,6 @@ class AuthControllerTest {
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
 
@@ -66,65 +65,84 @@ class AuthControllerTest {
                 .build();
     }
 
-    @Test
-    @DisplayName("유효한 access_token이 있을 때 로그아웃 성공")
-    void logoutSuccessWithValidToken() throws Exception {
-        // given
-        String fakeAccessToken = "valid-token";
-        String userId = "user123";
+    @Nested
+    @DisplayName("🔓 로그아웃 요청 시")
+    class Logout {
 
-        MockCookie accessCookie = new MockCookie("access_token", fakeAccessToken);
-        accessCookie.setPath("/");
-        accessCookie.setHttpOnly(true);
+        @Nested
+        @DisplayName("유효한 access_token이 있을 때")
+        class WhenTokenIsValid {
 
-        when(jwtTokenProvider.validateToken(fakeAccessToken)).thenReturn(true);
-        when(jwtTokenProvider.getUserIdFromToken(fakeAccessToken)).thenReturn(userId);
+            @Test
+            @DisplayName("로그아웃 성공")
+            void logoutSuccessWithValidToken() throws Exception {
+                // given
+                String fakeAccessToken = "valid-token";
+                String userId = "user123";
 
-        // when & then
-        mockMvc.perform(post(LOGOUT_URL)
-                        .cookie(accessCookie)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("로그아웃 완료"));
+                MockCookie accessCookie = new MockCookie("access_token", fakeAccessToken);
+                accessCookie.setPath("/");
+                accessCookie.setHttpOnly(true);
 
-        verify(userService, times(1)).removeRefreshToken(userId);
-    }
+                when(jwtTokenProvider.validateToken(fakeAccessToken)).thenReturn(true);
+                when(jwtTokenProvider.getUserIdFromToken(fakeAccessToken)).thenReturn(userId);
 
-    @Test
-    @DisplayName("access_token이 없을 때 로그아웃 실패")
-    void logoutFailWhenNoAccessToken() throws Exception {
+                // when & then
+                mockMvc.perform(post(LOGOUT_URL)
+                                .cookie(accessCookie)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(content().string("로그아웃 완료"));
 
-        // given
+                verify(userService, times(1)).removeRefreshToken(userId);
+            }
+        }
 
+        @Nested
+        @DisplayName("유효하지 않은 access_token일 때")
+        class WhenTokenIsNotValid {
 
-        // when & then
-        mockMvc.perform(post(LOGOUT_URL)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string("유효하지 않은 토큰입니다."));
+            @Test
+            @DisplayName("로그아웃 실패")
+            void logoutFailWithInvalidToken() throws Exception {
 
-        verify(userService, never()).removeRefreshToken(anyString());
-    }
+                // given
+                String invalidToken = "invalid-token";
+                MockCookie cookie = new MockCookie("access_token", invalidToken);
+                cookie.setHttpOnly(true);
+                cookie.setPath("/");
 
-    @Test
-    @DisplayName("유효하지 않은 access_token일 때 로그아웃 실패")
-    void logoutFailWithInvalidToken() throws Exception {
+                when(jwtTokenProvider.validateToken(invalidToken)).thenReturn(false);
 
-        // given
-        String invalidToken = "invalid-token";
-        MockCookie cookie = new MockCookie("access_token", invalidToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
+                // when & then
+                mockMvc.perform(post(LOGOUT_URL)
+                                .cookie(cookie)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isUnauthorized())
+                        .andExpect(content().string("유효하지 않은 토큰입니다."));
 
-        when(jwtTokenProvider.validateToken(invalidToken)).thenReturn(false);
+                verify(userService, never()).removeRefreshToken(anyString());
+            }
+        }
 
-        // when & then
-        mockMvc.perform(post(LOGOUT_URL)
-                        .cookie(cookie)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string("유효하지 않은 토큰입니다."));
+        @Nested
+        @DisplayName("access_token이 없을 때")
+        class WhenRefreshTokenIsMissing {
 
-        verify(userService, never()).removeRefreshToken(anyString());
+            @Test
+            @DisplayName("access_token이 없을 때 로그아웃 실패")
+            void logoutFailWhenNoAccessToken () throws Exception {
+
+                // given
+
+                // when & then
+                mockMvc.perform(post(LOGOUT_URL)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isUnauthorized())
+                        .andExpect(content().string("유효하지 않은 토큰입니다."));
+
+                verify(userService, never()).removeRefreshToken(anyString());
+            }
+        }
     }
 }
