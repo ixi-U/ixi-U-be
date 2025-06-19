@@ -1,5 +1,6 @@
 package com.ixi_U.user.service;
 
+import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
 import com.ixi_U.plan.entity.Plan;
@@ -11,6 +12,7 @@ import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.Comparator;
 import org.springframework.stereotype.Service;
@@ -22,12 +24,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final SubscribedRepository subscribedRepository;
     private final PlanRepository planRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository,
-            PlanRepository planRepository) {
+            PlanRepository planRepository, CustomOAuth2UserService customOAuth2UserService) {
         this.userRepository = userRepository;
         this.subscribedRepository = subscribedRepository;
         this.planRepository = planRepository;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     public ShowCurrentSubscribedResponse findCurrentSubscribedPlan(String userId) {
@@ -77,11 +81,12 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserById(String userId) {
+    public void deleteUserById(String userId, HttpServletResponse response) {
         if (!userRepository.existsById(userId)) {
             throw new GeneralException(UserException.USER_NOT_FOUND);
         }
-
+        customOAuth2UserService.expireCookie("access_token", response);
+        customOAuth2UserService.expireCookie("refresh_token", response);
         subscribedRepository.deleteAllByUserId(userId);
 
         userRepository.deleteById(userId);
