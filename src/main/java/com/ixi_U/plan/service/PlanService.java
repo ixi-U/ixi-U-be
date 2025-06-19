@@ -9,6 +9,7 @@ import com.ixi_U.chatbot.dto.GeneratePlanDescriptionRequest;
 import com.ixi_U.chatbot.dto.SingleBenefitDTO;
 import com.ixi_U.chatbot.service.VectorStoreService;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanListDto;
 import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
@@ -23,15 +24,15 @@ import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -64,11 +65,13 @@ public class PlanService {
 
         validateSamePlanName(request);
 
-        List<BundledBenefit> bundledBenefits = bundledBenefitRepository.findAllById(request.bundledBenefits());
+        List<BundledBenefit> bundledBenefits = bundledBenefitRepository.findAllById(
+                request.bundledBenefits());
 
         log.info("bundledBenefits = {}", bundledBenefits);
 
-        List<SingleBenefit> singleBenefits = singleBenefitRepository.findAllById(request.singleBenefits());
+        List<SingleBenefit> singleBenefits = singleBenefitRepository.findAllById(
+                request.singleBenefits());
 
         log.info("singleBenefits = {}", singleBenefits);
 
@@ -118,7 +121,8 @@ public class PlanService {
         );
     }
 
-    private List<BundledBenefitDTO> bundledBenefitEntityToDto(List<BundledBenefit> bundledBenefits) {
+    private List<BundledBenefitDTO> bundledBenefitEntityToDto(
+            List<BundledBenefit> bundledBenefits) {
         return bundledBenefits.stream()
                 .map(entity ->
                         BundledBenefitDTO.create(
@@ -149,10 +153,48 @@ public class PlanService {
         Slice<PlanSummaryDto> plans = planRepository.findPlans(pageable, planType, planSortOption,
                 request.searchKeyword(), request.planId(), request.cursorSortValue());
 
+        List<PlanListDto> convertedPlanList = plans.getContent().stream()
+                .map(dto -> new PlanListDto(
+                        dto.id(),
+                        dto.name(),
+                        convertMobileData(dto.mobileDataLimitMb()),
+                        convertSharedMobileDataLimitMb(dto.sharedMobileDataLimitMb()),
+                        convertCallLimit(dto.callLimitMinutes()),
+                        convertMessageLimit(dto.messageLimit()),
+                        dto.monthlyPrice(),
+                        dto.priority(),
+                        dto.singleBenefits(),
+                        dto.bundledBenefits()
+                ))
+                .toList();
+
+        Slice<PlanListDto> convertedSlice = new SliceImpl<>(
+                convertedPlanList,
+                plans.getPageable(),
+                plans.hasNext()
+        );
+
         String lastPlanId = getLastPlanId(plans);
         int lastSortValue = getLastSortValue(plans, planSortOption);
 
-        return new SortedPlanResponse(plans, lastPlanId, lastSortValue);
+        return new SortedPlanResponse(convertedSlice, lastPlanId, lastSortValue);
+    }
+
+    private String convertCallLimit(int callLimitMinutes) {
+        return callLimitMinutes == -1 ? "기본제공" : String.valueOf(callLimitMinutes) + " 분";
+    }
+
+    private String convertMessageLimit(int messageLimit) {
+        return messageLimit == -1 ? "기본제공" : String.valueOf(messageLimit) + " 건";
+    }
+
+    private String convertMobileData(int mobileDataLimitMb) {
+        return mobileDataLimitMb == -1 ? "무제한" : String.valueOf(mobileDataLimitMb / 1000) + " GB";
+    }
+
+    private String convertSharedMobileDataLimitMb(int sharedMobileDataLimitMb) {
+        return sharedMobileDataLimitMb == -1 ? "무제한"
+                : String.valueOf(sharedMobileDataLimitMb / 1000) + " GB";
     }
 
     private String getLastPlanId(Slice<PlanSummaryDto> plans) {
@@ -210,7 +252,7 @@ public class PlanService {
         Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
         planRepository.save(updatePlan);
     }
-  
+
     public List<PlanNameDto> getPlanNameList() {
         return planRepository.findAllPlanNames();
     }
