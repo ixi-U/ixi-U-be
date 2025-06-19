@@ -1,6 +1,7 @@
 package com.ixi_U.jwt;
 
 import com.ixi_U.user.entity.User;
+import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -76,14 +77,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
                 String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
-                String role = jwtTokenProvider.getRoleFromToken(refreshToken);
+                String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
+                UserRole role = UserRole.from(roleString);
 
                 // refresh token이 DB에 저장된 값과 일치하는지 검증 필요
                 User user = userRepository.findById(userId).orElse(null);
 
                 if (user != null && refreshToken.equals(user.getRefreshToken())) {
                     // access token 재발급
-                    String newAcceessToken = jwtTokenProvider.generateAccessToken(userId, role); // USER_ROLE
+                    String newAcceessToken = jwtTokenProvider.generateAccessToken(userId, role);
 
                     // 쿠키에 다시 저장
                     Cookie newAccessTokenCookie = new Cookie("access_token", newAcceessToken);
@@ -94,7 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     // 인증 처리
                     UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(role)));
+                            new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(roleString)));
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
