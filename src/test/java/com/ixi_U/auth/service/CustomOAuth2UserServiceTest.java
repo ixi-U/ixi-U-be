@@ -5,8 +5,10 @@ import com.ixi_U.user.entity.User;
 import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -25,7 +27,7 @@ class CustomOAuth2UserServiceTest {
     @Mock
     private OAuth2UserRequest oAuth2UserRequest;
 
-    @Mock
+    @InjectMocks
     private CustomOAuth2UserService customOAuth2UserService;
 
     @BeforeEach
@@ -36,7 +38,7 @@ class CustomOAuth2UserServiceTest {
     }
 
     @Nested
-    @DisplayName("loadUser()는")
+    @DisplayName("loadUser()에서")
     class LoadUser {
 
         @Test
@@ -67,6 +69,41 @@ class CustomOAuth2UserServiceTest {
             assertThat(customUser.isNewUser()).isFalse();
             assertThat(customUser.getUserId()).isEqualTo(userId);
             assertThat(customUser.getName()).isEqualTo(nickname);
+        }
+
+        @Test
+        @DisplayName("기존 카카오 ID가 없으면 신규 유저로 저장하고 isNewUser는 true여야 한다")
+        void givenNewKakaoUser_whenProcessOAuth2User_thenSaveUserAndReturnNewUser() {
+            // given
+            String kakaoId = "22222";
+            String userId = "user-222";
+            String nickname = "신규유저";
+
+            Map<String, Object> profile = Map.of("nickname", nickname);
+            Map<String, Object> kakaoAccount = new HashMap<>();
+            kakaoAccount.put("email", null);
+            kakaoAccount.put("profile", profile);
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("id", kakaoId);
+            attributes.put("kakao_account", kakaoAccount);
+
+            OAuth2User fakeOAuth2User = new DefaultOAuth2User(List.of(), attributes, "id");
+
+            when(userRepository.findByKakaoId(Long.valueOf(kakaoId))).thenReturn(Optional.empty());
+            when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+                User savedUser = invocation.getArgument(0);
+                return savedUser; // 실제 저장된 객체 그대로 반환
+            });
+
+            // when
+            CustomOAuth2User result = (CustomOAuth2User) customOAuth2UserService.processOAuth2User(fakeOAuth2User);
+
+            // then
+            assertThat(result.isNewUser()).isTrue();
+            assertThat(result.getName()).isEqualTo(nickname);
+            assertThat(result.getUserRole()).isEqualTo(UserRole.ROLE_USER);
+            verify(userRepository).save(any(User.class));
         }
     }
 }
