@@ -1,7 +1,7 @@
 package com.ixi_U.forbiddenWord;
 
-import com.ixi_U.chatbot.service.ChatBotForBiddenWordDecisionService;
 import com.ixi_U.forbiddenWord.filters.AhoCorasickFilter;
+import com.ixi_U.forbiddenWord.filters.EmbeddingSimilarityFilter;
 import com.ixi_U.forbiddenWord.filters.ForbiddenWordFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ public class ChatbotFilter implements ForbiddenWordFilter {
 
     private final ForbiddenWordLoader forbiddenWordLoader;
     private final AhoCorasickFilter ahoCorasickFilter;
-    private final ChatBotForBiddenWordDecisionService llmDecisionService;
+    private final EmbeddingSimilarityFilter embeddingSimilarityFilter;
 
     @Override
     public boolean matches(String text) {
@@ -31,7 +31,7 @@ public class ChatbotFilter implements ForbiddenWordFilter {
             return true;
         }
 
-        // 3) LLM 검사
-        return llmDecisionService.isForbidden(text);
+        // 3) Embedding 검사
+        return embeddingSimilarityFilter.matches(text);
     }
 }

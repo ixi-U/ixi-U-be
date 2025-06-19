@@ -16,8 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.dto.PlanListDto;
 import com.ixi_U.plan.dto.PlanNameDto;
-import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
 import com.ixi_U.plan.dto.response.BundledBenefitResponse;
@@ -170,12 +170,14 @@ class PlanControllerTest {
         void getPlansBySort() throws Exception {
 
             // given
-            PlanSummaryDto dto1 = new PlanSummaryDto("1", "요금제1", 10000, 2000, 300, 200, 29000, 5,
+            PlanListDto dto1 = new PlanListDto("1", "요금제1", "10GB", "2000", "300분", "200건", 29000,
+                    5,
                     List.of(), List.of());
-            PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000, 200, 100, 19000, 3,
+            PlanListDto dto2 = new PlanListDto("2", "요금제2", "무제한", "2000", "기본제공", "기본제공", 19000, 3,
                     List.of(), List.of());
-            SortedPlanResponse response =
-                    new SortedPlanResponse(new SliceImpl<>(List.of(dto1, dto2)), "2", 3);
+
+            SortedPlanResponse response = new SortedPlanResponse(
+                    new SliceImpl<>(List.of(dto1, dto2)), "2", 3);
 
             given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
                     "ONLINE", "PRIORITY", null, null, null)))
@@ -186,11 +188,14 @@ class PlanControllerTest {
                             .param("size", "2")
                             .param("planTypeStr", "ONLINE")
                             .param("planSortOptionStr", "PRIORITY")
-                            // 보안필터를 통과시키려면 필요시 Mock 사용자 주입
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.plans.content[0].id").value("1"))
+                    .andExpect(jsonPath("$.plans.content[0].mobileDataLimitMb").value("10GB"))
+                    .andExpect(jsonPath("$.plans.content[0].callLimitMinutes").value("300분"))
                     .andExpect(jsonPath("$.plans.content[1].id").value("2"))
+                    .andExpect(jsonPath("$.plans.content[1].mobileDataLimitMb").value("무제한"))
+                    .andExpect(jsonPath("$.plans.content[1].callLimitMinutes").value("기본제공"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
                     .andDo(document("get-plans-sort-success"))
@@ -202,7 +207,7 @@ class PlanControllerTest {
         void getPlansBySearch() throws Exception {
 
             // given
-            PlanSummaryDto dto2 = new PlanSummaryDto("2", "요금제2", 8000, 1000, 200, 100, 19000, 3,
+            PlanListDto dto2 = new PlanListDto("2", "요금제2", "8GB", "1000", "200분", "100건", 19000, 3,
                     List.of(), List.of());
             SortedPlanResponse response =
                     new SortedPlanResponse(new SliceImpl<>(List.of(dto2)), "2", 3);
