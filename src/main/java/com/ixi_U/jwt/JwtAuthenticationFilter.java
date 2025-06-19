@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -85,10 +85,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (user != null && refreshToken.equals(user.getRefreshToken())) {
                     // access token 재발급
-                    String newAcceessToken = jwtTokenProvider.generateAccessToken(userId, role);
+                    String newAccssToken = jwtTokenProvider.generateAccessToken(userId, role);
 
                     // 쿠키에 다시 저장
-                    Cookie newAccessTokenCookie = new Cookie("access_token", newAcceessToken);
+                    Cookie newAccessTokenCookie = new Cookie("access_token", newAccssToken);
                     newAccessTokenCookie.setHttpOnly(true);
                     newAccessTokenCookie.setPath("/");
                     newAccessTokenCookie.setMaxAge((int) ACCESS_TOKEN_EXP);
