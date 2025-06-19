@@ -4,6 +4,7 @@ import com.ixi_U.auth.handler.OAuth2SuccessHandler;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.jwt.JwtAuthenticationFilter;
 import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final UserRepository userRepository;
 
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
@@ -54,7 +56,7 @@ public class SecurityConfig {
         ;
         // JWT 필터
         http
-                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider),
+                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider, userRepository),
                         OAuth2LoginAuthenticationFilter.class);
 
         // OAuth2 필터
