@@ -1,7 +1,7 @@
 package com.ixi_U;
 
 import com.ixi_U.common.AbstractNeo4jContainer;
-import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.security.jwt.provider.JwtProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,7 +14,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class IxiUApplicationTests extends AbstractNeo4jContainer {
 
     @MockBean
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtProvider jwtProvider;
 
     @Test
     void contextLoads() {

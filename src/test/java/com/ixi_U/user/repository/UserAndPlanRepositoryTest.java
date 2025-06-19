@@ -73,7 +73,7 @@ class UserAndPlanRepositoryTest {
     @DisplayName("회원과 요금제 생성 후 실제 SUBSCRIBED 관계가 DB에 저장된다")
     void givenUserAndPlan_whenUpdateSubscribed_thenSubscribedRelationshipIsSaved() {
         // given
-        User user = User.of("홍승민", "hong@example.com", "KAKAO", 123L, UserRole.ROLE_USER);
+        User user = User.createSocialLoginUser("홍승민", "hong@example.com", "kakao_123");
         user = userRepository.save(user);
 
         Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
@@ -111,7 +111,7 @@ class UserAndPlanRepositoryTest {
     @DisplayName("요금제를 변경하면 구독 이력이 누적된다")
     void givenChangedSubscription_whenAddDifferentSubscription_thenHistoryAccumulates() {
         // given
-        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER));
+        User user = userRepository.save(User.createSocialLoginUser("홍승민", "hong@example.com", "kakao_123"));
         Plan planA = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
                 0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
@@ -147,7 +147,7 @@ class UserAndPlanRepositoryTest {
     @DisplayName("관계 매핑/저장 로직 확인")
     void givenSubscribed_whenReloadedFromDb_thenSubscribedHistoryIsNotEmpty() {
         // 1. given
-        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER));
+        User user = userRepository.save(User.createSocialLoginUser("홍승민", "hong@example.com", "kakao_123"));
         Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
                 0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
@@ -168,7 +168,7 @@ class UserAndPlanRepositoryTest {
     @DisplayName("이미 구독 중인 요금제를 중복 구독할 때의 동작을 확인한다")
     void givenExistingSubscription_whenAddDuplicateSubscription_thenHandlesProperly() {
         // given
-        User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER));
+        User user = userRepository.save(User.createSocialLoginUser("홍승민", "hong@example.com", "kakao_123"));
         Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
                 0, 100, false, 5, "기타 없음", 5, List.of(), List.of()

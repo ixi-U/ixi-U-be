@@ -2,21 +2,22 @@ package com.ixi_U.user.service;
 
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
+import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
-//import com.ixi_U.user.dto.response.SubscribedResponse;
+import com.ixi_U.security.oauth2.dto.OAuth2UserDto;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
 import com.ixi_U.user.dto.response.ShowMyInfoResponse;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
-import com.ixi_U.plan.entity.Plan;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -25,10 +26,22 @@ public class UserService {
     private final SubscribedRepository subscribedRepository;
     private final PlanRepository planRepository;
 
-    public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository,  PlanRepository planRepository) {
+    public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository, PlanRepository planRepository) {
         this.userRepository = userRepository;
         this.subscribedRepository = subscribedRepository;
         this.planRepository = planRepository;
+    }
+
+    public User findOrCreateUser(OAuth2UserDto oAuth2UserDto) {
+
+        return userRepository.findByProvider(oAuth2UserDto.provider())
+                .orElseGet(() ->
+                        userRepository.save(User.createSocialLoginUser(
+                                oAuth2UserDto.name(),
+                                oAuth2UserDto.email(),
+                                oAuth2UserDto.provider()
+                        ))
+                );
     }
 
     public ShowCurrentSubscribedResponse findCurrentSubscribedPlan(String userId) {
@@ -69,14 +82,14 @@ public class UserService {
         );
     }
 
-    @Transactional
-    public void removeRefreshToken(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
-
-        User updated = user.withRefreshToken(null); // null로 초기화 (or 빈 문자열 ..)
-        userRepository.save(updated);
-    }
+//    @Transactional
+//    public void removeRefreshToken(String userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
+//
+//        User updated = user.withRefreshToken(null); // null로 초기화 (or 빈 문자열 ..)
+//        userRepository.save(updated);
+//    }
 
     @Transactional
     public void deleteUserById(String userId) {

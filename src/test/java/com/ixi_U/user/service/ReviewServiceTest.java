@@ -1,13 +1,5 @@
 package com.ixi_U.user.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanType;
@@ -18,16 +10,11 @@ import com.ixi_U.user.dto.response.ShowReviewResponse;
 import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.entity.User;
-import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
 import com.ixi_U.user.repository.ReviewedRepository;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,6 +27,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -75,8 +75,7 @@ class ReviewServiceTest {
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
-                                UserRole.ROLE_USER)));
+                        Optional.of(User.createSocialLoginUser("testName", "testEmail", "testProvider_123")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(false);
                 ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -109,8 +108,7 @@ class ReviewServiceTest {
                                 0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
                         )));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
-                                UserRole.ROLE_USER)));
+                        Optional.of(User.createSocialLoginUser("testName", "testEmail", "testProvider_123")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(false);
 
                 // when
@@ -136,8 +134,7 @@ class ReviewServiceTest {
                         PlanType.ONLINE, "주의사항", 400,
                         0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
-                        Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
-                                UserRole.ROLE_USER)));
+                        Optional.of(User.createSocialLoginUser("testName", "testEmail", "testProvider_123")));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(true);
 
@@ -169,9 +166,9 @@ class ReviewServiceTest {
             Pageable pageable = PageRequest.of(0, 5);
 
             List<ShowReviewResponse> content = List.of(
-                    new ShowReviewResponse(123L,"유저1", 4, "리뷰1",
+                    new ShowReviewResponse(123L, "유저1", 4, "리뷰1",
                             LocalDateTime.of(2025, Month.JUNE, 11, 12, 0)),
-                    new ShowReviewResponse(456L,"유저2", 5, "리뷰2",
+                    new ShowReviewResponse(456L, "유저2", 5, "리뷰2",
                             LocalDateTime.of(2025, Month.JUNE, 13, 12, 0))
             );
 
@@ -205,13 +202,13 @@ class ReviewServiceTest {
             given(userRepository.findAveragePointAndReviewCount(anyString())).willReturn(
                     ShowReviewStatsResponse.of(averagePoint, totalCount));
 
-            given(reviewedRepository.showMyReview(anyString(),anyString())).willReturn(
-                    ShowReviewResponse.of(1L,"jinu",5,"comment",LocalDateTime.now())
+            given(reviewedRepository.showMyReview(anyString(), anyString())).willReturn(
+                    ShowReviewResponse.of(1L, "jinu", 5, "comment", LocalDateTime.now())
             );
 
             //when
             ShowReviewSummaryResponse showReviewSummary = reviewService.showReviewSummary(
-                    "user-id","plan-id");
+                    "user-id", "plan-id");
 
             //then
             assertThat(showReviewSummary.showReviewStatsResponse().averagePoint()).isEqualTo(averagePoint);

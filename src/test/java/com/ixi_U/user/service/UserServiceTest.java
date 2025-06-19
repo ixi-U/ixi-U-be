@@ -3,7 +3,8 @@ package com.ixi_U.user.service;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.ixi_U.auth.dto.CustomOAuth2User;
+import com.ixi_U.security.oauth2.dto.CustomOAuth2User;
+import com.ixi_U.security.oauth2.dto.OAuth2UserDto;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.SubscribedRepository;
@@ -16,8 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -50,18 +49,16 @@ class UserServiceTest {
     @DisplayName("@AuthenticationPrincipal UserId를 통한 회원 탈퇴 로직 확인")
     void deleteUser_withCustomOAuth2User() {
         // given
-        User dummyUser = User.of("nickname", "email@example.com", "kakao", 123456L,
-                UserRole.ROLE_USER);
+        User dummyUser = User.createSocialLoginUser("nickname", "email@example.com", "kakao_123456");
         when(userRepository.save(dummyUser)).thenReturn(dummyUser);
         when(userRepository.existsById(dummyUser.getId())).thenReturn(true);
 
         userRepository.save(dummyUser);
 
         CustomOAuth2User customUser = new CustomOAuth2User(
-                dummyUser.getName(),
+                new OAuth2UserDto("kakao_123", "nickname", "profile_url", "user@email.com"),
                 dummyUser.getId(),
-                dummyUser.getUserRole(),
-                false
+                dummyUser.getUserRole()
         );
 
         UsernamePasswordAuthenticationToken auth =

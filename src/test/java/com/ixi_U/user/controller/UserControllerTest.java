@@ -1,32 +1,13 @@
 package com.ixi_U.user.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
-import com.ixi_U.common.config.SecurityConfig;
-import com.ixi_U.jwt.JwtTokenProvider;
-import com.ixi_U.user.dto.response.PlanResponse;
+import com.ixi_U.security.config.SecurityConfig;
+import com.ixi_U.security.jwt.provider.JwtProvider;
+import com.ixi_U.security.oauth2.service.CustomOAuth2UserService;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
 import com.ixi_U.user.service.UserService;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,6 +31,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(value = {UserController.class})
 @Import(SecurityConfig.class)
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
@@ -66,7 +61,7 @@ class UserControllerTest {
     private WebApplicationContext context;
 
     @MockBean
-    JwtTokenProvider oAuth2SuccessHandler;
+    JwtProvider jwtProvider;
 
     @MockBean
     CustomOAuth2UserService customOAuth2UserService;
@@ -85,7 +80,7 @@ class UserControllerTest {
     class DescribeMyPlan {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -114,11 +109,11 @@ class UserControllerTest {
             given(userService.findCurrentSubscribedPlan(any())).willReturn(response1);
 
             // when
-            ResultActions result = mockMvc.perform(get(USER_URL+"/plan")
+            ResultActions result = mockMvc.perform(get(USER_URL + "/plan")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON))
-                            .andDo(document("get-my-plan-success"))
-                            .andDo(print());
+                    .andDo(document("get-my-plan-success"))
+                    .andDo(print());
 
             // then
             result.andExpect(status().isOk())
@@ -132,7 +127,7 @@ class UserControllerTest {
     class DescribeDeleteUser {
 
         @BeforeEach
-        public void initSecurity(){
+        public void initSecurity() {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken("userId", null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -158,7 +153,6 @@ class UserControllerTest {
 
         }
     }
-
 
 
 }

@@ -1,10 +1,10 @@
 package com.ixi_U.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ixi_U.auth.service.CustomOAuth2UserService;
-import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.common.exception.GeneralException;
-import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.security.config.SecurityConfig;
+import com.ixi_U.security.jwt.provider.JwtProvider;
+import com.ixi_U.security.oauth2.service.CustomOAuth2UserService;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.request.UpdateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
@@ -73,7 +73,7 @@ class ReviewControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    JwtTokenProvider oAuth2SuccessHandler;
+    JwtProvider jwtProvider;
 
     @MockBean
     CustomOAuth2UserService customOAuth2UserService;

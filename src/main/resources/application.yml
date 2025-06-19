@@ -7,10 +7,12 @@ spring:
         registration:
           kakao:
             client-id: ${KAKAO_REST_API_KEY}
-            client-name: Kakao
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: kakao
+            redirect-uri: http://localhost:8080/login/code/kakao
+            client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            scope: profile_nickname
+            scope:
+              - profile_nickname
 
         provider:
           kakao:

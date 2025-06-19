@@ -3,6 +3,7 @@ package com.ixi_U.chatbot.controller;
 import com.ixi_U.TestWebFluxSecurityConfig;
 import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.service.ChatBotService;
+import com.ixi_U.security.jwt.filter.JwtAuthenticationFilter;
 import com.ixi_U.util.constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,6 +1,5 @@
 package com.ixi_U.benefit.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -22,16 +21,10 @@ import com.ixi_U.benefit.dto.response.FindBundledBenefitResponse;
 import com.ixi_U.benefit.dto.response.FindSingleBenefitResponse;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.benefit.service.BenefitService;
-import com.ixi_U.common.config.SecurityConfig;
-import com.ixi_U.user.controller.ReviewController;
-import com.ixi_U.user.dto.request.CreateReviewRequest;
-import com.ixi_U.user.dto.response.ShowReviewListResponse;
-import com.ixi_U.user.dto.response.ShowReviewResponse;
-import com.ixi_U.user.service.ReviewService;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.ArrayList;
+
 import java.util.List;
+
+import com.ixi_U.security.jwt.filter.JwtAuthenticationFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -40,13 +33,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -56,7 +45,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @WebMvcTest(value = {BenefitController.class})
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@ExtendWith({RestDocumentationExtension.class})
 @ActiveProfiles("test")
 class BenefitControllerTest {
 
@@ -66,6 +55,9 @@ class BenefitControllerTest {
 
     @MockBean
     BenefitService benefitService;
+
+    @MockBean
+    JwtAuthenticationFilter authenticationFilter;
 
     @Autowired
     private WebApplicationContext context;
@@ -84,7 +76,7 @@ class BenefitControllerTest {
 
     @Nested
     @DisplayName("혜택 목록 조회 요청은")
-    class DescribeBenfitList {
+    class DescribeBenefitList {
 
         List<FindSingleBenefitResponse>  findSingleBenefitResponses;
         List<FindBundledBenefitResponse> findBundledBenefitResponses;

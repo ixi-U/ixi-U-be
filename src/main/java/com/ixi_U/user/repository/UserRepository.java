@@ -35,4 +35,5 @@ public interface UserRepository extends Neo4jRepository<User, String> {
             """)
     Optional<User> findOwnerByReviewedId(Long reviewedId);
 
+    Optional<User> findByProvider(String provider);
 }
