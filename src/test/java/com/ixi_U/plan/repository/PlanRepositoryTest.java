@@ -58,6 +58,16 @@ class PlanRepositoryTest {
         registry.add("spring.neo4j.authentication.password", neo4jContainer::getAdminPassword);
     }
 
+    @DynamicPropertySource
+    static void redisProps(DynamicPropertyRegistry r) {
+        r.add("spring.cache.type", () -> "none");
+        r.add("spring.cache.redis.time-to-live", () -> "10m");
+        r.add("spring.neo4j.pool.connection-acquisition-timeout", () -> "30s");
+        r.add("spring.neo4j.pool.max-connection-pool-size", () -> "100");
+        r.add("spring.neo4j.pool.min-connection-pool-size", () -> "10");
+        r.add("spring.neo4j.pool.max-connection-lifetime", () -> "3600s");
+    }
+
     @Nested
     class findPlansTest {
 
