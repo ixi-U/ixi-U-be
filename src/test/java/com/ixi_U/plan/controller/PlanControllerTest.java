@@ -399,10 +399,11 @@ class PlanControllerTest {
         @Test
         @DisplayName("요금제 요약 목록을 조회하고 200을 반환한다")
         void shouldReturnPlanNames() throws Exception {
-            when(planService.getPlanNameList()).thenReturn(Collections.singletonList(new PlanNameDto("요금제A", "ABLE")));
+            when(planService.getPlanNameList()).thenReturn(Collections.singletonList(new PlanNameDto("id", "요금제A")));
 
             mockMvc.perform(get("/plans/summaries"))
                     .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].id").value("id"))
                     .andExpect(jsonPath("$[0].name").value("요금제A"));
         }
     }
