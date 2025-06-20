@@ -1,5 +1,7 @@
 package com.ixi_U.chatbot.tool;
 
+import com.ixi_U.chatbot.exception.ChatBotException;
+import com.ixi_U.common.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
@@ -36,15 +38,20 @@ public class RecommendTool {
 
         log.info("---요금제 추천 툴 동작");
 
-        String filterExpression = (String) toolContext.getContext().get(ToolContextKey.FILTER_EXPRESSION.getKey());
-        String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
+        try {
+            String filterExpression = (String) toolContext.getContext().get(ToolContextKey.FILTER_EXPRESSION.getKey());
+            String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
 
-        log.info("대화 사이즈 : {}",neo4jChatMemoryRepository.findByConversationId(userId).size());
-        log.info("userRequest = {}", userQuery);
-        log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
-        log.info("{} = {}", ToolContextKey.USER_ID, userId);
+            log.info("userRequest = {}", userQuery);
+            log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
+            log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
-        return performVectorSearch(userQuery, filterExpression);
+            return performVectorSearch(userQuery, filterExpression);
+
+        } catch (Exception e) {
+
+            throw new GeneralException(ChatBotException.RECOMMEND_PLAN_TOOL_ERROR);
+        }
     }
 
     @Tool(description = """
@@ -61,17 +68,20 @@ public class RecommendTool {
             3. 조건에 맞는 요금제만 필터링하여 반환
             """)
     List<Message> recommendUsingChatMemory(final ToolContext toolContext) {
-        try{
-            log.info("---대화 내역 기반 추천 툴 동작");
 
+        log.info("---대화 내역 기반 추천 툴 동작");
+
+        try {
             String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
 
             log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
             return neo4jChatMemoryRepository.findByConversationId(userId);
-        }catch (Exception e){
+        } catch (Exception e) {
+
             log.error(e.getMessage());
-            return null;
+
+            throw new GeneralException(ChatBotException.RECOMMEND_USING_CHAT_MEMORY_TOOL_ERROR);
         }
     }
 
