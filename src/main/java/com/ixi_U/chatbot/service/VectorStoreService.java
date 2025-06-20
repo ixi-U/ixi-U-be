@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class VectorStoreService {
 
     private final ChatBotService chatBotService;
+
     @Qualifier("planVectorStore")
     private final VectorStore planVectorStore;
 
