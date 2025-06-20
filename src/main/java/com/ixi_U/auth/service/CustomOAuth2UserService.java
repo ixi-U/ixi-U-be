@@ -77,26 +77,4 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(), isNewUser);
     }
-
-    public OAuth2User processOAuth2User(OAuth2User oAuth2User) {
-        Map<String, Object> attributes = oAuth2User.getAttributes();
-        Long kakaoId = Long.valueOf(attributes.get("id").toString());
-
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        String nickname = profile.get("nickname").toString();
-        String email = kakaoAccount.get("email") != null ? kakaoAccount.get("email").toString()
-                : "temp_kakao_" + kakaoId + "@example.com";
-
-        Optional<User> optionalUser = userRepository.findByKakaoId(kakaoId);
-        boolean isNewUser = optionalUser.isEmpty();
-
-        User user = optionalUser.orElseGet(() ->
-                userRepository.save(User.of(nickname, email, "kakao", kakaoId, UserRole.ROLE_USER))
-        );
-
-        return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(), isNewUser);
-    }
 }
-
-
