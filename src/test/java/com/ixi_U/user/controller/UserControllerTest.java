@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -20,10 +21,15 @@ import com.ixi_U.benefit.entity.BundledBenefit;
 import com.ixi_U.benefit.entity.SingleBenefit;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
+import com.ixi_U.user.dto.response.ShowMyInfoResponse;
+import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -159,5 +165,81 @@ class UserControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("온보딩 요청은")
+    class DescribeOnboarding {
 
+        @BeforeEach
+        public void initSecurity() {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("user123", null,
+                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        @Test
+        @DisplayName("성공적으로 온보딩 정보를 등록하고 200을 반환한다")
+        void it_returns_onboarding_success() throws Exception {
+            // given
+            String json = """
+                    {
+                        "email": "user@example.com",
+                        "planId": "plan123"
+                    }
+                    """;
+
+            // when
+            ResultActions result = mockMvc.perform(post(USER_URL + "/onboarding")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json))
+                    .andDo(document("post-onboarding-success"))
+                    .andDo(print());
+
+            // then
+            result.andExpect(status().isOk());
+            verify(userService).updateOnboardingInfo("user123", "user@example.com", "plan123");
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 정보 조회 요청은")
+    class DescribeGetMyInfo {
+
+        @BeforeEach
+        public void initSecurity() {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken("user123", null,
+                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        @Test
+        @DisplayName("성공적으로 유저 정보를 조회하고 200을 반환한다")
+        void it_returns_user_info_success() throws Exception {
+
+            LocalDate createDate = LocalDate.now();
+            // given
+            ShowMyInfoResponse response = new ShowMyInfoResponse(
+                    "user123",
+                    "user@example.com",
+                    "plan123",
+                    UserRole.ROLE_USER,
+                    createDate);
+            given(userService.findMyInfoByUserId("user123")).willReturn(response);
+
+            // when
+            ResultActions result = mockMvc.perform(get(USER_URL + "/info")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(document("get-user-info-success"))
+                    .andDo(print());
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.userId").value("user123"))
+                    .andExpect(jsonPath("$.email").value("user@example.com"))
+                    .andExpect(jsonPath("$.planId").value("plan123"));
+        }
+    }
 }
