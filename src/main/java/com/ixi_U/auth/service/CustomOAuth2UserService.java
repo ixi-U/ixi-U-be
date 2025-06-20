@@ -4,9 +4,10 @@ import com.ixi_U.auth.dto.CustomOAuth2User;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -44,7 +45,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 userRepository.save(User.of(nickname, email, "kakao", kakaoId, UserRole.ROLE_USER))
         );
 
-        return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(), isNewUser); // JWT 토큰 생성에 사용되는 사용자 정보의 출처가 된다.
+        return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(),
+                isNewUser); // JWT 토큰 생성에 사용되는 사용자 정보의 출처가 된다.
+    }
+
+    public void expireCookie(String name, HttpServletResponse response) {
+        Cookie cookie = new Cookie(name, null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 즉시 만료
+        response.addCookie(cookie);
     }
 
     public OAuth2User processOAuth2User(OAuth2User oAuth2User) {

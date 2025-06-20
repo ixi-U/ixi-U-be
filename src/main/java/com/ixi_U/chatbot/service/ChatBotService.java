@@ -35,12 +35,6 @@ public class ChatBotService {
             관심있는 혜택 또는 원하는 조건을 말씀해주시면 최적의 요금제를 안내해드리겠습니다!
             예시) "넷플릭스 있는 요금제 중 가장 싼 요금제가 뭐야?", "데이터 10기가 이상인 요금제 알려줘"
             """;
-    private static final String GENERAL_ERROR_MESSAGE = """
-            죄송합니다. 요금제 추천 서비스에 일시적인 문제가 발생했습니다.
-            """;
-    private static final String UNEXPECT_ERROR_MESSAGE = """
-            죄송합니다. 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
-            """;
 
     @Qualifier("descriptionClient")
     private final ChatClient descriptionClient;
@@ -65,47 +59,44 @@ public class ChatBotService {
 
         return Mono.fromCallable(() -> {
 
-                    String llmResult = filterExpressionClient.prompt()
+                    String filterExpression = filterExpressionClient.prompt()
                             .user(request.userQuery())
                             .call()
                             .content();
 
-                    log.info("llmResult = {}", llmResult);
+                    log.info("filterExpression = {}", filterExpression);
 
-                    if (llmResult == null || llmResult.isBlank()) {
+                    if (filterExpression == null || filterExpression.isBlank()) {
 
                         throw new GeneralException(ChatBotException.CHAT_BOT_RECOMMENDING_ERROR);
                     }
 
-                    return llmResult;
+                    return filterExpression;
                 })
-                .flatMapMany(llmResult ->
+                .flatMapMany(filterExpression ->
 
                         recommendClient.prompt()
                                 .user(request.userQuery())
                                 .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
-                                .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
+                                .toolContext(Map.of(
+                                        ToolContextKey.USER_ID.getKey(), userId,
+                                        ToolContextKey.FILTER_EXPRESSION.getKey(), filterExpression)
+                                )
                                 .stream()
                                 .content()
-                                .bufferTimeout(5, Duration.ofMillis(1))
+                                .bufferTimeout(5, Duration.ofMillis(50))
                 )
                 .onErrorResume(GeneralException.class, e -> {
 
                     log.error("추천 로직 에러 발생", e);
 
-                    return Flux.fromStream(GENERAL_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
-                            )
-                            .delayElements(Duration.ofMillis(50));
+                    return generateErrorResponse(e.getMessage());
                 })
                 .onErrorResume(Exception.class, e -> {
 
                     log.error("추천 로직에서 예상치 못한 에러 발생", e);
 
-                    return Flux.fromStream(UNEXPECT_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
-                            )
-                            .delayElements(Duration.ofMillis(50));
+                    return generateErrorResponse(e.getMessage());
                 });
     }
 
@@ -130,5 +121,13 @@ public class ChatBotService {
 
             throw new GeneralException(ChatBotException.CHAT_BOT_EMBEDDING_DESCRIPTION_ERROR);
         }
+    }
+
+    private Flux<List<String>> generateErrorResponse(String error) {
+
+        return Flux.fromStream(error.chars()
+                        .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
+                )
+                .delayElements(Duration.ofMillis(50));
     }
 }

@@ -1,6 +1,6 @@
 package com.ixi_U.auth.controller;
 
-import com.ixi_U.auth.dto.CustomOAuth2User;
+import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,6 +20,7 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
@@ -35,14 +38,16 @@ public class AuthController {
         userService.removeRefreshToken(userId);
 
         // 쿠키 제거
-        expireCookie("access_token", response);
-        expireCookie("refresh_token", response);
+        customOAuth2UserService.expireCookie("access_token", response);
+        customOAuth2UserService.expireCookie("refresh_token", response);
 
         return ResponseEntity.ok("로그아웃 완료");
     }
 
     private String extractAccessTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
+        if (request.getCookies() == null) {
+            return null;
+        }
 
         for (Cookie cookie : request.getCookies()) {
             if ("access_token".equals(cookie.getName())) {
@@ -52,12 +57,5 @@ public class AuthController {
         return null;
     }
 
-    private void expireCookie(String name, HttpServletResponse response) {
-        Cookie cookie = new Cookie(name, null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // 즉시 만료
-        response.addCookie(cookie);
-    }
+
 }

@@ -3,7 +3,8 @@ package com.ixi_U.auth.controller;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtAuthenticationFilter;
-import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.jwt.JwtTokenProvider
+import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,6 +50,9 @@ class AuthControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @MockBean
     private CustomOAuth2UserService customOAuth2UserService;
