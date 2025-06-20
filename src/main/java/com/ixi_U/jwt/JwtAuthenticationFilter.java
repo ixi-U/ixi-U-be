@@ -103,6 +103,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
                         log.info("♻️ access token 재발급 완료 - userId: {}", userId);
+                    } else {
+                        log.warn("❗ Refresh token도 유효하지 않음. 소셜 로그인 필요");
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
                     }
                 }
             }
