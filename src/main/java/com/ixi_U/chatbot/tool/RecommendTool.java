@@ -3,6 +3,7 @@ package com.ixi_U.chatbot.tool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
@@ -21,6 +22,7 @@ public class RecommendTool {
 
     @Qualifier("planVectorStore")
     private final VectorStore planVectorStore;
+
     private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
 
     @Tool(description = """
@@ -32,40 +34,45 @@ public class RecommendTool {
             @ToolParam(description = "사용자의 특정 조건이 포함된 요금제 추천/검색 쿼리") String userQuery,
             final ToolContext toolContext) {
 
-        log.info("요금제 추천 툴 동작");
+        log.info("---요금제 추천 툴 동작");
 
         String filterExpression = (String) toolContext.getContext().get(ToolContextKey.FILTER_EXPRESSION.getKey());
         String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
 
-        List<Document> documents = performVectorSearch(userQuery, filterExpression);
-
+        log.info("대화 사이즈 : {}",neo4jChatMemoryRepository.findByConversationId(userId).size());
         log.info("userRequest = {}", userQuery);
         log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
         log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
-        return documents;
+        return performVectorSearch(userQuery, filterExpression);
     }
 
     @Tool(description = """
-            이전에 추천받은 요금제를 제외하고 새로운 요금제를 추천합니다.
-            "다른 요금제", "이거 말고", "또 다른 추천" 등의 요청에 사용됩니다.
-            새로운 필터 표현식이 존재하지 않을 경우 이전 표현식을 그대로 사용합니다.
+            이전 대화의 요금제에 대한 내용이 나올경우 사용한다
+            
+            - "그 중에서 ~만", "그것들 중에서", "앞에서 추천한 것 중에서"
+            - "이전 추천에서 ~조건", "방금 추천한 것에서"
+            
+            와 같은 맥락의 요청이 들어올 경우 사용한다
+            
+            이 도구는 대화 컨텍스트의 이전 추천 결과를 기반으로:
+            1. 사용자의 추가 조건을 파싱
+            2. 기존 필터와 새 조건을 결합
+            3. 조건에 맞는 요금제만 필터링하여 반환
             """)
-    List<Document> recommendExcludePreviousPlan(
-            @ToolParam(description = "사용자의 특정 조건이 포함된 요금제 추천/검색 쿼리") String userQuery,
-            @ToolParam(description = "가장 최근 대화에서 사용한 필터 표현식을 가져온다") String filterExpression,
-            final ToolContext toolContext
-    ) {
+    List<Message> recommendUsingChatMemory(final ToolContext toolContext) {
+        try{
+            log.info("---대화 내역 기반 추천 툴 동작");
 
-        log.info("이전 요금제 제외 추천 툴 동작");
-        String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
-        log.info("userRequest = {}", userQuery);
-        log.info("{} = {}", ToolContextKey.FILTER_EXPRESSION, filterExpression);
-        log.info("{} = {}", ToolContextKey.USER_ID, userId);
+            String userId = (String) toolContext.getContext().get(ToolContextKey.USER_ID.getKey());
 
-        List<Document> documents = null;
+            log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
-        return documents;
+            return neo4jChatMemoryRepository.findByConversationId(userId);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -78,8 +85,8 @@ public class RecommendTool {
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
-                        .similarityThreshold(0.6)
-                        .topK(3)
+                        .similarityThreshold(0.5)
+                        .topK(10)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());
@@ -97,8 +104,8 @@ public class RecommendTool {
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
-                        .similarityThreshold(0.1)
-                        .topK(3)
+                        .similarityThreshold(0.5)
+                        .topK(10)
                         .filterExpression(filterExpression)
                         .build());
 
