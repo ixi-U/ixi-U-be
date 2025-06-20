@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -176,8 +175,7 @@ class PlanControllerTest {
             PlanListDto dto2 = new PlanListDto("2", "요금제2", "무제한", "2000", "기본제공", "기본제공", 19000, 3,
                     List.of(), List.of());
 
-            SortedPlanResponse response = new SortedPlanResponse(
-                    new SliceImpl<>(List.of(dto1, dto2)), "2", 3);
+            SortedPlanResponse response = new SortedPlanResponse(List.of(dto1, dto2), true, "2", 3);
 
             given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
                     "ONLINE", "PRIORITY", null, null, null)))
@@ -190,12 +188,12 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.plans.content[0].id").value("1"))
-                    .andExpect(jsonPath("$.plans.content[0].mobileDataLimitMb").value("10GB"))
-                    .andExpect(jsonPath("$.plans.content[0].callLimitMinutes").value("300분"))
-                    .andExpect(jsonPath("$.plans.content[1].id").value("2"))
-                    .andExpect(jsonPath("$.plans.content[1].mobileDataLimitMb").value("무제한"))
-                    .andExpect(jsonPath("$.plans.content[1].callLimitMinutes").value("기본제공"))
+                    .andExpect(jsonPath("$.plans[0].id").value("1"))
+                    .andExpect(jsonPath("$.plans[0].mobileDataLimitMb").value("10GB"))
+                    .andExpect(jsonPath("$.plans[0].callLimitMinutes").value("300분"))
+                    .andExpect(jsonPath("$.plans[1].id").value("2"))
+                    .andExpect(jsonPath("$.plans[1].mobileDataLimitMb").value("무제한"))
+                    .andExpect(jsonPath("$.plans[1].callLimitMinutes").value("기본제공"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
                     .andDo(document("get-plans-sort-success"))
@@ -209,8 +207,8 @@ class PlanControllerTest {
             // given
             PlanListDto dto2 = new PlanListDto("2", "요금제2", "8GB", "1000", "200분", "100건", 19000, 3,
                     List.of(), List.of());
-            SortedPlanResponse response =
-                    new SortedPlanResponse(new SliceImpl<>(List.of(dto2)), "2", 3);
+
+            SortedPlanResponse response = new SortedPlanResponse(List.of(dto2), true, "2", 3);
 
             given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
                     "ONLINE", "PRIORITY", "제2", null, null)))
@@ -224,7 +222,7 @@ class PlanControllerTest {
                             .param("searchKeyword", "제2")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.plans.content[0].id").value("2"))
+                    .andExpect(jsonPath("$.plans[0].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
                     .andDo(document("get-plans-search-success"))

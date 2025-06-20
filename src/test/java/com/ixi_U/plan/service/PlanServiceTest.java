@@ -87,7 +87,7 @@ class PlanServiceTest {
             );
 
             // then
-            assertThat(result.plans().getContent()).containsExactly(dtoA, dtoB, dtoC);
+            assertThat(result.plans()).containsExactly(dtoA, dtoB, dtoC);
             verify(planRepository).findPlans(pageable, PlanType.from(planTypeStr),
                     PlanSortOption.from(planSortOptionStr), null, null, null
             );
