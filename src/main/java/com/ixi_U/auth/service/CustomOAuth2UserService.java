@@ -78,5 +78,3 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(), isNewUser);
     }
 }
-
-
