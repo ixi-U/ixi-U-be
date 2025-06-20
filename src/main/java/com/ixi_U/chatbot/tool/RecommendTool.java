@@ -50,6 +50,8 @@ public class RecommendTool {
 
         } catch (Exception e) {
 
+            log.error(e.getMessage());
+
             throw new GeneralException(ChatBotException.RECOMMEND_PLAN_TOOL_ERROR);
         }
     }
