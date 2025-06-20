@@ -62,6 +62,10 @@ public class PlanService {
      * 요금제 저장 & 벡터 저장소에 저장
      */
     @Transactional
+    @CacheEvict(
+            value = {"planListPages"},
+            allEntries = true
+    )
     public PlanEmbeddedResponse savePlan(final SavePlanRequest request) {
 
         validateSamePlanName(request);
@@ -236,7 +240,10 @@ public class PlanService {
                 .toList();
     }
 
-    @CacheEvict(value = "planListPages", allEntries = true)
+    @CacheEvict(
+            value = {"planListPages"},
+            allEntries = true
+    )
     public void togglePlanState(String planId) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 요금제를 찾을 수 없습니다."));
@@ -249,7 +256,10 @@ public class PlanService {
     }
 
     @Transactional
-    @CacheEvict(value = "planListPages", allEntries = true)
+    @CacheEvict(
+            value = {"planListPages"},
+            allEntries = true
+    )
     public void disablePlan(String planId) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
