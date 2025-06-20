@@ -26,6 +26,7 @@ import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
 import com.ixi_U.user.dto.response.ShowMyInfoResponse;
 import com.ixi_U.user.entity.UserRole;
+import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -71,6 +72,9 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext context;
+
+    @MockBean
+    UserRepository userRepository;
 
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
