@@ -26,11 +26,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        CustomOAuth2User CustomOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
-        String userId = CustomOAuth2User.getUserId();
-        UserRole userRole = CustomOAuth2User.getUserRole();
-        Boolean isNewUser = CustomOAuth2User.isNewUser();
+        String userId = customOAuth2User.getUserId();
+        UserRole userRole = customOAuth2User.getUserRole();
+        Boolean isNewUser = customOAuth2User.isNewUser();
 
         log.info("userId = {}", userId);
         log.info("userRole = {}", userRole);
@@ -56,9 +56,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
 
-        String redirectUrl = CustomOAuth2User.isNewUser()
-                ? "http://localhost:3000/onboarding"
-                : "http://localhost:3000/plans";
+        String host = request.getHeader("host");
+        String frontBaseUrl = (host != null && host.contains("localhost"))
+                ? "http://localhost:3000"
+                : "https://ixiu.site";
+
+        String redirectUrl = isNewUser
+                ? frontBaseUrl + "/onboarding"
+                : frontBaseUrl + "/plans";
 
         response.sendRedirect(redirectUrl);
     }

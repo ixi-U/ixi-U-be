@@ -1,19 +1,19 @@
 package com.ixi_U.user.service;
 
+import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.common.exception.enums.UserException;
+import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
-//import com.ixi_U.user.dto.response.SubscribedResponse;
 import com.ixi_U.user.dto.response.ShowCurrentSubscribedResponse;
 import com.ixi_U.user.dto.response.ShowMyInfoResponse;
 import com.ixi_U.user.entity.Subscribed;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.repository.SubscribedRepository;
 import com.ixi_U.user.repository.UserRepository;
-import com.ixi_U.plan.entity.Plan;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +24,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final SubscribedRepository subscribedRepository;
     private final PlanRepository planRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository,  PlanRepository planRepository) {
+    public UserService(UserRepository userRepository, SubscribedRepository subscribedRepository,
+            PlanRepository planRepository, CustomOAuth2UserService customOAuth2UserService) {
         this.userRepository = userRepository;
         this.subscribedRepository = subscribedRepository;
         this.planRepository = planRepository;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     public ShowCurrentSubscribedResponse findCurrentSubscribedPlan(String userId) {
@@ -58,14 +61,13 @@ public class UserService {
     @Transactional(readOnly = true)
     public ShowMyInfoResponse findMyInfoByUserId(String userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+                .orElseThrow(() -> new GeneralException(UserException.USER_NOT_FOUND));
         return ShowMyInfoResponse.of(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getUserRole(),
-                LocalDate.parse(
-                        user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                LocalDate.from(user.getCreatedAt())
         );
     }
 
@@ -79,11 +81,12 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserById(String userId) {
+    public void deleteUserById(String userId, HttpServletResponse response) {
         if (!userRepository.existsById(userId)) {
             throw new GeneralException(UserException.USER_NOT_FOUND);
         }
-
+        customOAuth2UserService.expireCookie("access_token", response);
+        customOAuth2UserService.expireCookie("refresh_token", response);
         subscribedRepository.deleteAllByUserId(userId);
 
         userRepository.deleteById(userId);
@@ -124,9 +127,7 @@ public class UserService {
             Plan plan = planRepository.findById(planId)
                     .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
 
-            Subscribed subscribed = Subscribed.of(plan);
-            updatedUser.addSubscribed(subscribed);
-            subscribedRepository.save(subscribed);
+            updatedUser.addSubscribed(Subscribed.of(plan));
         }
         userRepository.save(updatedUser);
     }

@@ -119,7 +119,7 @@ public class VectorStoreService {
     }
 
     private void processBundledBenefitList(Map<String, Object> result,
-                                           List<BundledBenefitDTO> bundledBenefits) {
+            List<BundledBenefitDTO> bundledBenefits) {
 
         try {
 
@@ -141,7 +141,7 @@ public class VectorStoreService {
     }
 
     private void processSingleBenefitList(Map<String, Object> result,
-                                          List<SingleBenefitDTO> singleBenefits) {
+            List<SingleBenefitDTO> singleBenefits) {
 
         try {
 
