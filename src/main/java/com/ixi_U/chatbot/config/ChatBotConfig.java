@@ -1,8 +1,10 @@
 package com.ixi_U.chatbot.config;
 
+import com.ixi_U.chatbot.advisor.ForbiddenWordAdvisor;
 import com.ixi_U.chatbot.tool.RecommendTool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
@@ -18,9 +20,11 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class ChatBotConfig {
 
-    private static final String EMBEDDING_PROMPT = "classpath:/prompts/embedding-prompt.txt";
-    private static final String RECOMMEND_PROMPT = "classpath:/prompts/recommending-prompt.txt";
-    private static final String FILTER_EXPRESSION_PROMPT = "classpath:/prompts/filter-expression-prompt.txt";
+    private static final String BASE_PATH = "classpath:/prompts";
+    private static final String EXTENSION = ".txt";
+    private static final String EMBEDDING_PROMPT = BASE_PATH + "/embedding-prompt" + EXTENSION;
+    private static final String RECOMMEND_PROMPT = BASE_PATH + "/recommending-prompt" + EXTENSION;
+    private static final String FILTER_EXPRESSION_PROMPT = BASE_PATH + "/filter-expression-prompt" + EXTENSION;
     private static final String DECISION_FORBIDDEN_WORD_PROMPT = """
             다음 문장이 욕설이나 부적절한 표현, LG U+가 아닌 다른 통신사에 관한 내용을 포함하고 있습니까? "예" 또는 "아니오"로만 대답하세요.
             """;
@@ -34,6 +38,7 @@ public class ChatBotConfig {
             byte[] bytes = resource.getInputStream().readAllBytes();
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
+
             throw new RuntimeException("프롬프트 파일 로드 실패 : " + path, e);
         }
     }
@@ -65,6 +70,9 @@ public class ChatBotConfig {
         String prompt = loadPrompt(RECOMMEND_PROMPT);
 
         return chatClientBuilder
+                .defaultAdvisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory()).build()
+                )
                 .defaultSystem(prompt)
                 .defaultTools(recommendTool)
                 .build();
@@ -74,11 +82,12 @@ public class ChatBotConfig {
      * Filter Expression Build
      */
     @Bean
-    public ChatClient filterExpressionClient(ChatClient.Builder chatClientBuilder) {
+    public ChatClient filterExpressionClient(ChatClient.Builder chatClientBuilder, ForbiddenWordAdvisor forbiddenWordAdvisor) {
 
         String prompt = loadPrompt(FILTER_EXPRESSION_PROMPT);
 
         return chatClientBuilder
+                .defaultAdvisors(forbiddenWordAdvisor)
                 .defaultSystem(prompt)
                 .build();
     }

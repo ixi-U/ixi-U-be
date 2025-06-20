@@ -11,9 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.repository.neo4j.Neo4jChatMemoryRepository;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -57,7 +54,6 @@ public class ChatBotService {
     private final ChatClient filterExpressionClient;
 
     private final ObjectMapper objectMapper;
-    private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
 
     private final ForbiddenWordAdvisor forbiddenWordAdvisor;
 
@@ -73,25 +69,29 @@ public class ChatBotService {
 
         return Mono.fromCallable(() -> {
 
-                    String llmResult = filterExpressionClient.prompt()
+                    String filterExpression = filterExpressionClient.prompt()
                             .user(request.userQuery())
-                            .advisors(forbiddenWordAdvisor)
                             .call()
                             .content();
 
-                    log.info("llmResult = {}", llmResult);
+                    log.info("filterExpression = {}", filterExpression);
 
-                    if (llmResult == null || llmResult.isBlank()) {
+                    if (filterExpression == null || filterExpression.isBlank()) {
 
                         throw new GeneralException(ChatBotException.CHAT_BOT_RECOMMENDING_ERROR);
                     }
 
-                    return llmResult;
+                    return filterExpression;
                 })
-                .flatMapMany(llmResult ->
-                    recommendClient.prompt()
+                .flatMapMany(filterExpression ->
+
+                        recommendClient.prompt()
                             .user(request.userQuery())
-                            .toolContext(Map.of(ToolContextKey.USER_ID.getKey(), userId, ToolContextKey.FILTER_EXPRESSION.getKey(), llmResult))
+                            .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID,userId))
+                            .toolContext(Map.of(
+                                    ToolContextKey.USER_ID.getKey(), userId,
+                                    ToolContextKey.FILTER_EXPRESSION.getKey(), filterExpression)
+                            )
                             .stream()
                             .content()
                             .bufferTimeout(5, Duration.ofMillis(50))
@@ -100,19 +100,13 @@ public class ChatBotService {
 
                     log.error("추천 로직 에러 발생", e);
 
-                    return Flux.fromStream(e.getMessage().chars()
-                                    .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
-                            )
-                            .delayElements(Duration.ofMillis(50));
+                    return generateErrorResponse(e.getMessage());
                 })
                 .onErrorResume(Exception.class, e -> {
 
                     log.error("추천 로직에서 예상치 못한 에러 발생", e);
 
-                    return Flux.fromStream(UNEXPECT_ERROR_MESSAGE.chars()
-                                    .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
-                            )
-                            .delayElements(Duration.ofMillis(50));
+                    return generateErrorResponse(e.getMessage());
                 });
     }
 
@@ -139,19 +133,11 @@ public class ChatBotService {
         }
     }
 
-    private void saveMessage(String userId, String userQuery, String assistantResponse){
+    private Flux<List<String>> generateErrorResponse(String error){
 
-        saveUserMessage(userId, userQuery);
-//        saveAssistantMessage(userId, assistantResponse);
-
-    }
-
-    private void saveUserMessage(String userId, String userQuery){
-
-        List<Message> userChatHistory = neo4jChatMemoryRepository.findByConversationId(userId);
-
-        UserMessage.builder()
-                .text(userQuery).build();
-//                .metadata(Map.of("planIds",""))
+        return Flux.fromStream(error.chars()
+                        .mapToObj(c -> Collections.singletonList(String.valueOf((char) c)))
+                )
+                .delayElements(Duration.ofMillis(50));
     }
 }

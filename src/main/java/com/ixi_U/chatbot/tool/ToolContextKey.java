@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ToolContextKey {
 
     USER_ID("userId"),
-    FILTER_EXPRESSION("filterExpression");
+    FILTER_EXPRESSION("filterExpression")
+    ;
 
     private final String key;
 
