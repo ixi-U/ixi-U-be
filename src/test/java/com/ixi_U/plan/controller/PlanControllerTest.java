@@ -49,7 +49,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -57,14 +56,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "spring.cache.type=none",
-        "spring.cache.redis.time-to-live=10m",
-        "spring.neo4j.pool.connection-acquisition-timeout=30s",
-        "spring.neo4j.pool.max-connection-pool-size=100",
-        "spring.neo4j.pool.min-connection-pool-size=10",
-        "spring.neo4j.pool.max-connection-lifetime=3600s"
-})
 @WebMvcTest(PlanController.class)
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class PlanControllerTest {
