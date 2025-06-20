@@ -65,6 +65,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 ? frontBaseUrl + "/onboarding"
                 : frontBaseUrl + "/plans";
 
-        response.sendRedirect(redirectUrl);
+//        response.sendRedirect(redirectUrl);
+        response.setStatus(HttpServletResponse.SC_FOUND);
+        response.setHeader("Location", redirectUrl);
     }
 }
