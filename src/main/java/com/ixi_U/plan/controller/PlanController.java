@@ -34,7 +34,7 @@ public class PlanController {
 
     @GetMapping("/plans")
     public ResponseEntity<SortedPlanResponse> getPlans(
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String planTypeStr,
             @RequestParam(defaultValue = "PRIORITY") String planSortOptionStr,
             @RequestParam(required = false) String searchKeyword,
