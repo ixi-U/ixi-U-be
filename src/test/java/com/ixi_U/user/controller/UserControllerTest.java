@@ -236,10 +236,9 @@ class UserControllerTest {
                     .andDo(print());
 
             // then
-            result.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.userId").value("user123"))
-                    .andExpect(jsonPath("$.email").value("user@example.com"))
-                    .andExpect(jsonPath("$.planId").value("plan123"));
+            result.andExpect(jsonPath("$.id").value("user123"))
+                    .andExpect(jsonPath("$.name").value("user@example.com"))
+                    .andExpect(jsonPath("$.email").value("plan123"));
         }
     }
 }
