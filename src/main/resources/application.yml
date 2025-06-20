@@ -24,6 +24,11 @@ spring:
     authentication:
       username: ${GRAPH_DB_USERNAME}
       password: ${GRAPH_DB_PASSWORD}
+    pool:
+      max-connection-pool-size: ${GRAPH_DB_MAX_CONNECTION_POOL_SIZE}
+      min-connection-pool-size: ${GRAPH_DB_MIN_CONNECTION_POOL_SIZE}
+      max-connection-lifetime: ${GRAPH_DB_MAX_CONNECTION_LIFETIME}
+      connection-acquisition-timeout: ${GRAPH_DB_CONNECTION_ACQUISITION_TIMEOUT}
 
   ai:
     openai:
@@ -34,6 +39,16 @@ spring:
       chat:
         options:
           model: ${OPEN_AI_CHAT_MODEL}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${REDIS_TTL}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 jwt:
   secret: ${JWT_SECRET_KEY}

@@ -1,9 +1,11 @@
 package com.ixi_U.plan.dto.response;
 
 import com.ixi_U.plan.dto.PlanListDto;
-import org.springframework.data.domain.Slice;
+import java.util.List;
 
-public record SortedPlanResponse(Slice<PlanListDto> plans, String lastPlanId,
+public record SortedPlanResponse(List<PlanListDto> plans,
+                                 boolean hasNext,
+                                 String lastPlanId,
                                  int lastSortValue) {
 
 }

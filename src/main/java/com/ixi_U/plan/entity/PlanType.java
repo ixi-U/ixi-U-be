@@ -21,6 +21,11 @@ public enum PlanType {
 
     public static PlanType from(String type) {
 
+        if (type == null) {
+
+            return null;
+        }
+
         validatePlanType(type);
 
         return switch (type) {
@@ -34,7 +39,7 @@ public enum PlanType {
 
     private static void validatePlanType(String planTypeStr) {
 
-        if (planTypeStr == null || planTypeStr.isBlank()) {
+        if (planTypeStr.isBlank()) {
 
             throw new GeneralException(PlanException.INVALID_PLAN_TYPE);
         }

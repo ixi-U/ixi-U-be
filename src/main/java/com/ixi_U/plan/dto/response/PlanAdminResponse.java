@@ -9,7 +9,9 @@ public record PlanAdminResponse(
         PlanState planState,
         String usageCautions
 ) {
+
     public static PlanAdminResponse from(Plan plan) {
+
         return new PlanAdminResponse(
                 plan.getId(),
                 plan.getName(),

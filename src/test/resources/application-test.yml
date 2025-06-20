@@ -2,3 +2,19 @@ spring:
   data:
     neo4j:
       database: neo4j
+
+    redis:
+      host: localhost
+      port: 6379
+
+  neo4j:
+    pool:
+      connection-acquisition-timeout: 30s
+      max-connection-pool-size: 100
+      min-connection-pool-size: 10
+      max-connection-lifetime: 3600s
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 60

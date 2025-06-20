@@ -1,23 +1,28 @@
 package com.ixi_U.plan.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.*;
+import com.ixi_U.plan.dto.response.PlanAdminResponse;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.service.PlanService;
-import com.ixi_U.user.dto.request.OnboardingRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Validated
@@ -30,11 +35,11 @@ public class PlanController {
     @GetMapping("/plans")
     public ResponseEntity<SortedPlanResponse> getPlans(
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam String planTypeStr,
+            @RequestParam(required = false) String planTypeStr,
             @RequestParam(defaultValue = "PRIORITY") String planSortOptionStr,
             @RequestParam(required = false) String searchKeyword,
             @RequestParam(required = false) String planId,
-            @RequestParam(required = false) Integer cursorSortValue){
+            @RequestParam(required = false) Integer cursorSortValue) {
 
         GetPlansRequest.validate(size);
         Pageable pageable = PageRequest.ofSize(size);
@@ -83,13 +88,13 @@ public class PlanController {
         return ResponseEntity.ok().build();
     }
 
-    
+
     // 요금제 목록 조회
     @GetMapping("/plans/summaries")
     public ResponseEntity<List<PlanNameDto>> getPlanNames() {
         return ResponseEntity.ok(planService.getPlanNameList());
     }
-        
+
     @GetMapping("/plans/embed")
     public ResponseEntity<Void> embedPlan() {
 
