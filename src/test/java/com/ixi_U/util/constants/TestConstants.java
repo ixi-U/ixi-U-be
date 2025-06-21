@@ -1,10 +1,12 @@
 package com.ixi_U.util.constants;
 
+import com.ixi_U.chatbot.tool.dto.MostReviewedPlanToolDto;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
 import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 
 import java.util.List;
+import java.util.Map;
 
 public class TestConstants {
 
@@ -78,5 +80,108 @@ public class TestConstants {
 
     public static String createPlanId() {
         return "0235cc16-6d6a-43f6-ada2-23c97fedb846";
+    }
+
+    public static MostReviewedPlanToolDto createMostReviewedPlanDto() {
+        return new MostReviewedPlanToolDto(
+                "plan-001",
+                "프리미엄 5G 요금제",
+                100000,
+                200000,
+                3000,
+                1000,
+                65000,
+                1,
+                250,
+                createSingleBenefits(),
+                createBundledBenefits()
+        );
+    }
+
+    public static MostReviewedPlanToolDto createSecondMostReviewedPlanDto() {
+        return new MostReviewedPlanToolDto(
+                "plan-003",
+                "스탠다드 요금제",
+                50000,
+                100000,
+                2000,
+                500,
+                45000,
+                3,
+                150,
+                createBasicSingleBenefits(),
+                createBasicBundledBenefits()
+        );
+    }
+
+    private static List<Map<String, Object>> createSingleBenefits() {
+        return List.of(
+                Map.of(
+                        "id", "benefit-001",
+                        "name", "Netflix 프리미엄",
+                        "description", "Netflix 프리미엄 구독 무료 제공",
+                        "monthlyValue", 17000
+                ),
+                Map.of(
+                        "id", "benefit-002",
+                        "name", "YouTube Premium",
+                        "description", "YouTube Premium 구독 무료 제공",
+                        "monthlyValue", 11900
+                ),
+                Map.of(
+                        "id", "benefit-003",
+                        "name", "멜론 이용권",
+                        "description", "멜론 스트리밍 무제한 이용",
+                        "monthlyValue", 10900
+                )
+        );
+    }
+
+    private static List<Map<String, Object>> createBundledBenefits() {
+        return List.of(
+                Map.of(
+                        "id", "bundle-001",
+                        "name", "엔터테인먼트 패키지",
+                        "description", "Netflix + Disney+ + Wavve",
+                        "monthlyValue", 35000,
+                        "services", List.of("Netflix", "Disney+", "Wavve")
+                ),
+                Map.of(
+                        "id", "bundle-002",
+                        "name", "클라우드 스토리지",
+                        "description", "구글 드라이브 + 원드라이브 확장",
+                        "monthlyValue", 15000,
+                        "storage", "2TB"
+                )
+        );
+    }
+
+    private static List<Map<String, Object>> createBasicSingleBenefits() {
+        return List.of(
+                Map.of(
+                        "id", "benefit-101",
+                        "name", "네이버 플러스 멤버십",
+                        "description", "네이버 플러스 멤버십 무료 제공",
+                        "monthlyValue", 4900
+                ),
+                Map.of(
+                        "id", "benefit-102",
+                        "name", "카카오 VIP",
+                        "description", "카카오톡 이모티콘 무제한",
+                        "monthlyValue", 3900
+                )
+        );
+    }
+
+    private static List<Map<String, Object>> createBasicBundledBenefits() {
+        return List.of(
+                Map.of(
+                        "id", "bundle-101",
+                        "name", "기본 스트리밍",
+                        "description", "Wavve + 티빙 베이직",
+                        "monthlyValue", 18000,
+                        "services", List.of("Wavve", "티빙")
+                )
+        );
     }
 }
