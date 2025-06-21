@@ -1,6 +1,7 @@
 package com.ixi_U.chatbot.tool;
 
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.repository.PlanRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class RecommendToolTest {
 
     @Mock
     private Neo4jChatMemoryRepository neo4jChatMemoryRepository;
+
+    @Mock
+    private PlanRepository planRepository;
 
     @InjectMocks
     private RecommendTool recommendTool;
