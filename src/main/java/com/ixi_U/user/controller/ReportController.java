@@ -1,5 +1,6 @@
 package com.ixi_U.user.controller;
 
+import com.ixi_U.user.dto.request.CreateReportRequest;
 import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.service.ReportService;
@@ -25,9 +26,9 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<Void> createReport(@AuthenticationPrincipal String userId,
-            @RequestParam("reviewId")Long reviewId) {
+            @Valid @RequestBody CreateReportRequest createReportRequest) {
 
-        reportService.createReport(userId,reviewId);
+        reportService.createReport(userId,createReportRequest.reviewId());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
