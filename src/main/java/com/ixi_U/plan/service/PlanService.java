@@ -64,7 +64,7 @@ public class PlanService {
      */
     @Transactional
     @CacheEvict(
-            value = {"planListPages"},
+            value = {"planListPages", "planCounts"},
             allEntries = true
     )
     public PlanEmbeddedResponse savePlan(final SavePlanRequest request) {
@@ -186,6 +186,7 @@ public class PlanService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "planCounts", key = "'all'")
     public PlansCountResponse countPlans() {
 
         return PlansCountResponse.from(planRepository.countPlans());
@@ -248,7 +249,7 @@ public class PlanService {
     }
 
     @CacheEvict(
-            value = {"planListPages"},
+            value = {"planListPages", "planCounts"},
             allEntries = true
     )
     public void togglePlanState(String planId) {
@@ -264,7 +265,7 @@ public class PlanService {
 
     @Transactional
     @CacheEvict(
-            value = {"planListPages"},
+            value = {"planListPages", "planCounts"},
             allEntries = true
     )
     public void disablePlan(String planId) {
