@@ -6,7 +6,6 @@ import com.ixi_U.jwt.JwtAuthenticationFilter;
 import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,20 +19,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
-//    private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
-        System.out.println("--- go success handler ---");
         return new OAuth2SuccessHandler(jwtTokenProvider);
     }
 
@@ -60,8 +56,7 @@ public class SecurityConfig {
         ;
         // JWT 필터
         http
-//                log.info("jwt filter");
-                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider),
+                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider, userRepository),
                         OAuth2LoginAuthenticationFilter.class);
 
         // OAuth2 필터

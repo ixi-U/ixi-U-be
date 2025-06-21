@@ -51,32 +51,15 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-
-    // security holder에 담긴 userid 직접 꺼내기
     @GetMapping("/info")
-    public ResponseEntity<ShowMyInfoResponse> getMyInfo() {
-        // SecurityContext에서 직접 userId 추출
-        String userId = (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
+    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
+        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
 
         if (userId == null || userId.isBlank()) {
-            throw new RuntimeException("인증 정보가 없습니다.");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."
+            );
         }
-
-        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
         return ResponseEntity.ok(response);
     }
-
-//    @GetMapping("/info")
-//    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
-//        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
-//
-//        if (userId == null || userId.isBlank()) {
-//            throw new ResponseStatusException(
-//                    HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."
-//            );
-//        }
-//        return ResponseEntity.ok(response);
-//    }
 }
