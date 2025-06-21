@@ -1,6 +1,7 @@
 package com.ixi_U.plan.repository;
 
 import com.ixi_U.plan.dto.PlanSummaryDto;
+import com.ixi_U.plan.dto.PlansCountDto;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.entity.SortOrder;
@@ -16,6 +17,7 @@ import org.neo4j.cypherdsl.core.Statement;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.neo4j.core.Neo4jClient;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Repository;
 public class PlanRepositoryImpl implements PlanCustomRepository {
 
     private final Neo4jTemplate neo4jTemplate;
+    private final Neo4jClient neo4jClient;
 
     public Slice<PlanSummaryDto> findPlans(Pageable pageable, PlanType planType,
             PlanSortOption planSortOption, String searchKeyword, String planId,
@@ -140,5 +143,50 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
         }
 
         return condition;
+    }
+
+    public PlansCountDto countPlans() {
+
+        String cypher = """
+                    MATCH (p:Plan)
+                    WHERE p.planState <> 'DISABLE'
+                    RETURN 'ALL' AS type, count(p) AS count
+                    UNION
+                    MATCH (p:Plan)
+                    WHERE p.planState <> 'DISABLE' AND p.planType = 'FIVE_G_LTE'
+                    RETURN 'FIVE_G_LTE' AS type, count(p) AS count
+                    UNION
+                    MATCH (p:Plan)
+                    WHERE p.planState <> 'DISABLE' AND p.planType = 'ONLINE'
+                    RETURN 'ONLINE' AS type, count(p) AS count
+                    UNION
+                    MATCH (p:Plan)
+                    WHERE p.planState <> 'DISABLE' AND p.planType = 'TABLET_SMARTWATCH'
+                    RETURN 'TABLET_SMARTWATCH' AS type, count(p) AS count
+                    UNION
+                    MATCH (p:Plan)
+                    WHERE p.planState <> 'DISABLE' AND p.planType = 'DUAL_NUMBER'
+                    RETURN 'DUAL_NUMBER' AS type, count(p) AS count
+                """;
+
+        List<Map<String, Object>> result = (List<Map<String, Object>>) neo4jClient.query(cypher)
+                .fetch().all();
+
+        int all = 0, fiveGLte = 0, online = 0, tabletSmartwatch = 0, dualNumber = 0;
+
+        for (Map<String, Object> row : result) {
+            String type = (String) row.get("type");
+            Long count = (Long) row.get("count");
+
+            switch (type) {
+                case "ALL" -> all = count.intValue();
+                case "FIVE_G_LTE" -> fiveGLte = count.intValue();
+                case "ONLINE" -> online = count.intValue();
+                case "TABLET_SMARTWATCH" -> tabletSmartwatch = count.intValue();
+                case "DUAL_NUMBER" -> dualNumber = count.intValue();
+            }
+        }
+
+        return new PlansCountDto(all, fiveGLte, online, tabletSmartwatch, dualNumber);
     }
 }
