@@ -54,7 +54,7 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
         ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
-            
+
         if (userId == null || userId.isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."
