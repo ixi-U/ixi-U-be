@@ -7,6 +7,11 @@ import com.ixi_U.plan.dto.response.PlanAdminResponse;
 import com.ixi_U.plan.dto.response.PlanDetailResponse;
 import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.PlanAdminResponse;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.PlansCountResponse;
+import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.service.PlanService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +54,12 @@ public class PlanController {
         SortedPlanResponse response = planService.findPlans(pageable, request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/plans/count")
+    public ResponseEntity<PlansCountResponse> countPlans() {
+
+        return ResponseEntity.ok(planService.countPlans());
     }
 
     @GetMapping("/plans/details/{planId}")
