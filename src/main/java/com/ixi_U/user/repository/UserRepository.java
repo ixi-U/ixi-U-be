@@ -35,4 +35,10 @@ public interface UserRepository extends Neo4jRepository<User, String> {
             """)
     Optional<User> findOwnerByReviewedId(Long reviewedId);
 
+    @Query("""
+            MATCH (u:User)-[r:REVIEWED]->(p:Plan) where id(r) = $reviewedId
+            RETURN u,r,p
+            """)
+    Optional<User> findOwnerAndReviewByReviewedId(Long reviewedId);
+
 }

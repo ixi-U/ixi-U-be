@@ -169,3 +169,15 @@ operation::recommend-plan-success[]
 
 ==== 실패
 operation::recommend-plan-fail[]
+
+== 신고 API
+
+=== 신고 적용
+
+==== 성공
+operation::create-report-success[]
+
+=== 신고 조회
+
+==== 성공
+operation::get-report-success[]
