@@ -1,9 +1,11 @@
 package com.ixi_U.chatbot.tool;
 
 import com.ixi_U.chatbot.exception.ChatBotException;
+import com.ixi_U.chatbot.tool.dto.MostDataAmountPlanToolDto;
 import com.ixi_U.chatbot.tool.dto.MostReviewPointPlanToolDto;
 import com.ixi_U.chatbot.tool.dto.MostReviewedPlanToolDto;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.repository.PlanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,11 +116,36 @@ public class RecommendTool {
 
             return mostReviewPointPlan;
         } catch (Exception e) {
+
             log.error(e.getMessage());
+
             return null;
         }
     }
 
+    @Tool(description = """
+            가장 많은 데이터를 가진 요금제를 조회할 때 사용
+            """)
+    MostDataAmountPlanToolDto findMostDataAmountPlan(
+            @ToolParam(description = "N 번째로 많은 데이터를 가진 요금제를 추천할 때 N을 숫자로 반환한다.") int skip){
+
+        log.info("---가장 많은 데이터를 가진 요금제 추천 툴 동작");
+        log.info("N 번째 = {}", skip);
+
+        try {
+            MostDataAmountPlanToolDto mostDataAmountPlan = planRepository.findByMostDataAmount(skip);
+
+            log.info("요금제 이름 : {}", mostDataAmountPlan.name());
+            log.info("데이터 제공량 : {}", mostDataAmountPlan.mobileDataLimitMb());
+
+            return mostDataAmountPlan;
+        } catch (Exception e) {
+
+            log.error(e.getMessage());
+
+            return null;
+        }
+    }
 
     @Tool(description = """
             이 도구는 다음과 같은 맥락에서만 사용됩니다:
@@ -151,7 +178,6 @@ public class RecommendTool {
         }
     }
 
-
     /**
      * 필터 표현식을 사용하지 않는 유사도 검색
      */
@@ -162,8 +188,8 @@ public class RecommendTool {
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
-                        .similarityThreshold(0.1)
-                        .topK(5)
+                        .similarityThreshold(0.5)
+                        .topK(100)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());
@@ -184,12 +210,14 @@ public class RecommendTool {
 
         log.info("filterExpression = {}", filterExpression);
 
+        log.info("실제 무제한 데이터 수 : {}",planRepository.findByMobileDataLimitMb(2147483647).size());
+
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
-                        .similarityThreshold(0.1)
-                        .topK(5)
+                        .similarityThreshold(0.5)
                         .filterExpression(filterExpression)
+                        .topK(100)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());

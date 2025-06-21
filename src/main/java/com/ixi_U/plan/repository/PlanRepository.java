@@ -1,5 +1,6 @@
 package com.ixi_U.plan.repository;
 
+import com.ixi_U.chatbot.tool.dto.MostDataAmountPlanToolDto;
 import com.ixi_U.chatbot.tool.dto.MostReviewPointPlanToolDto;
 import com.ixi_U.chatbot.tool.dto.MostReviewedPlanToolDto;
 import com.ixi_U.plan.dto.PlanNameDto;
@@ -86,4 +87,26 @@ public interface PlanRepository extends Neo4jRepository<Plan, String>, PlanCusto
             "ORDER BY reviewPointAverage DESC " +
             "SKIP $skip LIMIT 1")
     MostReviewPointPlanToolDto findMostReviewPointPlan(@Param("skip") int skip);
+
+    @Query("MATCH (p:Plan) " +
+            "OPTIONAL MATCH (p)-[:HAS_BENEFIT]->(sb:SingleBenefit) " +
+            "OPTIONAL MATCH (p)-[:HAS_BENEFIT]->(bb:BundledBenefit) " +
+            "WITH p, " +
+            "     COLLECT(DISTINCT {id: sb.id, name: sb.name, subscript: sb.subscript}) as singleBenefits, " +
+            "     COLLECT(DISTINCT {id: bb.id, name: bb.name, subscript: bb.subscript}) as bundledBenefits " +
+            "RETURN p.id as id, " +
+            "       p.name as name, " +
+            "       p.mobileDataLimitMb as mobileDataLimitMb, " +
+            "       p.sharedMobileDataLimitMb as sharedMobileDataLimitMb, " +
+            "       p.callLimitMinutes as callLimitMinutes, " +
+            "       p.messageLimit as messageLimit, " +
+            "       p.monthlyPrice as monthlyPrice, " +
+            "       p.priority as priority, " +
+            "       singleBenefits, " +
+            "       bundledBenefits " +
+            "ORDER BY p.mobileDataLimitMb DESC, p.id ASC " +
+            "SKIP $skip LIMIT 1")
+    MostDataAmountPlanToolDto findByMostDataAmount(@Param("skip")int skip);
+
+    List<Plan> findByMobileDataLimitMb(Integer mobileDataLimitMb);
 }
