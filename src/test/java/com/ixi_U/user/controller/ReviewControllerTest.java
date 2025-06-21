@@ -13,6 +13,7 @@ import com.ixi_U.user.dto.response.ShowReviewStatsResponse;
 import com.ixi_U.user.dto.response.ShowReviewSummaryResponse;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.SubscribedException;
+import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -71,6 +73,9 @@ class ReviewControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    UserRepository userRepository;
 
     @MockBean
     JwtTokenProvider oAuth2SuccessHandler;

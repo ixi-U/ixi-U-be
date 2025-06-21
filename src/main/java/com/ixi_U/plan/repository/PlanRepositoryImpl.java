@@ -31,7 +31,7 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
 
         int limit = pageable.getPageSize();
         Map<String, Object> params = buildParams(planType, searchKeyword, planId, cursorSortValue);
-        Condition condition = buildCondition(planSortOption, searchKeyword, planId,
+        Condition condition = buildCondition(planType, planSortOption, searchKeyword, planId,
                 cursorSortValue);
 
         Node p = Cypher.node("Plan").named("p");
@@ -88,7 +88,10 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
             Integer cursorSortValue) {
 
         Map<String, Object> params = new HashMap<>();
-        params.put("planType", planType.name());
+
+        if (planType != null) {
+            params.put("planType", planType.name());
+        }
 
         if (planId != null && cursorSortValue != null) {
             params.put("cursorSortValue", cursorSortValue);
@@ -101,13 +104,18 @@ public class PlanRepositoryImpl implements PlanCustomRepository {
         return params;
     }
 
-    private Condition buildCondition(PlanSortOption planSortOption, String searchKeyword,
+    private Condition buildCondition(PlanType planType, PlanSortOption planSortOption,
+            String searchKeyword,
             String planId, Integer cursorSortValue) {
 
         Node p = Cypher.node("Plan").named("p");
-        Condition condition = p.property("planType").eq(Cypher.parameter("planType"));
-        condition = condition.and(p.property("planState").ne(Cypher.literalOf("DISABLE")));
+        Condition condition = p.property("planState").ne(Cypher.literalOf("DISABLE"));
 
+        if (planType != null) {
+            condition = condition.and(
+                    p.property("planType").eq(Cypher.parameter("planType"))
+            );
+        }
         if (planId != null && cursorSortValue != null) {
             Condition sortCondition;
             if (planSortOption.getOrder() == SortOrder.ASC) {

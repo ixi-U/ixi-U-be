@@ -28,9 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,10 @@ public class PlanService {
      * 요금제 저장 & 벡터 저장소에 저장
      */
     @Transactional
+    @CacheEvict(
+            value = {"planListPages"},
+            allEntries = true
+    )
     public PlanEmbeddedResponse savePlan(final SavePlanRequest request) {
 
         validateSamePlanName(request);
@@ -146,6 +151,10 @@ public class PlanService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "planListPages",
+            key = "'planListPages:' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #request.planTypeStr() + '-' + #request.planSortOptionStr() + '-' + #request.searchKeyword() + '-' + (#request.planId() != null ? #request.planId() : '') + '-' + #request.cursorSortValue()"
+    )
     public SortedPlanResponse findPlans(Pageable pageable, GetPlansRequest request) {
 
         PlanType planType = PlanType.from(request.planTypeStr());
@@ -168,32 +177,29 @@ public class PlanService {
                 ))
                 .toList();
 
-        Slice<PlanListDto> convertedSlice = new SliceImpl<>(
-                convertedPlanList,
-                plans.getPageable(),
-                plans.hasNext()
-        );
-
+        boolean hasNext = plans.hasNext();
         String lastPlanId = getLastPlanId(plans);
         int lastSortValue = getLastSortValue(plans, planSortOption);
 
-        return new SortedPlanResponse(convertedSlice, lastPlanId, lastSortValue);
+        return new SortedPlanResponse(convertedPlanList, hasNext, lastPlanId, lastSortValue);
     }
 
     private String convertCallLimit(int callLimitMinutes) {
-        return callLimitMinutes == -1 ? "기본제공" : String.valueOf(callLimitMinutes) + " 분";
+        return callLimitMinutes == Integer.MAX_VALUE ? "기본제공"
+                : String.valueOf(callLimitMinutes) + " 분";
     }
 
     private String convertMessageLimit(int messageLimit) {
-        return messageLimit == -1 ? "기본제공" : String.valueOf(messageLimit) + " 건";
+        return messageLimit == Integer.MAX_VALUE ? "기본제공" : String.valueOf(messageLimit) + " 건";
     }
 
     private String convertMobileData(int mobileDataLimitMb) {
-        return mobileDataLimitMb == -1 ? "무제한" : String.valueOf(mobileDataLimitMb / 1000) + " GB";
+        return mobileDataLimitMb == Integer.MAX_VALUE ? "무제한"
+                : String.valueOf(mobileDataLimitMb / 1000) + " GB";
     }
 
     private String convertSharedMobileDataLimitMb(int sharedMobileDataLimitMb) {
-        return sharedMobileDataLimitMb == -1 ? "무제한"
+        return sharedMobileDataLimitMb == Integer.MAX_VALUE ? "무제한"
                 : String.valueOf(sharedMobileDataLimitMb / 1000) + " GB";
     }
 
@@ -234,6 +240,10 @@ public class PlanService {
                 .toList();
     }
 
+    @CacheEvict(
+            value = {"planListPages"},
+            allEntries = true
+    )
     public void togglePlanState(String planId) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 요금제를 찾을 수 없습니다."));
@@ -246,6 +256,10 @@ public class PlanService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = {"planListPages"},
+            allEntries = true
+    )
     public void disablePlan(String planId) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
