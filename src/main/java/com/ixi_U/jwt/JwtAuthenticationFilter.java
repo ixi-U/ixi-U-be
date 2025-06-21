@@ -55,10 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 String userId = jwtTokenProvider.getUserIdFromToken(token).toString();
                 String role = jwtTokenProvider.getRoleFromToken(token);
-
                 if (role == null) {
-                    log.warn("❗ 토큰에서 role 정보 누락 - 인증 생략");
-                    filterChain.doFilter(request, response);
+                    log.error("❌ JWT에서 role을 추출하지 못했습니다. token: {}", token);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
 
@@ -81,6 +80,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
                     String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
                     String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
+                    if (roleString == null) {
+                        log.warn("❗ refresh token에서 role 정보 누락됨: {}", refreshToken);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
+                    }
                     UserRole role = UserRole.from(roleString);
 
                     // refresh token이 DB에 저장된 값과 일치하는지 검증 필요
@@ -122,6 +126,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
                     String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
                     String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
+                    if (roleString == null) {
+                        log.warn("❗ refresh token에서 role 정보 누락됨: {}", refreshToken);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
+                    }
                     UserRole role = UserRole.from(roleString);
 
                     // refresh token이 DB에 저장된 값과 일치하는지 검증 필요
