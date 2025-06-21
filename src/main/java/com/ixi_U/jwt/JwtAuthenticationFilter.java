@@ -3,7 +3,6 @@ package com.ixi_U.jwt;
 import com.ixi_U.user.entity.User;
 import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
-import com.ixi_U.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -46,120 +45,73 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("🔍 JwtAuthenticationFilter 진입: {}", request.getRequestURI());
 
-        // 1. 쿠키에서 토큰 추출
-        String token = extractAccessTokenFromCookie(request);
-        log.info("🔑 추출된 토큰: {}", token);
-
-        // 2. 쿠키 유효성 검사 및 인증 처리
         try {
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                String userId = jwtTokenProvider.getUserIdFromToken(token).toString();
-                String role = jwtTokenProvider.getRoleFromToken(token);
+            String accessToken = extractAccessTokenFromCookie(request);
+            if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+                String userId = jwtTokenProvider.getUserIdFromToken(accessToken).toString();
+                String role = jwtTokenProvider.getRoleFromToken(accessToken);
                 if (role == null) {
-                    log.error("❌ JWT에서 role을 추출하지 못했습니다. token: {}", token);
+                    log.error("❌ JWT에서 role을 추출하지 못했습니다. token: {}", accessToken);
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
 
-                log.info("✅ 인증 성공 - userId: {}, role: {}", userId, role);
+                log.info("✅ access token 인증 성공 - userId: {}, role: {}", userId, role);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userId, null, List.of(new SimpleGrantedAuthority(role)));
-
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                log.info("❌ 인증 실패 - 유효하지 않은 access token");
 
-            // todo access token 이 없으면 -> 인증 실패 요청 차단 ?
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or missing token");
-//            return; // 요청 차단
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-                String refreshToken = extractRefreshTokenFromCookie(request);
+            log.info("❌ access token 인증 실패 - 재발급 시도");
 
-                if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
-                    String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
-                    String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
-                    if (roleString == null) {
-                        log.warn("❗ refresh token에서 role 정보 누락됨: {}", refreshToken);
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        return;
-                    }
-                    UserRole role = UserRole.from(roleString);
+            String refreshToken = extractRefreshTokenFromCookie(request);
+            if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
+                String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
+                String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
+                if (roleString == null) {
+                    log.warn("❗ refresh token에서 role 정보 누락됨: {}", refreshToken);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
 
-                    // refresh token이 DB에 저장된 값과 일치하는지 검증 필요
-                    User user = userRepository.findById(userId).orElse(null);
+                UserRole role = UserRole.from(roleString);
+                User user = userRepository.findById(userId).orElse(null);
+                if (user != null && refreshToken.equals(user.getRefreshToken())) {
+                    String newAccessToken = jwtTokenProvider.generateAccessToken(userId, role);
+                    Cookie newAccessTokenCookie = new Cookie("access_token", newAccessToken);
+                    newAccessTokenCookie.setHttpOnly(true);
+                    newAccessTokenCookie.setPath("/");
+                    newAccessTokenCookie.setMaxAge((int) ACCESS_TOKEN_EXP);
+                    response.addCookie(newAccessTokenCookie);
 
-                    if (user != null && refreshToken.equals(user.getRefreshToken())) {
-                        // access token 재발급
-                        String newAccssToken = jwtTokenProvider.generateAccessToken(userId, role);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(roleString)));
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                        // 쿠키에 다시 저장
-                        Cookie newAccessTokenCookie = new Cookie("access_token", newAccssToken);
-                        newAccessTokenCookie.setHttpOnly(true);
-                        newAccessTokenCookie.setPath("/");
-                        newAccessTokenCookie.setMaxAge((int) ACCESS_TOKEN_EXP);
-                        response.addCookie(newAccessTokenCookie);
+                    log.info("♻️ access token 재발급 완료 - userId: {}", userId);
 
-                        // 인증 처리
-                        UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(roleString)));
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-                        log.info("♻️ access token 재발급 완료 - userId: {}", userId);
-                    } else {
-                        log.warn("❗ Refresh token도 유효하지 않음. 소셜 로그인 필요");
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        return;
-                    }
+                    filterChain.doFilter(request, response);
+                    return;
+                } else {
+                    log.warn("❗ refresh token 유효하지만 DB 정보와 불일치 또는 사용자 없음");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
                 }
             }
-            filterChain.doFilter(request, response);
+
+            log.warn("❌ access + refresh token 모두 유효하지 않음");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (Exception e) {
             log.error("❌ JwtAuthenticationFilter 예외 발생", e);
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
-
-                String refreshToken = extractRefreshTokenFromCookie(request);
-
-                if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
-                    String userId = jwtTokenProvider.getUserIdFromToken(refreshToken).toString();
-                    String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
-                    if (roleString == null) {
-                        log.warn("❗ refresh token에서 role 정보 누락됨: {}", refreshToken);
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        return;
-                    }
-                    UserRole role = UserRole.from(roleString);
-
-                    // refresh token이 DB에 저장된 값과 일치하는지 검증 필요
-                    User user = userRepository.findById(userId).orElse(null);
-
-                    if (user != null && refreshToken.equals(user.getRefreshToken())) {
-                        // access token 재발급
-                        String newAccssToken = jwtTokenProvider.generateAccessToken(userId, role);
-
-                        // 쿠키에 다시 저장
-                        Cookie newAccessTokenCookie = new Cookie("access_token", newAccssToken);
-                        newAccessTokenCookie.setHttpOnly(true);
-                        newAccessTokenCookie.setPath("/");
-                        newAccessTokenCookie.setMaxAge((int) ACCESS_TOKEN_EXP);
-                        response.addCookie(newAccessTokenCookie);
-
-                        // 인증 처리
-                        UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority(roleString)));
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-                        log.info("♻️ access token 재발급 완료 - userId: {}", userId);
-                    } else {
-                        log.warn("❗ Refresh token도 유효하지 않음. 소셜 로그인 필요");
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    }
-                }
-            }
+    }
 
     // access 토큰 추출
     private String extractAccessTokenFromCookie(HttpServletRequest request) {
@@ -188,3 +140,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
+
