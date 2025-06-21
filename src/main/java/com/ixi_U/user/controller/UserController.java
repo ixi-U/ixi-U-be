@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,15 +51,32 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+
+    // security holder에 담긴 userid 직접 꺼내기
     @GetMapping("/info")
-    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
-        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
-            
+    public ResponseEntity<ShowMyInfoResponse> getMyInfo() {
+        // SecurityContext에서 직접 userId 추출
+        String userId = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
         if (userId == null || userId.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."
-            );
+            throw new RuntimeException("인증 정보가 없습니다.");
         }
+
+        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
         return ResponseEntity.ok(response);
     }
+
+//    @GetMapping("/info")
+//    public ResponseEntity<ShowMyInfoResponse> getMyInfo(@AuthenticationPrincipal String userId) {
+//        ShowMyInfoResponse response = userService.findMyInfoByUserId(userId);
+//
+//        if (userId == null || userId.isBlank()) {
+//            throw new ResponseStatusException(
+//                    HttpStatus.UNAUTHORIZED, "인증 정보가 없습니다."
+//            );
+//        }
+//        return ResponseEntity.ok(response);
+//    }
 }

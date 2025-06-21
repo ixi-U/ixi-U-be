@@ -27,9 +27,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
+        System.out.println(" ===== 사용자 정보 가져오기 =====");
+
+        // kakao pk 추출
         Map<String, Object> attributes = oAuth2User.getAttributes();
         Long kakaoId = Long.valueOf(attributes.get("id").toString());
 
+        // nickname 추출
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         String nickname = profile.get("nickname").toString();
