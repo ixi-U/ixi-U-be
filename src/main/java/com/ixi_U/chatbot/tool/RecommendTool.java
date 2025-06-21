@@ -1,6 +1,7 @@
 package com.ixi_U.chatbot.tool;
 
 import com.ixi_U.chatbot.exception.ChatBotException;
+import com.ixi_U.chatbot.tool.dto.MostReviewPointPlanToolDto;
 import com.ixi_U.chatbot.tool.dto.MostReviewedPlanToolDto;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -28,19 +29,20 @@ public class RecommendTool {
     private final VectorStore planVectorStore;
 
     private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
+
     private final PlanRepository planRepository;
 
     @Tool(description = """
-        사용자가 특정 조건(가격, 데이터량, 혜택 등)에 맞는 요금제를 찾거나 추천받고 싶을 때 사용한다.
-        또한 특정 그룹, 컨셉, 브랜드와 관련된 요금제 추천 요청에도 사용된다.
-        예시:
-        - 조건부 검색: '3만원대 요금제 추천해줘', '무제한 데이터 요금제 찾아줘', '넷플릭스 혜택 있는 요금제는?'
-        - 사용자 그룹: '학생용 저렴한 요금제 추천', '시니어 요금제', '군인 요금제'
-        - 컨셉/브랜드: '아이돌 요금제', 'BTS 요금제', '게이머 요금제', '유튜버 요금제'
-        - 라이프스타일: '미니멀리스트 요금제', '프리미엄 요금제', '가성비 요금제'
-        - 기타: '특별 프로모션 요금제', '신규 출시 요금제', '인기 있는 요금제'
-        등 요금제와 관련된 모든 추천/검색 요청에서 동작한다.
-        """)
+            사용자가 특정 조건(가격, 데이터량, 혜택 등)에 맞는 요금제를 찾거나 추천받고 싶을 때 사용한다.
+            또한 특정 그룹, 컨셉, 브랜드와 관련된 요금제 추천 요청에도 사용된다.
+            예시:
+            - 조건부 검색: '3만원대 요금제 추천해줘', '무제한 데이터 요금제 찾아줘', '넷플릭스 혜택 있는 요금제는?'
+            - 사용자 그룹: '학생용 저렴한 요금제 추천', '시니어 요금제', '군인 요금제'
+            - 컨셉/브랜드: '아이돌 요금제', 'BTS 요금제', '게이머 요금제', '유튜버 요금제'
+            - 라이프스타일: '미니멀리스트 요금제', '프리미엄 요금제', '가성비 요금제'
+            - 기타: '특별 프로모션 요금제', '신규 출시 요금제', '인기 있는 요금제'
+            등 요금제와 관련된 모든 추천/검색 요청에서 동작한다.
+            """)
     List<Document> recommendPlan(
             @ToolParam(description = "사용자의 특정 조건이 포함된 요금제 추천/검색 쿼리") String userQuery,
             final ToolContext toolContext) {
@@ -97,6 +99,28 @@ public class RecommendTool {
     }
 
     @Tool(description = """
+            가장 많은 리뷰 점수를 받은 요금제 추천
+            가장 높은 별점을 받은 요금제 추천
+            """)
+    MostReviewPointPlanToolDto findMostReviewPoint(
+            @ToolParam(description = "N 번째로 높은 리뷰 점수를 받은 요금제를 추천할 때 N을 숫자로 반환한다.") int skip) {
+
+        log.info("---리뷰 점수가 높은 요금제 추천 툴 동작");
+        log.info("N 번째 = {}", skip);
+        try {
+            MostReviewPointPlanToolDto mostReviewPointPlan = planRepository.findMostReviewPointPlan(skip);
+
+            log.info("리뷰 점수 : {}", mostReviewPointPlan.reviewPointAverage());
+
+            return mostReviewPointPlan;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+
+    @Tool(description = """
             이 도구는 다음과 같은 맥락에서만 사용됩니다:
             
             1. 필터 표현식이 없고 특별한 정렬 조건도 없을 때
@@ -106,18 +130,19 @@ public class RecommendTool {
             
             다음과 같은 경우에는 사용하지 않습니다:
             - "가장 비싼/저렴한 요금제" (가격 정렬 조건)
-            - "가장 많은 데이터" (데이터 정렬 조건) 
+            - "가장 많은 데이터" (데이터 정렬 조건)
             - "가장 X한" 형태의 최상급 표현
             - 특정 조건이나 필터가 있는 경우
             """)
     MostReviewedPlanToolDto findMostReviewedPlan(
             @ToolParam(description = "N 번째로 많은 리뷰를 받은 요금제를 추천할 때 N을 숫자로 반환한다.") int skip) {
 
-        log.info("리뷰가 많은 요금제 추천 툴 동작");
+        log.info("---리뷰가 많은 요금제 추천 툴 동작");
+        log.info("N 번째 = {}", skip);
         try {
             MostReviewedPlanToolDto mostReviewedPlan = planRepository.findMostReviewedPlan(skip);
+
             log.info("리뷰 수 : {}", mostReviewedPlan.reviewedCount());
-            log.info("test : {}", mostReviewedPlan);
 
             return mostReviewedPlan;
         } catch (Exception e) {
@@ -125,6 +150,7 @@ public class RecommendTool {
             return null;
         }
     }
+
 
     /**
      * 필터 표현식을 사용하지 않는 유사도 검색
@@ -143,7 +169,7 @@ public class RecommendTool {
         log.info("조회된 건 수 = {}", documents.size());
 
         for (Document document : documents) {
-            log.info("이름 : {}, 유사도 : {}",document.getMetadata().get("name"), document.getScore());
+            log.info("이름 : {}, 유사도 : {}", document.getMetadata().get("name"), document.getScore());
         }
 
         return documents;
@@ -169,7 +195,7 @@ public class RecommendTool {
         log.info("조회된 건 수 = {}", documents.size());
 
         for (Document document : documents) {
-            log.info("이름 : {}, 유사도 : {}",document.getMetadata().get("name"), document.getScore());
+            log.info("이름 : {}, 유사도 : {}", document.getMetadata().get("name"), document.getScore());
         }
 
         return documents;
