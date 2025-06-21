@@ -3,12 +3,13 @@ package com.ixi_U.plan.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,16 +21,15 @@ import com.ixi_U.plan.dto.PlanListDto;
 import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.BundledBenefitResponse;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.SingleBenefitResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
+import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
 import com.ixi_U.util.constants.TestConstants;
 import jakarta.servlet.Filter;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -176,8 +175,7 @@ class PlanControllerTest {
             PlanListDto dto2 = new PlanListDto("2", "요금제2", "무제한", "2000", "기본제공", "기본제공", 19000, 3,
                     List.of(), List.of());
 
-            SortedPlanResponse response = new SortedPlanResponse(
-                    new SliceImpl<>(List.of(dto1, dto2)), "2", 3);
+            SortedPlanResponse response = new SortedPlanResponse(List.of(dto1, dto2), true, "2", 3);
 
             given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
                     "ONLINE", "PRIORITY", null, null, null)))
@@ -190,12 +188,12 @@ class PlanControllerTest {
                             .param("planSortOptionStr", "PRIORITY")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.plans.content[0].id").value("1"))
-                    .andExpect(jsonPath("$.plans.content[0].mobileDataLimitMb").value("10GB"))
-                    .andExpect(jsonPath("$.plans.content[0].callLimitMinutes").value("300분"))
-                    .andExpect(jsonPath("$.plans.content[1].id").value("2"))
-                    .andExpect(jsonPath("$.plans.content[1].mobileDataLimitMb").value("무제한"))
-                    .andExpect(jsonPath("$.plans.content[1].callLimitMinutes").value("기본제공"))
+                    .andExpect(jsonPath("$.plans[0].id").value("1"))
+                    .andExpect(jsonPath("$.plans[0].mobileDataLimitMb").value("10GB"))
+                    .andExpect(jsonPath("$.plans[0].callLimitMinutes").value("300분"))
+                    .andExpect(jsonPath("$.plans[1].id").value("2"))
+                    .andExpect(jsonPath("$.plans[1].mobileDataLimitMb").value("무제한"))
+                    .andExpect(jsonPath("$.plans[1].callLimitMinutes").value("기본제공"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
                     .andDo(document("get-plans-sort-success"))
@@ -209,8 +207,8 @@ class PlanControllerTest {
             // given
             PlanListDto dto2 = new PlanListDto("2", "요금제2", "8GB", "1000", "200분", "100건", 19000, 3,
                     List.of(), List.of());
-            SortedPlanResponse response =
-                    new SortedPlanResponse(new SliceImpl<>(List.of(dto2)), "2", 3);
+
+            SortedPlanResponse response = new SortedPlanResponse(List.of(dto2), true, "2", 3);
 
             given(planService.findPlans(PageRequest.ofSize(2), GetPlansRequest.of(
                     "ONLINE", "PRIORITY", "제2", null, null)))
@@ -224,7 +222,7 @@ class PlanControllerTest {
                             .param("searchKeyword", "제2")
                             .with(user("tester").roles("USER")))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.plans.content[0].id").value("2"))
+                    .andExpect(jsonPath("$.plans[0].id").value("2"))
                     .andExpect(jsonPath("$.lastPlanId").value("2"))
                     .andExpect(jsonPath("$.lastSortValue").value(3))
                     .andDo(document("get-plans-search-success"))
@@ -350,6 +348,74 @@ class PlanControllerTest {
                     .andExpect(jsonPath("$.singleBenefits[0].benefitType")
                             .value(singleBenefit.benefitType()))
                     .andDo(document("get-plans-details-success"));
+        }
+    }
+
+    @Nested
+    @DisplayName("어드민 요금제 전체 조회 시")
+    class GetPlansForAdmin {
+        @Test
+        @DisplayName("전체 요금제를 조회하고 200을 반환한다")
+        void shouldReturnPlans() throws Exception {
+            when(planService.getPlansForAdmin()).thenReturn(List.of(new PlanAdminResponse("id", "요금제A", PlanState.ABLE, "")));
+
+            mockMvc.perform(get("/admin/plans"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].id").value("id"));
+        }
+    }
+
+    @Nested
+    @DisplayName("어드민 요금제 상태 토글 시")
+    class TogglePlanState {
+        @Test
+        @DisplayName("요금제 상태를 토글하고 200을 반환한다")
+        void shouldToggleState() throws Exception {
+            doNothing().when(planService).togglePlanState("id");
+
+            mockMvc.perform(patch("/admin/plans/id/toggle"))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("어드민 요금제 비활성화 시")
+    class DisablePlan {
+        @Test
+        @DisplayName("요금제를 비활성화하고 200을 반환한다")
+        void shouldDisablePlan() throws Exception {
+            doNothing().when(planService).disablePlan("id");
+
+            mockMvc.perform(patch("/admin/plans/id/disable"))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("요금제 요약 조회 시")
+    class GetPlanNames {
+        @Test
+        @DisplayName("요금제 요약 목록을 조회하고 200을 반환한다")
+        void shouldReturnPlanNames() throws Exception {
+            when(planService.getPlanNameList()).thenReturn(Collections.singletonList(new PlanNameDto("id", "요금제A")));
+
+            mockMvc.perform(get("/plans/summaries"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].id").value("id"))
+                    .andExpect(jsonPath("$[0].name").value("요금제A"));
+        }
+    }
+
+    @Nested
+    @DisplayName("요금제 임베드 수행 시")
+    class EmbedPlan {
+        @Test
+        @DisplayName("전체 요금제를 임베드하고 200을 반환한다")
+        void shouldEmbedAllPlan() throws Exception {
+            doNothing().when(planService).embedAllPlan();
+
+            mockMvc.perform(get("/plans/embed"))
+                    .andExpect(status().isOk());
         }
     }
 }

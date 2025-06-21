@@ -41,8 +41,19 @@ bootJar {
 }
 
 dependencies {
+
+    // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly('io.jsonwebtoken:jjwt-jackson:0.11.5')
+
+    // Oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // Hot Swap
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -68,18 +79,31 @@ dependencies {
     // Advisors
     implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
 
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Bean Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Ahocorasick
+    implementation 'org.ahocorasick:ahocorasick:0.6.3'
+
+    // Open Korean Text
+    implementation("org.openkoreantext:open-korean-text:2.3.1")
+
+    // Spring Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // Redis & Spring Data Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     testImplementation "org.testcontainers:junit-jupiter:1.21.1"
     testImplementation "org.testcontainers:neo4j:1.21.1"
-
-    // Bean Validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Reactor Test
     testImplementation 'io.projectreactor:reactor-test:3.6.5'
@@ -89,19 +113,6 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient:3.0.3'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
-    // jwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly('io.jsonwebtoken:jjwt-jackson:0.11.5')
-
-    // oauthAdd commentMore actions
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-    // ahocorasick
-    implementation 'org.ahocorasick:ahocorasick:0.6.3'
-
-    // open korean text
-    implementation("org.openkoreantext:open-korean-text:2.3.1")
 }
 
 dependencyManagement {
