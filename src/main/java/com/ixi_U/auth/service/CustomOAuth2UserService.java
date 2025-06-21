@@ -27,9 +27,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
+        // kakao pk 추출
         Map<String, Object> attributes = oAuth2User.getAttributes();
         Long kakaoId = Long.valueOf(attributes.get("id").toString());
 
+        // nickname 추출
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         String nickname = profile.get("nickname").toString();
@@ -39,11 +41,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 신규/기존 유저에 따라 redirect 위치 달라짐
         Optional<User> optionalUser = userRepository.findByKakaoId(kakaoId);
-        boolean isNewUser = optionalUser.isEmpty();
+        User user;
+        boolean isNewUser;
 
-        User user = optionalUser.orElseGet(() ->
-                userRepository.save(User.of(nickname, email, "kakao", kakaoId, UserRole.ROLE_USER))
-        );
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+            isNewUser = false;
+        } else {
+            user = userRepository.save(User.of(nickname, email, "kakao", kakaoId, UserRole.ROLE_USER));
+            isNewUser = true;
+        }
 
         return new CustomOAuth2User(nickname, user.getId(), user.getUserRole(),
                 isNewUser); // JWT 토큰 생성에 사용되는 사용자 정보의 출처가 된다.

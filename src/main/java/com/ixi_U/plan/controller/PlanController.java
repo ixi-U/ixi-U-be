@@ -6,6 +6,7 @@ import com.ixi_U.plan.dto.request.SavePlanRequest;
 import com.ixi_U.plan.dto.response.PlanAdminResponse;
 import com.ixi_U.plan.dto.response.PlanDetailResponse;
 import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.PlansCountResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.service.PlanService;
 import java.util.List;
@@ -51,6 +52,12 @@ public class PlanController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/plans/count")
+    public ResponseEntity<PlansCountResponse> countPlans() {
+
+        return ResponseEntity.ok(planService.countPlans());
+    }
+
     @GetMapping("/plans/details/{planId}")
     public ResponseEntity<PlanDetailResponse> getPlanDetail(@PathVariable String planId) {
 
@@ -87,7 +94,6 @@ public class PlanController {
         planService.disablePlan(planId);
         return ResponseEntity.ok().build();
     }
-
 
     // 요금제 목록 조회
     @GetMapping("/plans/summaries")

@@ -1,6 +1,7 @@
 package com.ixi_U.plan.repository;
 
 import com.ixi_U.plan.dto.PlanSummaryDto;
+import com.ixi_U.plan.dto.PlansCountDto;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanType;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +13,5 @@ public interface PlanCustomRepository {
             PlanSortOption planSortOptionStr, String searchKeyword, String planId,
             Integer cursorSortValue);
 
+    PlansCountDto countPlans();
 }

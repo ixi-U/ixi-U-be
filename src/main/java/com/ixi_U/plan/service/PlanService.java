@@ -17,6 +17,7 @@ import com.ixi_U.plan.dto.request.SavePlanRequest;
 import com.ixi_U.plan.dto.response.PlanAdminResponse;
 import com.ixi_U.plan.dto.response.PlanDetailResponse;
 import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.PlansCountResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
@@ -63,7 +64,7 @@ public class PlanService {
      */
     @Transactional
     @CacheEvict(
-            value = {"planListPages"},
+            value = {"planListPages", "planCounts"},
             allEntries = true
     )
     public PlanEmbeddedResponse savePlan(final SavePlanRequest request) {
@@ -184,6 +185,13 @@ public class PlanService {
         return new SortedPlanResponse(convertedPlanList, hasNext, lastPlanId, lastSortValue);
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "planCounts", key = "'all'")
+    public PlansCountResponse countPlans() {
+
+        return PlansCountResponse.from(planRepository.countPlans());
+    }
+
     private String convertCallLimit(int callLimitMinutes) {
         return callLimitMinutes == Integer.MAX_VALUE ? "기본제공"
                 : String.valueOf(callLimitMinutes) + " 분";
@@ -241,7 +249,7 @@ public class PlanService {
     }
 
     @CacheEvict(
-            value = {"planListPages"},
+            value = {"planListPages", "planCounts"},
             allEntries = true
     )
     public void togglePlanState(String planId) {
@@ -257,7 +265,7 @@ public class PlanService {
 
     @Transactional
     @CacheEvict(
-            value = {"planListPages"},
+            value = {"planListPages", "planCounts"},
             allEntries = true
     )
     public void disablePlan(String planId) {
