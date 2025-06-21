@@ -17,6 +17,7 @@ import com.ixi_U.plan.dto.request.SavePlanRequest;
 import com.ixi_U.plan.dto.response.PlanAdminResponse;
 import com.ixi_U.plan.dto.response.PlanDetailResponse;
 import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.PlansCountResponse;
 import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
@@ -182,6 +183,12 @@ public class PlanService {
         int lastSortValue = getLastSortValue(plans, planSortOption);
 
         return new SortedPlanResponse(convertedPlanList, hasNext, lastPlanId, lastSortValue);
+    }
+
+    @Transactional(readOnly = true)
+    public PlansCountResponse countPlans() {
+
+        return PlansCountResponse.from(planRepository.countPlans());
     }
 
     private String convertCallLimit(int callLimitMinutes) {
