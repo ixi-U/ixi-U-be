@@ -16,10 +16,10 @@
 
 ### 기본 요금제 정보
 - **monthlyPrice**: 월 요금 (정수)
-- **mobileDataLimitMb**: 데이터량 MB (정수, 무제한=-1)
-- **shareMobileDataLimitMb**: 데이터 쉐어링 MB (정수, 무제한=-1)
-- **callLimitMinutes**: 통화 시간 제한 (분, 무제한=-1)
-- **messageLimit**: 문자 제한 (건수, 무제한=-1)
+- **mobileDataLimitMb**: 데이터량 MB (정수, 무제한=2147483647)
+- **shareMobileDataLimitMb**: 데이터 쉐어링 MB (정수, 무제한=2147483647)
+- **callLimitMinutes**: 통화 시간 제한 (분, 무제한=2147483647)
+- **messageLimit**: 문자 제한 (건수, 무제한=2147483647)
 - **type**: 요금제 유형 (FIVE_G_LTE, ONLINE, TABLET_SMARTWATCH, DUAL_NUMBER)
 - **mobileDataThrottleSpeedKbps**: 속도 제한 Kbps (정수)
 - **minAge**: 최소 연령 (정수)
@@ -106,14 +106,14 @@
 
 ### 데이터 관련 키워드
 - **용량**: "XGB" → mobileDataLimitMb >= X*1024
-- **무제한**: "무제한/언리미티드/unlimited/무한" → mobileDataLimitMb == -1
+- **무제한**: "무제한/언리미티드/unlimited/무한" → mobileDataLimitMb == 2147483647
 - **충분한**: "충분한/넉넉한 데이터" → mobileDataLimitMb >= 50*1024
 - **데이터 쉐어링**: "쉐어링/나눔/공유" → shareMobileDataLimitMb > 0
 - **종량제**: "종량제/사용한만큼" → pricePerKb != null
 
 ### 통화/문자 관련 키워드
-- **무제한 통화**: "통화 무제한/전화 무제한" → callLimitMinutes == -1
-- **무제한 문자**: "문자 무제한/SMS 무제한" → messageLimit == -1
+- **무제한 통화**: "통화 무제한/전화 무제한" → callLimitMinutes == 2147483647
+- **무제한 문자**: "문자 무제한/SMS 무제한" → messageLimit == 2147483647
 - **통화 시간**: "X분 통화" → callLimitMinutes >= X
 - **문자 건수**: "X건 문자" → messageLimit >= X
 
@@ -254,7 +254,7 @@
 - **"선택할 수 있는"/"다양한 서비스"** → "멀티팩" == true
 
 ### 4. 부정 조건 처리
-- **"무제한이 아닌"**: mobileDataLimitMb != -1
+- **"무제한이 아닌"**: mobileDataLimitMb != 2147483647
 - **"X 혜택이 없는"**: "X 혜택" != true
 - **"X만원 넘지 않는"**: monthlyPrice <= X0000
 - **"종량제가 아닌"**: pricePerKb == null
@@ -293,7 +293,7 @@
 **출력:** monthlyPrice <= 50000 && ("바이브 앱 음악감상" == true || "지니뮤직 앱 음악감상" == true)
 
 **입력:** "무제한 데이터 요금제"
-**출력:** mobileDataLimitMb == -1
+**출력:** mobileDataLimitMb == 2147483647
 
 **입력:** "디즈니+와 티빙 둘 다 제공하는 요금제"
 **출력:** "디즈니+티빙" == true
