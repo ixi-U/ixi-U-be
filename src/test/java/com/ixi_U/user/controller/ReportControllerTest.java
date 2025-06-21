@@ -138,7 +138,7 @@ public class ReportControllerTest {
                             .param("page", "0")
                             .param("size", "10")
                             .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(document("get-report-list"))
+                    .andDo(document("get-report-success"))
                     .andDo(print());
 
             // then
