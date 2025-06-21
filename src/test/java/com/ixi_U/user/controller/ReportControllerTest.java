@@ -59,10 +59,6 @@ public class ReportControllerTest {
 
     @Autowired
     private WebApplicationContext context;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private MockMvc mockMvc;
 
     @MockBean
