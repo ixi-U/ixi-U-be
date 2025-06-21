@@ -20,8 +20,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.common.config.SecurityConfig;
 import com.ixi_U.jwt.JwtTokenProvider;
+import com.ixi_U.user.dto.request.CreateReportRequest;
+import com.ixi_U.user.dto.request.CreateReviewRequest;
 import com.ixi_U.user.dto.response.ShowReviewListResponse;
 import com.ixi_U.user.dto.response.ShowReviewResponse;
+import com.ixi_U.user.repository.UserRepository;
 import com.ixi_U.user.service.ReportService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,7 +52,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-@WebMvcTest(controllers = ReportController.class)
+@WebMvcTest(value = {ReportController.class})
 @Import(SecurityConfig.class)
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @ActiveProfiles("test")
@@ -68,7 +71,13 @@ public class ReportControllerTest {
     JwtTokenProvider jwtTokenProvider;
 
     @MockBean
+    UserRepository userRepository;
+
+    @MockBean
     CustomOAuth2UserService customOAuth2UserService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void init(RestDocumentationContextProvider restDocumentation) {
@@ -95,18 +104,19 @@ public class ReportControllerTest {
         void it_returns_201() throws Exception {
             // given
             doNothing().when(reportService).createReport(anyString(), any(Long.class));
+            CreateReportRequest request = CreateReportRequest.from( 5L);
 
             // when
-            ResultActions result = mockMvc.perform(post(REPORT_URL)
+            ResultActions result = mockMvc.perform(post("/api/reports")
                             .with(csrf())
-                            .param("reviewId", "123")
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(document("create-report-success"))
-                    .andDo(print());
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                            .andDo(document("create-report-success"))
+                            .andDo(print());
 
             // then
             result.andExpect(status().isCreated());
-            verify(reportService, times(1)).createReport("userId", 123L);
+            verify(reportService, times(1)).createReport("userId", 5L);
         }
     }
 
