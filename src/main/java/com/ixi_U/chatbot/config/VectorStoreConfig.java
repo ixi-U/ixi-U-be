@@ -17,7 +17,6 @@ public class VectorStoreConfig {
                 .databaseName("neo4j")
                 .indexName("embedded-forbidden-index")
                 .label("EmbeddedForbidden")
-                .embeddingDimension(1536)
                 .distanceType(Neo4jVectorStore.Neo4jDistanceType.COSINE)
                 .initializeSchema(true)
                 .build();
@@ -30,7 +29,6 @@ public class VectorStoreConfig {
                 .databaseName("neo4j")
                 .indexName("embedded-plan-index")
                 .label("EmbeddedPlan")
-                .embeddingDimension(1536)
                 .distanceType(Neo4jVectorStore.Neo4jDistanceType.COSINE)
                 .initializeSchema(true)
                 .build();
