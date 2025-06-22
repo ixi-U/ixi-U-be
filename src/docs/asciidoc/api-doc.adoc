@@ -13,159 +13,222 @@
 
 operation::get-my-plan-success[]
 
-
 === 유저 삭제
 
 ==== 성공
 
 operation::delete-my-user-success[]
 
-
 == 요금제 API
 
 === 요금제 저장
+
 ==== 성공
+
 operation::save-plans-success[]
 
 === 요금제 목록 조회
 
 ==== 성공 - 정렬 조건으로 조회
+
 operation::get-plans-sort-success[]
 
 ==== 성공 - 검색 조건으로 조회
+
 operation::get-plans-search-success[]
 
 ==== 실패 - 정렬 조건 유효하지 않음
+
 operation::get-plans-error-invalid-sort[]
 
 ==== 실패 - 요금제 타입 유효하지 않음
+
 operation::get-plans-error-invalid-plan-type[]
 
 ==== 실패 - size 파라미터 유효하지 않음
+
 operation::get-plans-error-invalid-size-parameter[]
 
-=== 요금제 상세 정보 조회
+=== 요금제 개수 조회
+
 ==== 성공
+
+operation::get-plans-count-success[]
+
+=== 요금제 상세 정보 조회
+
+==== 성공
+
 operation::get-plans-details-success[]
 
 === 요금제 리뷰 저장
 
 ==== 성공
+
 operation::create-review-success[]
 
 ==== 실패 - planID가 NULL
+
 operation::create-review-error-plan-id-null[]
 
 ==== 실패 - 리뷰 글자 수 200자 초과
+
 operation::create-review-error-review-letter-too-long[]
 
 ==== 실패 - 리뷰 글자 수 20자 미만
+
 operation::create-review-error-review-letter-too-short[]
 
 ==== 실패 - 리뷰 점수 6점 초과
+
 operation::create-review-error-review-point-over-6[]
 
 ==== 실패 - 리뷰 점수 0점 이하
+
 operation::create-review-error-review-point-under-zero[]
 
 ==== 실패 - 리뷰 내용 없음
+
 operation::create-review-error-review-content-null[]
 
 ==== 실패 - 이미 리뷰한 요금제
+
 operation::create-review-error-when-already-reviewed[]
 
 ==== 실패 - 구독하지 않은 요금제
+
 operation::create-review-error-when-not-subscribe[]
 
 === 요금제 리뷰 조회
+
 ==== 성공
+
 operation::get-review-success[]
 
 === 요금제 리뷰 요약 조회 (개수 및 평균 별점)
+
 ==== 성공
+
 operation::get-review-summary-success[]
 
 === 요금제 리뷰 수정
 
 ==== 성공
+
 operation::update-review-success[]
 
 ==== 실패 - 리뷰 내용 없음
+
 operation::update-review-error-review-content-null[]
 
 ==== 실패 - 리뷰 ID 없음
+
 operation::update-review-error-review-id-null[]
 
 ==== 실패 - 리뷰 글자 수 200자 초과
+
 operation::update-review-error-review-letter-too-long[]
 
 ==== 실패 - 리뷰 글자 수 20자 미만
+
 operation::update-review-error-review-letter-too-short[]
 
 ==== 실패 - 본인 리뷰 아님
+
 operation::update-review-error-when-not-my-review[]
 
 === 요금제 리뷰 삭제
-==== 성공
-operation::delete-review-success[]
 
+==== 성공
+
+operation::delete-review-success[]
 
 == 혜택 API
 
 === 묶음 혜택 리스트 조회
+
 ==== 성공
+
 operation::get-bundled-benefit-list-success[]
 
 === 단일 혜택 리스트 조회
+
 ==== 성공
+
 operation::get-single-benefit-list-success[]
 
 === 단일 혜택 저장
+
 ==== 성공
+
 operation::save-single-benefit-success[]
 
 === 묶음 혜택 저장
-==== 성공
-operation::save-bundled-benefit-success[]
 
+==== 성공
+
+operation::save-bundled-benefit-success[]
 
 == 구독 API
 
 === 구독 등록
 
 ==== 성공
+
 operation::create-subscribed-success[]
 
 ==== 실패 - planId 비어있음
+
 operation::create-subscribed-error-plan-id-blank[]
 
 ==== 실패 - 존재하지 않는 userId
+
 operation::create-subscribed-error-user-not-found[]
 
 ==== 실패 - 존재하지 않는 planId
+
 operation::create-subscribed-error-plan-not-found[]
 
 ==== 실패 - 이미 구독 중
+
 operation::create-subscribed-error-already-subscribed[]
 
 === 구독 히스토리 조회
 
 ==== 성공
+
 operation::get-subscribed-history-success[]
 
 ==== 실패 - 존재하지 않는 userId
-operation::get-subscribed-history-error-user-not-found[]
 
+operation::get-subscribed-history-error-user-not-found[]
 
 == 챗봇 API
 
 === 웰컴 메시지 조회
+
 ==== 성공
+
 operation::get-welcome-message-success[]
 
 === 요금제 추천 응답
+
 ==== 성공
+
 operation::recommend-plan-success[]
 
 ==== 실패
+
 operation::recommend-plan-fail[]
+
+== 신고 API
+
+=== 신고 적용
+
+==== 성공
+operation::create-report-success[]
+
+=== 신고 조회
+
+==== 성공
+operation::get-report-success[]
