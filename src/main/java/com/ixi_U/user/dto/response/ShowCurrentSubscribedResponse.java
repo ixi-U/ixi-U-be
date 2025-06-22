@@ -9,7 +9,7 @@ public record ShowCurrentSubscribedResponse(
         String name,
         Integer mobileDataLimitMb,
         Integer monthlyPrice,
-        Integer pricePerKb,
+        Double pricePerKb,
         List<BundledBenefit> bundledBenefits,
         List<SingleBenefit> singleBenefits
 ) {
@@ -18,7 +18,7 @@ public record ShowCurrentSubscribedResponse(
             String name,
             Integer mobileDataLimitMb,
             Integer monthlyPrice,
-            Integer pricePerKb,
+            Double pricePerKb,
             List<BundledBenefit> bundledBenefits,
             List<SingleBenefit> singleBenefits
     ) {
