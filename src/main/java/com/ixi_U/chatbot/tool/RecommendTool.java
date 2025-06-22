@@ -189,14 +189,11 @@ public class RecommendTool {
                 SearchRequest.builder()
                         .query(userQuery)
                         .similarityThreshold(0.5)
-                        .topK(100)
+                        .topK(20)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());
 
-        for (Document document : documents) {
-            log.info("이름 : {}, 유사도 : {}", document.getMetadata().get("name"), document.getScore());
-        }
 
         return documents;
     }
@@ -210,21 +207,15 @@ public class RecommendTool {
 
         log.info("filterExpression = {}", filterExpression);
 
-        log.info("실제 무제한 데이터 수 : {}",planRepository.findByMobileDataLimitMb(2147483647).size());
-
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
                         .similarityThreshold(0.5)
                         .filterExpression(filterExpression)
-                        .topK(100)
+                        .topK(20)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());
-
-        for (Document document : documents) {
-            log.info("이름 : {}, 유사도 : {}", document.getMetadata().get("name"), document.getScore());
-        }
 
         return documents;
     }
