@@ -75,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String roleString = jwtTokenProvider.getRoleFromToken(refreshToken);
                 if (roleString == null) {
                     log.warn("❗ refresh token에서 role 정보 누락됨: {}", refreshToken);
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    filterChain.doFilter(request,response);
                     return;
                 }
 
@@ -106,7 +106,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             log.warn("❌ access + refresh token 모두 유효하지 않음");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+       //     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("❌ JwtAuthenticationFilter 예외 발생", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
