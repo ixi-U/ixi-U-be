@@ -183,7 +183,7 @@ class UserServiceTest {
         User user = User.of("nickname", "old@email.com", "kakao", 123456L, UserRole.ROLE_USER);
         Plan plan = Plan.of(
                 "요금제A", 1000, 500, 100, 200, 30000, PlanType.FIVE_G_LTE,
-                "데이터 소진 시 속도제한", 1000, 18, 60, false, 1,
+                "데이터 소진 시 속도제한", 1000, 18, 60, false, 1.0,
                 "기타정보", 1,
                 new ArrayList<>(), new ArrayList<>()
         );

@@ -78,7 +78,7 @@ class UserAndPlanRepositoryTest {
 
         Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
-                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
         ));
 
         // when
@@ -114,11 +114,11 @@ class UserAndPlanRepositoryTest {
         User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER));
         Plan planA = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
-                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
         ));
         Plan planB = planRepository.save(Plan.of("요금제 B", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
-                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
         ));
 
         // 최초 구독 (A)
@@ -150,7 +150,7 @@ class UserAndPlanRepositoryTest {
         User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER));
         Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
-                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
         ));
 
         // 2. when 서비스로 구독 추가
@@ -171,7 +171,7 @@ class UserAndPlanRepositoryTest {
         User user = userRepository.save(User.of("홍길동", "hong@example.com", "KAKAO", 123L,UserRole.ROLE_USER));
         Plan plan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                 PlanType.ONLINE, "주의사항", 400,
-                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
         ));
 
         CreateSubscribedRequest request = new CreateSubscribedRequest(plan.getId());

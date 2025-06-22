@@ -54,7 +54,7 @@ public class Plan {
 
     private final Boolean isActiveDuty;
 
-    private final Integer pricePerKb;
+    private final Double pricePerKb;
 
     private final String etcInfo;
 
@@ -92,7 +92,7 @@ public class Plan {
             final Integer minAge,
             final Integer maxAge,
             final Boolean isActiveDuty,
-            final Integer pricePerKb,
+            final Double pricePerKb,
             final String etcInfo,
             final Integer priority,
             List<BundledBenefit> bundledBenefits,

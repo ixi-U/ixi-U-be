@@ -82,7 +82,7 @@ class ReviewedRepositoryTest {
             User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L, UserRole.ROLE_USER));
             Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                     PlanType.ONLINE, "주의사항", 400,
-                    0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                    0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
             ));
             Reviewed reviewed = Reviewed.of(5, savedPlan, "안녕하세영");
 
@@ -116,7 +116,7 @@ class ReviewedRepositoryTest {
                 User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L,UserRole.ROLE_USER));
                 Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
-                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                        0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
                 ));
                 Reviewed reviewed = Reviewed.of(5, savedPlan, "안녕하세영");
 
@@ -144,7 +144,7 @@ class ReviewedRepositoryTest {
                 User savedUser = userRepository.save(User.of("jinu", "jinu@mail.com", "kakao", 123L,UserRole.ROLE_USER));
                 Plan savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
-                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                        0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
                 ));
 
                 // when
@@ -170,7 +170,7 @@ class ReviewedRepositoryTest {
 
             savedPlan = planRepository.save(Plan.of("요금제 A", 20000, 300, 200, 100, 29000,
                     PlanType.ONLINE, "주의사항", 400,
-                    0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                    0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
             ));
 
             for (int i = 0; i < totalReviewCount; i++) {

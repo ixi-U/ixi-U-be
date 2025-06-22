@@ -41,7 +41,7 @@ public record GeneratePlanDescriptionRequest(
 
         Boolean isActiveDuty,
 
-        Integer pricePerKb,
+        Double pricePerKb,
 
         String etcInfo,
 
@@ -68,7 +68,7 @@ public record GeneratePlanDescriptionRequest(
             final Integer minAge,
             final Integer maxAge,
             final Boolean isActiveDuty,
-            final Integer pricePerKb,
+            final Double pricePerKb,
             final String etcInfo,
             final Integer priority,
             final List<SingleBenefitDTO> singleBenefits,
