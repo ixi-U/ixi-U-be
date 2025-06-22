@@ -94,7 +94,7 @@ class JwtAuthenticationFilterTest {
             when(jwtTokenProvider.validateToken(refreshToken)).thenReturn(true);
             when(jwtTokenProvider.getUserIdFromToken(refreshToken)).thenReturn(userId);
             when(jwtTokenProvider.getRoleFromToken(refreshToken)).thenReturn(role);
-            when(jwtTokenProvider.generateAccessToken(userId, UserRole.ROLE_USER)).thenReturn(newAccessToken);
+            when(jwtTokenProvider.generateToken(userId, UserRole.ROLE_USER)).thenReturn(newAccessToken);
             when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
             // when
