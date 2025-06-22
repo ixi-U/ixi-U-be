@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         // 예외 URI 정의 (예: 로그인 관련 URI 등은 필터 패스)
         String uri = request.getRequestURI();
-        return uri.startsWith("/oauth2") || uri.startsWith("/login") || uri.equals("/favicon.ico");
+        return uri.startsWith("/oauth2") || uri.startsWith("/login") || uri.equals("/favicon.ico") || uri.startsWith("/actuator/health");
     }
 
     @Override
