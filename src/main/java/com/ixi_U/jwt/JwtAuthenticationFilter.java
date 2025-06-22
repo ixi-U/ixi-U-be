@@ -107,7 +107,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("♻️ access token 재발급 완료 - userId: {}", userId);
 
                 filterChain.doFilter(request, response);
-//                return;
+                return;
 //                } else {
 //                    log.warn("❗ refresh token 유효하지만 DB 정보와 불일치 또는 사용자 없음");
 //                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -118,6 +118,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.warn("❌ access + refresh token 모두 유효하지 않음 -> 로그인하지 않은 사용자");
        //     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             filterChain.doFilter(request, response); // 로그인하지 않은 사용자
+            return;
         } catch (Exception e) {
             log.error("❌ JwtAuthenticationFilter 예외 발생", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
