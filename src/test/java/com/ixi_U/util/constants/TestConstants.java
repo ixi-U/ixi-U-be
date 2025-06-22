@@ -31,7 +31,7 @@ public class TestConstants {
                 7,
                 30,
                 false,
-                0,
+                0.0,
                 null,
                 1,
                 List.of("temp19", "temp20", "temp17", "temp18"),

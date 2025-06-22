@@ -320,7 +320,7 @@ class PlanControllerTest {
             PlanDetailResponse response = new PlanDetailResponse(name, 100, 100,
                     100, 100, 30000,
                     PlanType.ONLINE.getPlanType(), "이용 시 유의사항", 100,
-                    20, 40, 10,
+                    20, 40, 10.0,
                     "기타사항", bundledBenefits, singleBenefits);
 
             String planId = UUID.randomUUID().toString();

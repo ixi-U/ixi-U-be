@@ -106,7 +106,7 @@ class UserControllerTest {
                     "5G 프리미엄 요금제",
                     200_000,
                     85_000,
-                    5,
+                    5.0,
                     List.of(
                             BundledBenefit.create("스트리밍 혜택", "넷플릭스 포함", 1)
                     ),

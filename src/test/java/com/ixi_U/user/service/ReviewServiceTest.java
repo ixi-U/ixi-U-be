@@ -79,7 +79,7 @@ class ReviewServiceTest {
                 given(planRepository.findById(any())).willReturn(Optional.of(Plan.of(
                         "플랜1", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
-                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
+                        0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
                         Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
                                 UserRole.ROLE_USER)));
@@ -113,7 +113,7 @@ class ReviewServiceTest {
                 given(planRepository.findById(any())).willReturn(
                         Optional.of(Plan.of("플랜1", 20000, 300, 200, 100, 29000,
                                 PlanType.ONLINE, "주의사항", 400,
-                                0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                                0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
                         )));
                 given(userRepository.findById(any())).willReturn(
                         Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
@@ -141,7 +141,7 @@ class ReviewServiceTest {
                 given(planRepository.findById(any())).willReturn(Optional.of(Plan.of(
                         "플랜1", 20000, 300, 200, 100, 29000,
                         PlanType.ONLINE, "주의사항", 400,
-                        0, 100, false, 5, "기타 없음", 5, List.of(), List.of())));
+                        0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of())));
                 given(userRepository.findById(any())).willReturn(
                         Optional.of(User.of("testName", "testEmail", "testProvider", 123L,
                                 UserRole.ROLE_USER)));

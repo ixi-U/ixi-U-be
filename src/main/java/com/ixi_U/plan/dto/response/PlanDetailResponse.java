@@ -3,11 +3,11 @@ package com.ixi_U.plan.dto.response;
 import com.ixi_U.plan.entity.Plan;
 import java.util.List;
 
-public record PlanDetailResponse(String name, int mobileDataLimitMb, int sharedMobileDataLimitMb,
-                                 int callLimitMinutes, int messageLimit, int monthlyPrice,
+public record PlanDetailResponse(String name, Integer mobileDataLimitMb, Integer sharedMobileDataLimitMb,
+                                 Integer callLimitMinutes, Integer messageLimit, Integer monthlyPrice,
                                  String planType, String usageCautions,
-                                 int mobileDataThrottleSpeedKbps, int minAge, int maxAge,
-                                 int pricePerKb, String etcInfo,
+                                 Integer mobileDataThrottleSpeedKbps, Integer minAge, Integer maxAge,
+                                 Double pricePerKb, String etcInfo,
                                  List<BundledBenefitResponse> bundledBenefits,
                                  List<SingleBenefitResponse> singleBenefits) {
 

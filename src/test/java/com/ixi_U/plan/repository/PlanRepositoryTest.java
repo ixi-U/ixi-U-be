@@ -80,17 +80,17 @@ class PlanRepositoryTest {
             Plan plan1 = Plan.of(
                     "요금제1", 20000, 300, 200, 100, 29000,
                     PlanType.ONLINE, "주의사항", 400,
-                    0, 100, false, 5, "기타 없음", 5, List.of(), List.of()
+                    0, 100, false, 5.0, "기타 없음", 5, List.of(), List.of()
             );
             Plan plan2 = Plan.of(
                     "요금제2", 10000, 300, 200, 100, 79000,
                     PlanType.ONLINE, "주의사항", 400,
-                    0, 100, false, 5, "기타 없음", 1, List.of(), List.of()
+                    0, 100, false, 5.0, "기타 없음", 1, List.of(), List.of()
             );
             Plan plan3 = Plan.of(
                     "요금제3", 40000, 300, 200, 100, 109000,
                     PlanType.ONLINE, "주의사항", 400,
-                    0, 100, false, 5, "기타 없음", 3, List.of(), List.of()
+                    0, 100, false, 5.0, "기타 없음", 3, List.of(), List.of()
             );
 
             planRepository.saveAll(List.of(plan1, plan2, plan3));
