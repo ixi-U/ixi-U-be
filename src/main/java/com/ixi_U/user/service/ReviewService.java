@@ -1,6 +1,7 @@
 package com.ixi_U.user.service;
 
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.forbiddenWord.ReviewFilter;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -33,6 +34,7 @@ public class ReviewService {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;
     private final SubscribedRepository subscribedRepository;
+    private final ReviewFilter reviewFilter;
 
 
     @Transactional
@@ -44,7 +46,7 @@ public class ReviewService {
         User findUser = userRepository.findById(userId).orElseThrow(() -> new GeneralException(
                 UserException.USER_NOT_FOUND));
 
-        checkEnrollReview(findPlan, findUser);
+        checkEnrollReview(findPlan, findUser, createReviewRequest.comment());
 
         Reviewed createdReview = Reviewed.of(createReviewRequest.point(),
                 findPlan,
@@ -55,7 +57,7 @@ public class ReviewService {
 
     }
 
-    private void checkEnrollReview(Plan findPlan, User findUser) {
+    private void checkEnrollReview(Plan findPlan, User findUser,String comment) {
 
         // 구독을 이미 했던 요금제가 아니라면 리뷰 불가
         if (!subscribedRepository.existsSubscribeRelation(findUser.getId(), findPlan.getId())) {
@@ -65,6 +67,11 @@ public class ReviewService {
         // 이미 작성된 리뷰가 있다면 리뷰 불가
         if (reviewedRepository.existsReviewedRelation(findUser.getId(), findPlan.getId())) {
             throw new GeneralException(ReviewedException.REVIEW_ALREADY_EXIST);
+        }
+
+        // 리뷰 내용에 금칙어 존재 시 리뷰 불가.
+        if(reviewFilter.matches(comment)){
+            throw new GeneralException(ReviewedException.REVIEW_FIND_FORBIDDEN_WORD);
         }
     }
 
@@ -89,12 +96,20 @@ public class ReviewService {
     @Transactional
     public void updateReview(String userId, UpdateReviewRequest updateReviewRequest){
 
-        checkReviewOwner(userId,updateReviewRequest.reviewId());
-
+        checkUpdateReview(userId,updateReviewRequest.reviewId(),updateReviewRequest.comment());
         reviewedRepository.updateReviewed(updateReviewRequest.reviewId(), updateReviewRequest.comment());
     }
 
-    private void checkReviewOwner(String userId, Long reviewId){
+    private void checkUpdateReview(String userId, Long reviewId,String comment){
+
+        checkReviewOwner(userId, reviewId);
+
+        if(reviewFilter.matches(comment)){
+            throw new GeneralException(ReviewedException.REVIEW_FIND_FORBIDDEN_WORD);
+        }
+    }
+
+    private void checkReviewOwner(String userId, Long reviewId) {
 
         User reviewedOner = userRepository.findOwnerByReviewedId(reviewId)
                 .orElseThrow(()->new GeneralException(ReviewedException.REVIEW_NOT_FOUND));

@@ -5,7 +5,7 @@ import com.ixi_U.forbiddenWord.WordPreprocessingPolicy;
 import org.ahocorasick.trie.Trie;
 import org.springframework.stereotype.Component;
 
-@Component("ahoCorasickFilter")
+@Component
 public class AhoCorasickFilter implements ForbiddenWordFilter {
 
     private final Trie trie;

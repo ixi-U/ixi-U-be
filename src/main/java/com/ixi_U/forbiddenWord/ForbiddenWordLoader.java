@@ -18,8 +18,6 @@ import org.springframework.stereotype.Component;
 public class ForbiddenWordLoader {
 
     private final List<String> forbiddenWords = new ArrayList<>();
-    @Qualifier("forbiddenVectorStore")
-    private final VectorStore vectorStore;
 
     @PostConstruct
     public void init() throws Exception {

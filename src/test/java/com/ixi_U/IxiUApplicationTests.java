@@ -15,9 +15,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class IxiUApplicationTests extends AbstractNeo4jContainer {
 
-    @MockBean(name = "forbiddenVectorStore")
-    private VectorStore forbiddenVectorStore;
-
     @MockBean(name = "planVectorStore")
     private VectorStore planVectorStore;
 
