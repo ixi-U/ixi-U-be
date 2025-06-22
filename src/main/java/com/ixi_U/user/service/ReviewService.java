@@ -96,12 +96,20 @@ public class ReviewService {
     @Transactional
     public void updateReview(String userId, UpdateReviewRequest updateReviewRequest){
 
-        checkReviewOwner(userId,updateReviewRequest.reviewId());
-
+        checkUpdateReview(userId,updateReviewRequest.reviewId(),updateReviewRequest.comment());
         reviewedRepository.updateReviewed(updateReviewRequest.reviewId(), updateReviewRequest.comment());
     }
 
-    private void checkReviewOwner(String userId, Long reviewId){
+    private void checkUpdateReview(String userId, Long reviewId,String comment){
+
+        checkReviewOwner(userId, reviewId);
+
+        if(reviewFilter.matches(comment)){
+            throw new GeneralException(ReviewedException.REVIEW_FIND_FORBIDDEN_WORD);
+        }
+    }
+
+    private void checkReviewOwner(String userId, Long reviewId) {
 
         User reviewedOner = userRepository.findOwnerByReviewedId(reviewId)
                 .orElseThrow(()->new GeneralException(ReviewedException.REVIEW_NOT_FOUND));
