@@ -13,20 +13,6 @@ import org.springframework.context.annotation.Configuration;
 public class VectorStoreConfig {
 
     @Bean
-    public VectorStore forbiddenVectorStore(Driver driver, EmbeddingModel embeddingModel) {
-
-        log.info("임베딩 모델 차원수 확인 : {}",embeddingModel.dimensions());
-        
-        return Neo4jVectorStore.builder(driver, embeddingModel)
-                .databaseName("neo4j")
-                .indexName("embedded-forbidden-index")
-                .label("EmbeddedForbidden")
-                .distanceType(Neo4jVectorStore.Neo4jDistanceType.COSINE)
-                .initializeSchema(true)
-                .build();
-    }
-
-    @Bean
     public VectorStore planVectorStore(Driver driver, EmbeddingModel embeddingModel) {
 
         return Neo4jVectorStore.builder(driver, embeddingModel)
