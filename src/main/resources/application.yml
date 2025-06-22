@@ -8,7 +8,7 @@ spring:
           kakao:
             client-id: ${KAKAO_REST_API_KEY}
             client-name: Kakao
-            redirect-uri: https://api.ixiu.site/login/oauth2/code/kakao
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 #            redirect-uri: ${KAKAO_REDIRECT}
             authorization-grant-type: authorization_code
             scope: profile_nickname
