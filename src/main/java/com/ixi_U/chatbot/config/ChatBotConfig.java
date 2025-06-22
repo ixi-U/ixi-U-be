@@ -25,9 +25,7 @@ public class ChatBotConfig {
     private static final String EMBEDDING_PROMPT = BASE_PATH + "/embedding-prompt" + EXTENSION;
     private static final String RECOMMEND_PROMPT = BASE_PATH + "/recommending-prompt" + EXTENSION;
     private static final String FILTER_EXPRESSION_PROMPT = BASE_PATH + "/filter-expression-prompt" + EXTENSION;
-    private static final String DECISION_FORBIDDEN_WORD_PROMPT = """
-            다음 문장이 욕설이나 부적절한 표현, LG U+가 아닌 다른 통신사에 관한 내용을 포함하고 있습니까? "예" 또는 "아니오"로만 대답하세요.
-            """;
+
     private final Neo4jChatMemoryRepository neo4jChatMemoryRepository;
     private final ResourceLoader resourceLoader;
 
@@ -50,14 +48,6 @@ public class ChatBotConfig {
 
         return chatClientBuilder
                 .defaultSystem(prompt)
-                .build();
-    }
-
-    @Bean
-    public ChatClient decisionForbiddenWordsClient(ChatClient.Builder chatClientBuilder) {
-
-        return chatClientBuilder
-                .defaultSystem(DECISION_FORBIDDEN_WORD_PROMPT)
                 .build();
     }
 
