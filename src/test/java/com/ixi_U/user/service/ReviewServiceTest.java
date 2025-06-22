@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.forbiddenWord.ReviewFilter;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.repository.PlanRepository;
@@ -59,6 +60,9 @@ class ReviewServiceTest {
     @Mock
     SubscribedRepository subscribedRepository;
 
+    @Mock
+    ReviewFilter reviewFilter;
+
     @Nested
     @DisplayName("createReview 메서드는")
     class Describe_createReview {
@@ -81,6 +85,7 @@ class ReviewServiceTest {
                                 UserRole.ROLE_USER)));
                 given(subscribedRepository.existsSubscribeRelation(any(), any())).willReturn(true);
                 given(reviewedRepository.existsReviewedRelation(any(), any())).willReturn(false);
+                given(reviewFilter.matches(anyString())).willReturn(false);
                 ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
                 // when
