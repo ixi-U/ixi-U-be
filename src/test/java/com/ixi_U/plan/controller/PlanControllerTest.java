@@ -8,8 +8,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,16 +23,22 @@ import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
 import com.ixi_U.plan.dto.PlanListDto;
 import com.ixi_U.plan.dto.PlanNameDto;
+import com.ixi_U.plan.dto.PlansCountDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.*;
+import com.ixi_U.plan.dto.response.BundledBenefitResponse;
+import com.ixi_U.plan.dto.response.PlanAdminResponse;
+import com.ixi_U.plan.dto.response.PlanDetailResponse;
+import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
+import com.ixi_U.plan.dto.response.PlansCountResponse;
+import com.ixi_U.plan.dto.response.SingleBenefitResponse;
+import com.ixi_U.plan.dto.response.SortedPlanResponse;
 import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
 import com.ixi_U.util.constants.TestConstants;
 import jakarta.servlet.Filter;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +78,7 @@ class PlanControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -354,10 +365,12 @@ class PlanControllerTest {
     @Nested
     @DisplayName("어드민 요금제 전체 조회 시")
     class GetPlansForAdmin {
+
         @Test
         @DisplayName("전체 요금제를 조회하고 200을 반환한다")
         void shouldReturnPlans() throws Exception {
-            when(planService.getPlansForAdmin()).thenReturn(List.of(new PlanAdminResponse("id", "요금제A", PlanState.ABLE, "")));
+            when(planService.getPlansForAdmin()).thenReturn(
+                    List.of(new PlanAdminResponse("id", "요금제A", PlanState.ABLE, "")));
 
             mockMvc.perform(get("/admin/plans"))
                     .andExpect(status().isOk())
@@ -368,6 +381,7 @@ class PlanControllerTest {
     @Nested
     @DisplayName("어드민 요금제 상태 토글 시")
     class TogglePlanState {
+
         @Test
         @DisplayName("요금제 상태를 토글하고 200을 반환한다")
         void shouldToggleState() throws Exception {
@@ -381,6 +395,7 @@ class PlanControllerTest {
     @Nested
     @DisplayName("어드민 요금제 비활성화 시")
     class DisablePlan {
+
         @Test
         @DisplayName("요금제를 비활성화하고 200을 반환한다")
         void shouldDisablePlan() throws Exception {
@@ -394,10 +409,12 @@ class PlanControllerTest {
     @Nested
     @DisplayName("요금제 요약 조회 시")
     class GetPlanNames {
+
         @Test
         @DisplayName("요금제 요약 목록을 조회하고 200을 반환한다")
         void shouldReturnPlanNames() throws Exception {
-            when(planService.getPlanNameList()).thenReturn(Collections.singletonList(new PlanNameDto("id", "요금제A")));
+            when(planService.getPlanNameList()).thenReturn(
+                    Collections.singletonList(new PlanNameDto("id", "요금제A")));
 
             mockMvc.perform(get("/plans/summaries"))
                     .andExpect(status().isOk())
@@ -409,6 +426,7 @@ class PlanControllerTest {
     @Nested
     @DisplayName("요금제 임베드 수행 시")
     class EmbedPlan {
+
         @Test
         @DisplayName("전체 요금제를 임베드하고 200을 반환한다")
         void shouldEmbedAllPlan() throws Exception {
@@ -416,6 +434,40 @@ class PlanControllerTest {
 
             mockMvc.perform(get("/plans/embed"))
                     .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("요금제 개수 조회 시")
+    class CountPlans {
+
+        @Test
+        @DisplayName("성공한다")
+        void success() throws Exception {
+            // 1) given
+            PlansCountResponse stub =
+                    PlansCountResponse.from(new PlansCountDto(500, 100, 100, 100, 100));
+
+            given(planService.countPlans()).willReturn(stub);
+
+            // 2) when & then
+            mockMvc.perform(get("/plans/count"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.all").value(500))
+                    .andExpect(jsonPath("$.fiveGLte").value(100))
+                    .andExpect(jsonPath("$.online").value(100))
+                    .andExpect(jsonPath("$.tabletSmartwatch").value(100))
+                    .andExpect(jsonPath("$.dualNumber").value(100))
+                    .andDo(document("get-plans-count-success",
+                            responseFields(
+                                    fieldWithPath("all").description("전체 요금제 개수"),
+                                    fieldWithPath("fiveGLte").description("5G/LTE 요금제 개수"),
+                                    fieldWithPath("online").description("온라인 전용 요금제 개수"),
+                                    fieldWithPath("tabletSmartwatch").description(
+                                            "태블릿·스마트워치 요금제 개수"),
+                                    fieldWithPath("dualNumber").description("듀얼넘버 요금제 개수")
+                            )
+                    ));
         }
     }
 }
