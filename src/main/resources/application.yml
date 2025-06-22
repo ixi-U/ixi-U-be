@@ -33,6 +33,8 @@ spring:
       connection-acquisition-timeout: ${GRAPH_DB_CONNECTION_ACQUISITION_TIMEOUT}
 
   ai:
+    retry:
+      on-client-errors: false
     openai:
       api-key: ${OPEN_AI_API_KEY}
       embedding:
@@ -41,6 +43,8 @@ spring:
       chat:
         options:
           model: ${OPEN_AI_CHAT_MODEL}
+          max-completion-tokens: 800
+          temperature: 0.8
 
   cache:
     type: redis
