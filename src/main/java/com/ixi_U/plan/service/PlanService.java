@@ -154,7 +154,7 @@ public class PlanService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "planListPages",
-            key = "'planListPages:' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #request.planTypeStr() + '-' + #request.planSortOptionStr() + '-' + #request.searchKeyword() + '-' + (#request.planId() != null ? #request.planId() : '') + '-' + #request.cursorSortValue()"
+            key = "'planListPages:' + #pageable.pageNumber + '-' + #request.planTypeStr() + '-' + #request.planSortOptionStr() + '-' + #request.searchKeyword() + '-' + (#request.planId() != null ? #request.planId() : '') + '-' + #request.cursorSortValue()"
     )
     public SortedPlanResponse findPlans(Pageable pageable, GetPlansRequest request) {
 
