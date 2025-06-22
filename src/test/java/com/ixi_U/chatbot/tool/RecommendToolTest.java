@@ -1,6 +1,9 @@
 package com.ixi_U.chatbot.tool;
 
+import com.ixi_U.chatbot.tool.dto.MostReviewedPlanToolDto;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.plan.repository.PlanRepository;
+import com.ixi_U.util.constants.TestConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,7 +24,9 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +37,9 @@ class RecommendToolTest {
 
     @Mock
     private Neo4jChatMemoryRepository neo4jChatMemoryRepository;
+
+    @Mock
+    private PlanRepository planRepository;
 
     @InjectMocks
     private RecommendTool recommendTool;
@@ -92,9 +100,79 @@ class RecommendToolTest {
                 ));
 
                 //when & then
-                assertThatThrownBy(()->recommendTool.recommendPlan(userQuery,toolContext))
+                assertThatThrownBy(() -> recommendTool.recommendPlan(userQuery, toolContext))
                         .isInstanceOf(GeneralException.class)
                         .hasMessage("요금제 추천 도구에서 에러가 발생했습니다.");
+            }
+        }
+    }
+
+    @Nested
+    class WhenRequestedMostReviewedPlan {
+
+        @Nested
+        class WhenSuccess {
+
+            @Test
+            @DisplayName("가장 많은 리뷰를 받은 요금제 한 개를 반환한다")
+            public void success() throws Exception {
+
+                //given
+                int skip = 0;
+                MostReviewedPlanToolDto expectedDto = TestConstants.createMostReviewedPlanDto();
+                given(planRepository.findMostReviewedPlan(skip)).willReturn(expectedDto);
+
+                //when
+
+                MostReviewedPlanToolDto result = planRepository.findMostReviewedPlan(skip);
+
+                //then
+                assertThat(result).isNotNull();
+                assertThat(result.id()).isEqualTo("plan-001");
+                assertThat(result.name()).isEqualTo("프리미엄 5G 요금제");
+                assertThat(result.reviewedCount()).isEqualTo(250);
+                assertThat(result.monthlyPrice()).isEqualTo(65000);
+                assertThat(result.singleBenefits()).hasSize(3);
+                assertThat(result.bundledBenefits()).hasSize(2);
+            }
+
+            @Test
+            @DisplayName("N번째로 많은 리뷰를 받은 요금제를 반환한다")
+            public void successWithSkip() throws Exception {
+
+                //given
+                int skip = 2;
+                MostReviewedPlanToolDto expectedDto = TestConstants.createSecondMostReviewedPlanDto();
+                given(planRepository.findMostReviewedPlan(skip)).willReturn(expectedDto);
+
+                //when
+                MostReviewedPlanToolDto result = planRepository.findMostReviewedPlan(skip);
+
+                //then
+                assertThat(result).isNotNull();
+                assertThat(result.id()).isEqualTo("plan-003");
+                assertThat(result.name()).isEqualTo("스탠다드 요금제");
+                assertThat(result.reviewedCount()).isEqualTo(150);
+                assertThat(result.monthlyPrice()).isEqualTo(45000);
+            }
+        }
+
+        @Nested
+        class WhenFailure {
+
+            @Test
+            @DisplayName("조회되지 않을 경우 null을 반환한다")
+            public void returnNullWhenException() throws Exception {
+
+                //given
+                int skip = -1;
+                given(planRepository.findMostReviewedPlan(skip)).willReturn(null);
+
+                //when
+                MostReviewedPlanToolDto result = planRepository.findMostReviewedPlan(skip);
+
+                //then
+                assertThat(result).isNull();
             }
         }
     }
