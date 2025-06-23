@@ -43,8 +43,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info("userId = {}", userId);
         log.info("userRole = {}", userRole);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId, userRole);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+//        String accessToken = jwtTokenProvider.generateAccessToken(userId, userRole);
+//        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+
+        String accessToken = jwtTokenProvider.generateToken(userId, userRole);
+        String refreshToken = jwtTokenProvider.generateToken(userId, userRole);
 
         log.info("AccessToken = {}", accessToken);
         log.info("RefreshToken = {}", refreshToken);

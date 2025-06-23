@@ -30,7 +30,7 @@ public class JwtTokenProvider {
     }
 
     // JWT token 생성
-    public String generateAccessToken(String userId, UserRole userRole) {
+    public String generateToken(String userId, UserRole userRole) {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("role", userRole.getUserRole())
