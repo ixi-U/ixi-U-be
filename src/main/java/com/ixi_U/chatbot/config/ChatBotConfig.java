@@ -90,7 +90,7 @@ public class ChatBotConfig {
 
         return MessageWindowChatMemory.builder()
                 .chatMemoryRepository(neo4jChatMemoryRepository)
-                .maxMessages(20)
+                .maxMessages(10)
                 .build();
     }
 }

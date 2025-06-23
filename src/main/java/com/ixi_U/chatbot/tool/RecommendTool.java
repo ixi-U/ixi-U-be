@@ -35,15 +35,14 @@ public class RecommendTool {
     private final PlanRepository planRepository;
 
     @Tool(description = """
-            사용자가 특정 조건(가격, 데이터량, 혜택 등)에 맞는 요금제를 찾거나 추천받고 싶을 때 사용한다.
-            또한 특정 그룹, 컨셉, 브랜드와 관련된 요금제 추천 요청에도 사용된다.
-            예시:
-            - 조건부 검색: '3만원대 요금제 추천해줘', '무제한 데이터 요금제 찾아줘', '넷플릭스 혜택 있는 요금제는?'
-            - 사용자 그룹: '학생용 저렴한 요금제 추천', '시니어 요금제', '군인 요금제'
-            - 컨셉/브랜드: '아이돌 요금제', 'BTS 요금제', '게이머 요금제', '유튜버 요금제'
-            - 라이프스타일: '미니멀리스트 요금제', '프리미엄 요금제', '가성비 요금제'
-            - 기타: '특별 프로모션 요금제', '신규 출시 요금제', '인기 있는 요금제'
-            등 요금제와 관련된 모든 추천/검색 요청에서 동작한다.
+            요금제 추천/검색 도구. 다음 조건에 사용:
+            - 가격 조건: '3만원대', '저렴한'
+            - 데이터 조건: '무제한', '10GB'
+            - 혜택 조건: '넷플릭스', '할인', '군인'
+            - 사용자 그룹: '학생', '시니어', '직장인'
+            - 컨셉: '게이머', '아이돌', '프리미엄'
+            ⚠️ 중요: 이 Tool은 한 번의 요청에 대해 단 1번만 호출해야 함.
+            같은 요청을 여러 번 하거나 중복 호출하지 말 것.
             """)
     List<Document> recommendPlan(
             @ToolParam(description = "사용자의 특정 조건이 포함된 요금제 추천/검색 쿼리") String userQuery,
@@ -91,7 +90,11 @@ public class RecommendTool {
 
             log.info("{} = {}", ToolContextKey.USER_ID, userId);
 
-            return neo4jChatMemoryRepository.findByConversationId(userId);
+            List<Message> userChatHistory = neo4jChatMemoryRepository.findByConversationId(userId);
+
+            log.info("대화 내역 : {}", userChatHistory.size());
+
+            return userChatHistory;
         } catch (Exception e) {
 
             log.error(e.getMessage());
@@ -100,10 +103,7 @@ public class RecommendTool {
         }
     }
 
-    @Tool(description = """
-            가장 많은 리뷰 점수를 받은 요금제 추천
-            가장 높은 별점을 받은 요금제 추천
-            """)
+    @Tool(description = "리뷰 점수 기준으로 요금제 추천할 때 사용")
     MostReviewPointPlanToolDto findMostReviewPoint(
             @ToolParam(description = "N 번째로 높은 리뷰 점수를 받은 요금제를 추천할 때 N을 숫자로 반환한다.") int skip) {
 
@@ -123,11 +123,9 @@ public class RecommendTool {
         }
     }
 
-    @Tool(description = """
-            가장 많은 데이터를 가진 요금제를 조회할 때 사용
-            """)
+    @Tool(description = "요금제 데이터 기준 요금제를 조회할 때 사용")
     MostDataAmountPlanToolDto findMostDataAmountPlan(
-            @ToolParam(description = "N 번째로 많은 데이터를 가진 요금제를 추천할 때 N을 숫자로 반환한다.") int skip){
+            @ToolParam(description = "N 번째로 많은 데이터를 가진 요금제를 추천할 때 N을 숫자로 반환한다.") int skip) {
 
         log.info("---가장 많은 데이터를 가진 요금제 추천 툴 동작");
         log.info("N 번째 = {}", skip);
@@ -188,8 +186,8 @@ public class RecommendTool {
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
-                        .similarityThreshold(0.5)
-                        .topK(20)
+                        .similarityThreshold(0.6)
+                        .topK(15)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());
@@ -210,9 +208,9 @@ public class RecommendTool {
         List<Document> documents = planVectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(userQuery)
-                        .similarityThreshold(0.5)
+                        .similarityThreshold(0.6)
                         .filterExpression(filterExpression)
-                        .topK(20)
+                        .topK(15)
                         .build());
 
         log.info("조회된 건 수 = {}", documents.size());
