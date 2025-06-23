@@ -52,7 +52,7 @@ public class ChatBotService {
         return Flux.fromStream(CHATBOT_WELCOME_MESSAGE.chars()
                         .mapToObj(c -> String.valueOf((char) c))
                 )
-                .delayElements(Duration.ofMillis(50));
+                .delayElements(Duration.ofMillis(30));
     }
 
     public Flux<List<String>> recommendPlan(String userId, RecommendPlanRequest request) {
@@ -74,7 +74,6 @@ public class ChatBotService {
                     return filterExpression;
                 })
                 .flatMapMany(filterExpression ->
-
                         recommendClient.prompt()
                                 .user(request.userQuery())
                                 .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
@@ -84,7 +83,7 @@ public class ChatBotService {
                                 )
                                 .stream()
                                 .content()
-                                .bufferTimeout(5, Duration.ofMillis(50))
+                                .bufferTimeout(5, Duration.ofMillis(30))
                 )
                 .onErrorResume(GeneralException.class, e -> {
 
