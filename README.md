@@ -72,7 +72,7 @@
 > Aho–Corasick, 단순 Contains, RAG 기반(벡터화 및 토크나이징), LLM 방식 각각의 오류율과 응답 속도를 측정하여 가장 적합한 금칙어 검출 방법을 선정하기로 결정
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/61b70296-d2f0-4296-be06-0ce705886a44" width="600" />
+  <img src="https://github.com/user-attachments/assets/63c78170-f703-45da-bbee-70324990d4d3" width="600" />
 </div><br>
 
 #### 성과 및 결론 
@@ -88,7 +88,7 @@
 > 아호코라식과 contains를 비교하여 상황 별 응답 속도 차이를 관측
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/bed0bfa4-483b-4f1b-ae22-9a77b3e7c526" width="600" />
+  <img src="https://github.com/user-attachments/assets/d689877c-bf23-4847-a436-17746b6afcd5" width="600" />
 </div><br>
 
 #### 성과 및 결론 
