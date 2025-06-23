@@ -114,17 +114,59 @@
 
 ### [2️⃣ 금칙어 성능 고도화](https://github.com/ixi-U/ixi-U-be/wiki/%F0%9F%9A%A8-%EA%B8%88%EC%B9%99%EC%96%B4-%ED%95%84%ED%84%B0%EB%A7%81-%EA%B0%9C%EB%B0%9C)
 
+#### 문제 
+
+> 기존에는 ```String.contains``` 를 고려하였으나 변형된 금칙어를 탐지할 수 없다는 우려 발생 
+
+#### 접근 
+
+>금칙어를 구현할 수 있는 Aho-Corasick, Contains, RAG 기반(벡터화,띄어쓰기), LLM 각각에 대한 오류율과 응답 속도를 측정하여 최적의 방법을 선택하기로 함.
+
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/1d3a0acc-b598-4ef3-ad41-2147812cca41" width="600" />
+  <img src="https://github.com/user-attachments/assets/61b70296-d2f0-4296-be06-0ce705886a44" width="600" />
 </div><br>
 
-#### 결론
+#### 성과 및 결론 
+
+>변형된 금칙어를 RAG 기반 방식과 LLM 기반 방식을 통해 검출해 낼 수 있으나,정상적인 데이터를 금칙어로 판단할 가능성이 높아지며, 응답 속도 역시 증가한다 판단.
+
+---
+
+
+#### 문제
+
+> 기존에는 ```String.contains``` 를 고려하였으나 시간복잡도가 O(N*M) 이므로 응답 속도에 대한 우려 발생 
+
+
+#### 접근
+
+>아호코라식과 contains를 비교하여 상황 별 응답 속도 차이를 관측한다. 
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/bed0bfa4-483b-4f1b-ae22-9a77b3e7c526" width="600" />
+</div><br>
+
+#### 성과 및 결론 
+
+> 앞으로 데이터 및 프로젝트의 확장성을 고려하여 아호코라식 방식을 채택 
+
+#### 최종 결론
 
 > **금칙어 필터링에 아호코라식 알고리즘 적용**
 
 ### [3️⃣ Redis 캐싱](https://github.com/ixi-U/ixi-U-be/wiki/%F0%9F%92%A8-Redis-%EC%BA%90%EC%8B%B1)
 
-#### 테스트 환경
+
+#### 문제 
+> 자주 조회되는 요금제 페이지에 대한 부하상황 증가 가능성. 이에 따른 응답 속도 하락 문제 발생 가능
+
+
+
+#### 접근 
+> JMeter를 통하여 부하테스트 실시 및 응답 속도 개선 파악 
+
+
+##### 테스트 환경
 
 - Concurrent Users: 1,000
 
@@ -132,7 +174,7 @@
 
 - Dataset Size: 약 5,000개 요금제
 
-#### 부하 설정 근거
+##### 부하 설정 근거
 
 - LG U+ 사이트 일일 방문자: 약 25,200명
 
@@ -142,13 +184,13 @@
 
 - 안정성 검증을 위해 1분 1,000명 환경으로 설정
 
-#### 테스트 시나리오
+##### 테스트 시나리오
 
 - Baseline (Pre-Cache): 캐시·인덱스 미적용
 
 - Optimized (With Cache): 캐시 + 인덱스 적용
 
-#### 결론
+#### 성과 및 결론 
 
 > 캐시 및 인덱스 적용으로 목록 조회 평균 응답이 **31 ms &rarr; 6 ms(80%↓)**, P95 **38 ms &rarr; 12 ms(68%↓)**, 개수 조회 평균
 **13 ms &rarr; 4 ms(69%↓)**, P95 **18 ms &rarr; 6 ms(66%↓)** 로 대폭 개선
