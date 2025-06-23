@@ -6,6 +6,7 @@ import com.ixi_U.chatbot.dto.RecommendPlanRequest;
 import com.ixi_U.chatbot.exception.ChatBotException;
 import com.ixi_U.chatbot.tool.ToolContextKey;
 import com.ixi_U.common.exception.GeneralException;
+import com.ixi_U.user.entity.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,9 @@ public class ChatBotService {
     @Qualifier("filterExpressionClient")
     private final ChatClient filterExpressionClient;
 
+    @Qualifier("recommendClientWithoutChatMemory")
+    private final ChatClient recommendClientWithoutChatMemory;
+
     private final ObjectMapper objectMapper;
 
     public Flux<String> getWelcomeMessage() {
@@ -73,18 +77,32 @@ public class ChatBotService {
 
                     return filterExpression;
                 })
-                .flatMapMany(filterExpression ->
-                        recommendClient.prompt()
+                .flatMapMany(filterExpression -> {
+
+                    if (isAnonymousUser(userId)){
+
+                        return recommendClientWithoutChatMemory.prompt()
                                 .user(request.userQuery())
-                                .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
                                 .toolContext(Map.of(
                                         ToolContextKey.USER_ID.getKey(), userId,
                                         ToolContextKey.FILTER_EXPRESSION.getKey(), filterExpression)
                                 )
                                 .stream()
                                 .content()
-                                .bufferTimeout(5, Duration.ofMillis(30))
-                )
+                                .bufferTimeout(5, Duration.ofMillis(30));
+                    }
+
+                    return recommendClient.prompt()
+                            .user(request.userQuery())
+                            .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, userId))
+                            .toolContext(Map.of(
+                                    ToolContextKey.USER_ID.getKey(), userId,
+                                    ToolContextKey.FILTER_EXPRESSION.getKey(), filterExpression)
+                            )
+                            .stream()
+                            .content()
+                            .bufferTimeout(5, Duration.ofMillis(30));
+                })
                 .onErrorResume(GeneralException.class, e -> {
 
                     log.error("추천 로직 에러 발생", e);
@@ -120,6 +138,11 @@ public class ChatBotService {
 
             throw new GeneralException(ChatBotException.CHAT_BOT_EMBEDDING_DESCRIPTION_ERROR);
         }
+    }
+
+    private boolean isAnonymousUser(String userId) {
+
+        return userId.equals(UserRole.ROLE_ANONYMOUS.getUserRole());
     }
 
     private Flux<List<String>> generateErrorResponse(String error) {

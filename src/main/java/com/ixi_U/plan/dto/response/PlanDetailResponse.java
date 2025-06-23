@@ -2,6 +2,7 @@ package com.ixi_U.plan.dto.response;
 
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanState;
+
 import java.util.List;
 
 public record PlanDetailResponse(String name, PlanState planState, Integer mobileDataLimitMb,

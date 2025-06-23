@@ -1,6 +1,5 @@
 package com.ixi_U.jwt;
 
-import com.ixi_U.user.entity.User;
 import com.ixi_U.user.entity.UserRole;
 import com.ixi_U.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -8,8 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +14,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.List;
 
 // jwt access token 에 대한 인가 확인 필터
 @Slf4j
@@ -53,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 엑세스에서 정보 추출
                 String userId = jwtTokenProvider.getUserIdFromToken(accessToken).toString();
                 String role = jwtTokenProvider.getRoleFromToken(accessToken);
-
 
                 if (role == null) {
                     log.error("❌ JWT에서 role을 추출하지 못했습니다. token: {}", accessToken);
@@ -116,9 +114,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             log.warn("❌ access + refresh token 모두 유효하지 않음 -> 로그인하지 않은 사용자");
-       //     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
             filterChain.doFilter(request, response); // 로그인하지 않은 사용자
-            return;
         } catch (Exception e) {
             log.error("❌ JwtAuthenticationFilter 예외 발생", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -69,6 +69,20 @@ public class ChatBotConfig {
     }
 
     /**
+     * Recommend Build Without ChatMemory
+     */
+    @Bean
+    public ChatClient recommendClientWithoutChatMemory(ChatClient.Builder chatClientBuilder, RecommendTool recommendTool) {
+
+        String prompt = loadPrompt(RECOMMEND_PROMPT);
+
+        return chatClientBuilder
+                .defaultSystem(prompt)
+                .defaultTools(recommendTool)
+                .build();
+    }
+
+    /**
      * Filter Expression Build
      */
     @Bean
