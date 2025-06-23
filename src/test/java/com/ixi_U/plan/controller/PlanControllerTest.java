@@ -317,7 +317,7 @@ class PlanControllerTest {
                     .mapToObj(i -> bundledBenefit)
                     .toList();
 
-            PlanDetailResponse response = new PlanDetailResponse(name, 100, 100,
+            PlanDetailResponse response = new PlanDetailResponse(name, PlanState.ABLE, 100, 100,
                     100, 100, 30000,
                     PlanType.ONLINE.getPlanType(), "이용 시 유의사항", 100,
                     20, 40, 10.0,

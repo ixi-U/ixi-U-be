@@ -271,7 +271,14 @@ public class PlanService {
     public void disablePlan(String planId) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
-        Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
+
+        Plan updatePlan;
+
+        if (plan.getPlanState() == PlanState.ABLE) {
+            updatePlan = plan.withPlanState(PlanState.DISABLE);
+        } else {
+            updatePlan = plan.withPlanState(PlanState.ABLE);
+        }
         planRepository.save(updatePlan);
     }
 
