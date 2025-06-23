@@ -1,11 +1,13 @@
 package com.ixi_U.common.config;
 
 import com.ixi_U.auth.handler.OAuth2SuccessHandler;
+import com.ixi_U.auth.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.ixi_U.auth.service.CustomOAuth2UserService;
 import com.ixi_U.jwt.JwtAuthenticationFilter;
 import com.ixi_U.jwt.JwtTokenProvider;
 import com.ixi_U.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,11 +16,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -27,6 +32,11 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final UserRepository userRepository;
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
 
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
@@ -41,6 +51,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        log.info("--- security filter chain ---");
 
         // Security Option 설정
         http
@@ -61,7 +73,15 @@ public class SecurityConfig {
 
         // OAuth2 필터
         http
+//                .oauth2Login(oauth2 -> oauth2
+//                        .userInfoEndpoint(userInfo -> userInfo
+//                                .userService(customOAuth2UserService))
+//                        .successHandler(oAuth2SuccessHandler())
+//                );
                 .oauth2Login(oauth2 -> oauth2
+                                .authorizationEndpoint(authorization -> authorization
+                                        .authorizationRequestRepository(authorizationRequestRepository())
+                                )
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())

@@ -14,19 +14,13 @@ import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlanSummaryDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.PlanAdminResponse;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.PlansCountResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.entity.Plan;
 import com.ixi_U.plan.entity.PlanSortOption;
 import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.repository.PlanRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,6 +29,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -271,7 +268,14 @@ public class PlanService {
     public void disablePlan(String planId) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new GeneralException(PlanException.PLAN_NOT_FOUND));
-        Plan updatePlan = plan.withPlanState(PlanState.DISABLE);
+
+        Plan updatePlan;
+
+        if (plan.getPlanState() == PlanState.ABLE) {
+            updatePlan = plan.withPlanState(PlanState.DISABLE);
+        } else {
+            updatePlan = plan.withPlanState(PlanState.ABLE);
+        }
         planRepository.save(updatePlan);
     }
 

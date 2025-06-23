@@ -33,7 +33,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("AccessToken 생성 시 사용자 ID와 권한이 포함되어야 한다")
     void generateAccessToken_shouldContainUserIdAndRole() {
-        String token = jwtTokenProvider.generateAccessToken("user123", UserRole.ROLE_USER);
+        String token = jwtTokenProvider.generateToken("user123", UserRole.ROLE_USER);
 
         assertNotNull(token);
         assertEquals("user123", jwtTokenProvider.getUserIdFromToken(token));
@@ -43,7 +43,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("RefreshToken 생성 시 사용자 ID가 포함되어야 한다")
     void generateRefreshToken_shouldContainUserId() {
-        String token = jwtTokenProvider.generateRefreshToken("user123");
+        String token = jwtTokenProvider.generateToken("user123", UserRole.ROLE_USER);
 
         assertNotNull(token);
         assertEquals("user123", jwtTokenProvider.getUserIdFromToken(token));
@@ -52,7 +52,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("유효한 JWT 토큰은 true를 반환해야 한다")
     void validateToken_shouldReturnTrueForValidToken() {
-        String token = jwtTokenProvider.generateAccessToken("user123", UserRole.ROLE_USER);
+        String token = jwtTokenProvider.generateToken("user123", UserRole.ROLE_USER);
 
         assertTrue(jwtTokenProvider.validateToken(token));
     }

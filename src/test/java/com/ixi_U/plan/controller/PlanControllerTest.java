@@ -1,23 +1,5 @@
 package com.ixi_U.plan.controller;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ixi_U.benefit.entity.BenefitType;
 import com.ixi_U.common.exception.GeneralException;
@@ -26,24 +8,13 @@ import com.ixi_U.plan.dto.PlanNameDto;
 import com.ixi_U.plan.dto.PlansCountDto;
 import com.ixi_U.plan.dto.request.GetPlansRequest;
 import com.ixi_U.plan.dto.request.SavePlanRequest;
-import com.ixi_U.plan.dto.response.BundledBenefitResponse;
-import com.ixi_U.plan.dto.response.PlanAdminResponse;
-import com.ixi_U.plan.dto.response.PlanDetailResponse;
-import com.ixi_U.plan.dto.response.PlanEmbeddedResponse;
-import com.ixi_U.plan.dto.response.PlansCountResponse;
-import com.ixi_U.plan.dto.response.SingleBenefitResponse;
-import com.ixi_U.plan.dto.response.SortedPlanResponse;
+import com.ixi_U.plan.dto.response.*;
 import com.ixi_U.plan.entity.PlanState;
 import com.ixi_U.plan.entity.PlanType;
 import com.ixi_U.plan.exception.PlanException;
 import com.ixi_U.plan.service.PlanService;
 import com.ixi_U.util.constants.TestConstants;
 import jakarta.servlet.Filter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -64,6 +35,28 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @WebMvcTest(PlanController.class)
@@ -317,7 +310,7 @@ class PlanControllerTest {
                     .mapToObj(i -> bundledBenefit)
                     .toList();
 
-            PlanDetailResponse response = new PlanDetailResponse(name, 100, 100,
+            PlanDetailResponse response = new PlanDetailResponse(name, PlanState.ABLE, 100, 100,
                     100, 100, 30000,
                     PlanType.ONLINE.getPlanType(), "이용 시 유의사항", 100,
                     20, 40, 10.0,

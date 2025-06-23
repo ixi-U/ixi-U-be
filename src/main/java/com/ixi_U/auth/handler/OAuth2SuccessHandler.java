@@ -7,13 +7,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.io.IOException;
 
 /**
  *  로그인 성공 후 사용자 정보를 가져와서 토큰 생성 + 리다이랙트 경로 설정
@@ -43,8 +43,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info("userId = {}", userId);
         log.info("userRole = {}", userRole);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId, userRole);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+//        String accessToken = jwtTokenProvider.generateAccessToken(userId, userRole);
+//        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+
+        String accessToken = jwtTokenProvider.generateToken(userId, userRole);
+        String refreshToken = jwtTokenProvider.generateToken(userId, userRole);
 
         log.info("AccessToken = {}", accessToken);
         log.info("RefreshToken = {}", refreshToken);
