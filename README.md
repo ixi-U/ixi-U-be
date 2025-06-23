@@ -72,7 +72,11 @@
 > Aho–Corasick, 단순 Contains, RAG 기반(벡터화 및 토크나이징), LLM 방식 각각의 오류율과 응답 속도를 측정하여 가장 적합한 금칙어 검출 방법을 선정하기로 결정
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/61b70296-d2f0-4296-be06-0ce705886a44" width="600" />
+  <img src="https://github.com/user-attachments/assets/11db074b-2a86-4535-a47b-aaad6c88ad9e" width="600" />
+</div><br>
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/0ed8203c-415c-4c6b-b231-937fee876250" width="600" />
 </div><br>
 
 #### 성과 및 결론 
