@@ -51,11 +51,11 @@
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/3f313c35-eb5a-4454-b7ee-de764e6a7c06" width="800" />
-</div>
+</div><br>
 
 #### Spring AI를 활용한 RAG 시스템 구축을 통한 사용자 맞춤형 추천 구현
 
-<div align="center">
+<br><div align="center">
   <img src="https://github.com/user-attachments/assets/93bfce87-9df7-4839-9429-478a191938fd" width="500" />
 </div>
 
