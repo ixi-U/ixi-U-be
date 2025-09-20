@@ -9,7 +9,6 @@ import com.ixi_U.user.entity.User;
 import com.ixi_U.user.exception.ReviewedException;
 import com.ixi_U.user.exception.UserException;
 import com.ixi_U.user.repository.ReportedRepository;
-import com.ixi_U.user.repository.ReviewedRepository;
 import com.ixi_U.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
     private final ReportedRepository reportedRepository;
-    private final ReviewedRepository reviewedRepository;
     private final UserRepository userRepository;
 
     @Transactional
