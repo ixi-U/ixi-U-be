@@ -110,7 +110,7 @@ class ReportServiceTest {
             assertThatThrownBy(() -> reportService.createReport(userId, reviewId))
                     .isInstanceOf(GeneralException.class)
                     .extracting("exception")
-                    .isEqualTo(ReviewedException.REVIEW_REPORT_ONLY_OTHER);
+                    .isEqualTo(ReviewedException.CAN_NOT_REPORT_OWNED_REVIEW);
         }
     }
 }
